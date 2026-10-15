@@ -356,7 +356,7 @@ const DEF={
   d_pol:100, dp_pint:5, dp_vac:15, dp_trans:4, d_ele:100, de_trans:6, de_calor:10,
   pr_dba:34.80, pr_dbapas:61.92, pr_pas:82.00, pr_pasbac:79.20, pr_pol:26.80, pr_ele:103.00,
   dp_calor:10, de_pint:6, de_vac:15,
-  mn:{pp:true,pv:true,pt:true,pq:false,ep:false,ev:false,et:true,eq:true,po:false,eo:false},
+  mn:{pp:false,pv:false,pt:false,pq:false,ep:false,ev:false,et:false,eq:false,po:false,eo:false},
   on:{feed:false,pol:false,ele:false}
 };
 const PRE=[10000,50000,100000,250000,500000,1000000];
@@ -386,7 +386,7 @@ const FIELDS={
     ["de_vac","Eletroaminovit: dias nas vacinações da recria","total no lote","dias",1],
     ["de_calor","Eletroaminovit: dias de calor na postura","por ano","dias",1]]
 };
-const KEY="potencial-poedeiras-v1-cliente-v5-d";
+const KEY="potencial-poedeiras-v1-cliente-v5-d-m";
 let S=JSON.parse(JSON.stringify(DEF));S.ox={};
 try{const sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv)S=Object.assign(JSON.parse(JSON.stringify(DEF)),sv,{on:Object.assign({},DEF.on,sv.on||{}),mn:Object.assign({},DEF.mn,sv.mn||{}),ox:Object.assign({},sv.ox||{})});}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
@@ -541,7 +541,7 @@ function calc(){
   document.getElementById("cards").innerHTML=r.prod.map(p=>{const on=s.on[p.id];return `<article class="card${on?"":" off"}">
     <h3>${p.head||p.nome}<label class="chk2"><input type="checkbox" id="on_${p.id}" ${on?"checked":""}> incluir</label></h3>
     ${CIN(p.id,false)}
-    ${p.man?`<div class="mans">${MAN[p.man].map(m=>`<div class="mrow"><label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]}</label><span class="dd"><input type="text" inputmode="numeric" id="cx_${m[2]}" value="${S[m[2]]}"${on?"":" disabled"}><small>dias</small></span>${STD[m[2]]?`<small class="std">Padrão IMEVE: ${STD[m[2]]}</small>`:""}</div>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
+    ${p.man&&!(MAN[p.man].some(m=>S.mn[m[0]])||S.mn[OX[p.man]])?`<p class="fx-hint">Marque abaixo em quais manejos o produto vai entrar.</p>`:""}${p.man?`<div class="mans">${MAN[p.man].map(m=>`<div class="mrow"><label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]}</label><span class="dd"><input type="text" inputmode="numeric" id="cx_${m[2]}" value="${S[m[2]]}"${on?"":" disabled"}><small>dias</small></span>${STD[m[2]]?`<small class="std">Padrão IMEVE: ${STD[m[2]]}</small>`:""}</div>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
     <div class="money"><span>Investimento</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
     ${FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true)?`<p class="fx-hint">Marque abaixo em quais rações o produto vai entrar.</p>`:""}<details class="more" data-id="${p.id}"${(S.op&&S.op[p.id])||(FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true))?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>

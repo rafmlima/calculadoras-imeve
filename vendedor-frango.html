@@ -366,7 +366,7 @@ const DEF={
   pr_pas:82.00, pr_pasbac:79.20, pr_dba:34.80, pr_dbapas:61.92, pr_pol:26.80, pr_ele:103.00,
   e_ca:0.03, e_mort:0.5, e_peso:1.0,
   a_vac:0.12, a_s45:0.30, a_calor:0.35, dp_vac:4, dp_calor:5, de_s45:14, de_calor:6,
-de_aloj:6, de_troca:6,   mn:{pa:true,pr:true,pv:false,pq:false,po:false,ea:false,er:false,e2:true,eq:false,eo:false},
+de_aloj:6, de_troca:6,   mn:{pa:false,pr:false,pv:false,pq:false,po:false,ea:false,er:false,e2:false,eq:false,eo:false},
   on:{feed:false,pol:false,ele:false}
 };
 const PRE=[10000,25000,50000,100000,250000,500000];
@@ -396,7 +396,7 @@ const FIELDS={
     ["d_ele","Eletroaminovit na água","","mL/100L",5],["de_s2","Eletroaminovit: dias em vacinação e transferência","","dias",1],
     ["de_s45","Eletroaminovit: dias na 4ª e 5ª semanas","","dias",1],["de_calor","Eletroaminovit: dias de temperaturas extremas","por lote","dias",1]]
 };
-const KEY="potencial-frango-v1-v5-d";
+const KEY="potencial-frango-v1-v5-d-m";
 let S=JSON.parse(JSON.stringify(DEF));S.ox={};
 try{const sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv)S=Object.assign(JSON.parse(JSON.stringify(DEF)),sv,{on:Object.assign({},DEF.on,sv.on||{}),mn:Object.assign({},DEF.mn,sv.mn||{}),ox:Object.assign({},sv.ox||{})});}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
@@ -552,7 +552,7 @@ function calc(){
   document.getElementById("cards").innerHTML=r.prod.map(p=>{const on=s.on[p.id];return `<article class="card${on?"":" off"}">
     <h3>${p.head||p.nome}<label class="chk2"><input type="checkbox" id="on_${p.id}" ${on?"checked":""}> incluir</label></h3>
     ${CIN(p.id,false)}
-    ${p.man?`<div class="mans">${MAN[p.man].map(m=>`<div class="mrow"><label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]}</label><span class="dd"><input type="text" inputmode="numeric" id="cx_${m[2]}" value="${S[m[2]]}"${on?"":" disabled"}><small>dias</small></span>${STD[m[2]]?`<small class="std">Padrão IMEVE: ${STD[m[2]]}</small>`:""}</div>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
+    ${p.man&&!(MAN[p.man].some(m=>S.mn[m[0]])||S.mn[OX[p.man]])?`<p class="fx-hint">Marque abaixo em quais manejos o produto vai entrar.</p>`:""}${p.man?`<div class="mans">${MAN[p.man].map(m=>`<div class="mrow"><label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]}</label><span class="dd"><input type="text" inputmode="numeric" id="cx_${m[2]}" value="${S[m[2]]}"${on?"":" disabled"}><small>dias</small></span>${STD[m[2]]?`<small class="std">Padrão IMEVE: ${STD[m[2]]}</small>`:""}</div>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
     <div class="money"><span>Faturamento potencial</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
     ${FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true)?`<p class="fx-hint">Marque abaixo em quais rações o produto vai entrar.</p>`:""}<details class="more" data-id="${p.id}"${(S.op&&S.op[p.id])||(FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true))?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
