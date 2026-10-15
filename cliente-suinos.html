@@ -180,6 +180,29 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .ci input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--fg);font:700 15px var(--f-display);padding:7px 0;text-align:right;outline:none}
 .ci em{font-style:normal;font-size:12px;margin-left:6px;white-space:nowrap}
 #par-body{display:grid;gap:8px}
+.ph{border-top:1px solid var(--line);padding-top:8px;display:grid;gap:3px;font-size:13px}
+.ph-h,.ph-r{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:baseline}
+.ph-h{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.ph-h span:not(:first-child),.ph-r b{text-align:right}
+.ph-r b{font:700 13.5px var(--f-display);font-variant-numeric:tabular-nums}
+.more{border-top:1px solid var(--line);padding-top:6px}
+.more>summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--accent);list-style:none}
+.more>summary::-webkit-details-marker{display:none}
+.more>summary::before{content:"+ "}
+.more[open]>summary::before{content:"\2212  "}
+.more>div{display:grid;gap:10px;margin-top:8px}
+.lnk{border:0;background:none;color:var(--accent);font:700 13px var(--f-body);cursor:pointer;padding:4px 0;justify-self:start}
+.adv-h{margin:6px 0 -6px;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.uf{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:2px 18px;border-top:1px solid var(--line);padding-top:8px}
+.uf-t{grid-column:1/-1;font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.uf-r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:4px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.uf-r b{font:700 14px var(--f-display);font-variant-numeric:tabular-nums;white-space:nowrap}
+.uf-tot{margin:0;font-size:13px;color:var(--muted)}
+.uf-tot b{color:var(--fg)}
+.be-eq{display:block;font-size:12.5px;font-weight:700;color:var(--muted)}
+.live{display:block;color:var(--accent);font-weight:700;font-style:normal}
+#cards{align-items:start}
+#sec-precos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
 </style>
 
 <style>
@@ -221,7 +244,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     <div class="brand">
       <small>IMEVE · Suinocultura · Para o produtor</small>
       <h1>Calculadora Cliente · Suínos</h1>
-      <p class="note" style="margin:6px 0 0;max-width:640px">Informe o número de matrizes da granja e veja quanto ela pode consumir de cada produto IMEVE por semana, por mês e por ano.</p>
+      <p class="note" style="margin:6px 0 0;max-width:640px">Siga os passos: <b>1</b> escolha os produtos, <b>2</b> diga onde a granja vai melhorar e <b>3</b> veja o retorno.</p>
     </div>
     <div class="actions"><button class="btn" id="info-btn" type="button" aria-pressed="false">Informações</button><button class="btn" id="reset" type="button">Restaurar padrões</button></div>
   </header>
@@ -235,9 +258,14 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
       </div>
       <p class="note" id="resumo" style="margin:0"></p>
     </section>
+    <section class="size" aria-label="Preços dos produtos">
+      <label>Preços dos produtos</label>
+      <p class="note" style="margin:0">Coloque o preço que você vai praticar com este cliente.</p>
+      <div id="sec-precos"></div>
+    </section>
     <section class="size" aria-label="Produtos">
       <label>1. Produtos do programa</label>
-      <p class="note" style="margin:0">Marque “incluir” nos produtos que a granja vai usar e confira o preço e a dose. O resto já vem preenchido.</p>
+      <p class="note" style="margin:0">Marque “incluir” nos produtos que vai oferecer. A dose já vem preenchida.</p>
       <div class="cards" id="cards"></div>
     </section>
 
@@ -249,7 +277,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 
     <details class="sec" open>
       <summary>2. Resultado esperado com o programa <span class="hint">escolha onde a granja vai melhorar</span></summary>
-      <div class="body"><div class="bef" id="par"></div><p class="note" id="par-hint" style="margin:0">Toque em uma ou mais opções acima (peso, mortalidade ou conversão). Só aparecem e só entram na conta os campos escolhidos.</p><div id="sec-efeitos" style="display:grid;gap:8px"></div></div>
+      <div class="body"><div class="bef" id="par"></div><p class="note" id="par-hint" style="margin:0">Toque em uma ou mais opções acima (peso, mortalidade ou conversão). Só aparecem e só entram na conta os campos escolhidos.</p><div id="sec-efeitos" style="display:grid;gap:8px"></div><button type="button" class="lnk" id="adv-btn" hidden></button></div>
     </details>
     <section class="size" aria-label="Retorno para o produtor">
       <label>3. Quanto você investe e quanto volta</label>
@@ -257,34 +285,33 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
       <p class="note" id="roi-note" style="margin:0"></p>
     </section>
     <section class="size" aria-label="Quanto cada produto precisa melhorar">
-      <label>Quanto cada produto precisa melhorar para se pagar</label>
-      <p class="note" style="margin:0">Como ler: cada quadro mostra o <b>mínimo</b> que a granja precisa melhorar para aquele produto se pagar sozinho. Se melhorar mais do que isso, a diferença é lucro.</p>
+      <label>4. Quanto cada produto precisa melhorar para se pagar</label>
+      <p class="note" style="margin:0">O <b>mínimo</b> que a granja precisa melhorar para cada produto se pagar (cada R$ 1 investido volta R$ 1). Esse mínimo não depende do passo 2; o passo 2 só aparece embaixo, para comparar. Acima do mínimo, é lucro.</p>
       <div class="bef" id="be-f"></div>
         <div class="be" id="be"></div>
     </section>
 
-    <section class="size" aria-label="Mercado do suíno">
-      <label>Mercado do suíno</label>
+    <details class="sec">
+      <summary>Mercado do suíno <span class="hint">preço de venda e custo de produção</span></summary>
+      <div class="body">
       <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
         <div class="row"><label for="bolsa">Referência do preço<em>bolsa fechada ou bolsa aberta</em></label><div class="num"><select id="bolsa" style="width:100%;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px"><option value="fechada">Bolsa fechada</option><option value="aberta">Bolsa aberta</option></select></div></div>
         <div class="row"><label for="p_suino">Preço do suíno vivo<em>Bolsa MG fechada 08/10/2026: R$ 7,00</em></label><div class="num"><input id="p_suino" type="number" step="0.05" inputmode="decimal"><span>R$/kg</span></div></div>
         <div class="row"><label for="c_prod">Custo de produção<em>MG ~R$ 6,00 a 6,20 · SC (Embrapa) R$ 6,35</em></label><div class="num"><input id="c_prod" type="number" step="0.05" inputmode="decimal"><span>R$/kg</span></div></div>
       </div>
       <div class="flow" id="mkt-flow"></div>
-    </section>
+      </div>
+    </details>
 
 
-    <details class="sec">
-      <summary>Preços dos produtos <span class="hint">ajuste para o preço negociado</span></summary>
-      <div class="body" id="sec-precos"></div>
-    </details>
-    <details class="sec">
-      <summary>Premissas da granja padrão <span class="hint">já preenchidas · só mude se precisar</span></summary>
-      <div class="body" id="sec-prem"></div>
-    </details>
     <details class="sec">
       <summary>Doses usadas no cálculo <span class="hint">protocolo IMEVE</span></summary>
       <div class="body" id="sec-dose"></div>
+    </details>
+    <p class="adv-h">Premissas da granja · já vêm preenchidas, só mude se precisar</p>
+    <details class="sec">
+      <summary>Premissas da granja padrão <span class="hint">já preenchidas · só mude se precisar</span></summary>
+      <div class="body" id="sec-prem"></div>
     </details>
   </div>
 
@@ -344,9 +371,9 @@ const FIELDS={
     ["e_pag","Peso extra no abate","gramas a mais · pode editar sozinho","g",10],
     ["e_cre","Reflexo na saída da creche","kg a mais por kg extra no desmame · Cooper et al., 2001","×",0.1],
     ["e_abt","Reflexo no abate","kg a mais por kg extra no desmame · Cooper et al., 2001","×",0.1],
-    ["e_mm","Mortalidade na maternidade","pontos a menos · 0 = sem melhora","p.p.",0.1],
-    ["e_mc","Mortalidade na creche","pontos a menos","p.p.",0.1],
-    ["e_mt","Mortalidade na terminação","pontos a menos","p.p.",0.1],
+    ["e_mm","Redução da mortalidade na maternidade","pontos percentuais · ex.: de 8% para 7,5% = 0,5","p.p.",0.1],
+    ["e_mc","Redução da mortalidade na creche","pontos percentuais","p.p.",0.1],
+    ["e_mt","Redução da mortalidade na terminação","pontos percentuais","p.p.",0.1],
     ["e_cac","Conversão alimentar na creche","kg de ração por kg a menos","kg/kg",0.01],
     ["e_cat","Conversão alimentar na terminação","kg de ração por kg a menos","kg/kg",0.01]],
   "sec-dose":[
@@ -429,6 +456,10 @@ function model(s){
   r.sp={pol:[manK("pol",["pc","pm","po"]),manK("pol",["pt","pq"])],ele:[manK("ele",["ec","ev","eo"]),manK("ele",["et","eq"])]};
   r.polKg=manL("pol")*s.d_pol/1e6;
   r.eleL=manL("ele")*s.d_ele/100/1000;
+  const mq=p=>{const out=[];MAN[p].forEach(m=>{if(s.mn[m[0]])out.push([m[1],WA[m[0]]*s[m[2]]]);});const o=OX[p];if(s.mn[o]){const x=oxv(s,o);out.push(["Outros manejos",WA[o]*x.v*x.d]);}return out;};
+  r.ph={liq:[["Ao nascer",r.leitoes*s.d_liq/2/1000/0.5,"frascos"],["No dia do ferro",r.leitoes*s.d_liq/2/1000/0.5,"frascos"]],
+    dbi:[["Gestação","gest","d_gest"],["Lactação","lact","d_lact"],["Pré-inicial 1","p1","d_p1"],["Pré-inicial 2","p2","d_p2"],["Inicial 1","i1","d_i1"],["Inicial 2","i2","d_i2"],["Crescimento","cre","d_cre"],["Terminação","term","d_term"]].map(([l,k,d])=>[l,r.feed[k]/1e6*s[d],"kg"]),
+    pol:mq("pol").map(([l,L])=>[l,L*s.d_pol/1e6,"kg"]),ele:mq("ele").map(([l,L])=>[l,L*s.d_ele/1e5,"L"])};
   r.prod=[
     {id:"liq",nome:"DBI Líquido NF Pig Doser",proto:`${Number.isInteger(s.d_liq)?n0(s.d_liq):n1(s.d_liq)} mL por leitão nascido · ${n0(s.d_liq>0?500/s.d_liq:0)} leitões por frasco`,emb:r.liqL/0.5,embUn:"frascos de 500 mL",extra:[r.leitoes,"leitões tratados"],custo:r.liqL/0.5*s.pr_liq},
     {id:"dbi",nome:"DBI SUI PÓ",proto:"Na ração: gestação, lactação, creche e terminação",emb:r.dbiKg/25,embUn:"baldes/sacos de 25 kg",extra:[r.dbiKg,"kg"],custo:r.dbiKg*s.pr_dbi},
@@ -456,20 +487,28 @@ function renderBE(items){
   if(!rows.length){el.innerHTML='<p class="note" style="margin:0">Nenhum produto marcado atua nesse resultado.</p>';return;}
   el.innerHTML=(f!=="todos"?`<p class="note" style="margin:0;font-weight:600">${BEFT[f]}: quanto cada produto precisa para se pagar sozinho.</p>`:"")+rows.map(it=>{const ind=it.ind;return `<div class="be-row${it.prog?" prog":""}">
    <div class="be-h"><div><b>${it.nome}</b> <span class="be-f">· ${it.fase}</span></div><div class="be-c">Custa <b>${brlK(it.custo/12)}</b> por mês · ${it.pa(it.custo)}</div></div>${ind.length>1?`<p class="be-q">Para se pagar, basta <b>um</b> destes resultados:</p>`:`<p class="be-q">Para se pagar, basta este resultado:</p>`}
-   <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">Se a granja tiver ${i.fmt(i.ref)} (valor simulado): cada R$ 1 investido volta R$ ${nf(2).format(x)} → ${x>=1.005?"paga e sobra":x>=0.995?"empata":"não paga sozinho"}</em>`:""}</div>`;}).join(""):'<p class="note" style="margin:0">Com os preços atuais nenhum indicador cobre o custo.</p>'}</div></div>`;}).join("");
+   <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b><small class="be-eq">= empata: cada R$ 1 investido volta R$ 1</small>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">Com o resultado do passo 2 (${i.fmt(i.ref)}): cada R$ 1 investido volta R$ ${nf(2).format(x)} → ${x>=1.005?"paga e sobra":x>=0.995?"empata":"não paga sozinho"}</em>`:""}</div>`;}).join(""):'<p class="note" style="margin:0">Com os preços atuais nenhum indicador cobre o custo.</p>'}</div></div>`;}).join("");
 }
-const CI={liq:[["pr_liq","Preço do frasco (500 mL)","R$"],["d_liq","Dose por leitão","mL"]],dbi:[["pr_dbi","Preço","R$/kg"],["d_gest","Gestação","g/t"],["d_lact","Lactação","g/t"],["d_p1","Pré-inicial 1","g/t"],["d_p2","Pré-inicial 2","g/t"],["d_i1","Inicial 1","g/t"],["d_i2","Inicial 2","g/t"],["d_cre","Crescimento","g/t"],["d_term","Terminação","g/t"]],pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
+const CI={liq:[["pr_liq","Preço do frasco (500 mL)","R$"],["d_liq","Dose por leitão","mL"]],dbi:[["pr_dbi","Preço","R$/kg"],["d_gest","Gestação","g/t","x"],["d_lact","Lactação","g/t","x"],["d_p1","Pré-inicial 1","g/t","x"],["d_p2","Pré-inicial 2","g/t","x"],["d_i1","Inicial 1","g/t","x"],["d_i2","Inicial 2","g/t","x"],["d_cre","Crescimento","g/t","x"],["d_term","Terminação","g/t","x"]],pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
 const PARS=[["peso","Peso",["e_pdg","e_pcg","e_pag","e_cre","e_abt"],["e_pdg","e_pcg","e_pag"]],["mort","Mortalidade",["e_mm","e_mc","e_mt"]],["conv","Conversão alimentar",["e_cac","e_cat"]]];
-function CIN(id){const L=typeof CI[id]==="function"?CI[id]():CI[id];if(!L)return "";
+function CIN(id,adv){const L0=typeof CI[id]==="function"?CI[id]():CI[id];if(!L0)return "";const L=L0.filter(e=>!String(e[0]).startsWith("pr_")&&(e[3]==="x")===!!adv);if(!L.length)return "";
   return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div></label>`).join("")+`</div>`;}
 function effS(S0){const s=Object.assign({},S0);PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
 function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(!box)return;
   box.innerHTML=`<span>A granja vai melhorar em:</span>`+PARS.map(([c,l])=>`<button type="button" data-p="${c}" aria-pressed="${!!S.par[c]}">${l}</button>`).join("");
   PARS.forEach(([c,,show])=>show.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row)row.hidden=!S.par[c];}));
-  const h=document.getElementById("par-hint");if(h)h.hidden=PARS.some(([c])=>S.par[c]);}
+  const h=document.getElementById("par-hint");if(h)h.hidden=PARS.some(([c])=>S.par[c]);
+  const ADV=["e_cre","e_abt"],ab=document.getElementById("adv-btn"),hasAdv=ADV.some(k=>document.getElementById(k));
+  ADV.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row&&!row.hidden)row.hidden=!S.adv;});
+  if(ab){const pesoOn=PARS.some(([c,,sh])=>S.par[c]&&sh.includes("e_cre"));ab.hidden=!(hasAdv&&pesoOn);ab.textContent=S.adv?"Esconder reflexos (Cooper)":"Ajustar reflexos do peso (Cooper)";}}
 document.addEventListener("click",e=>{const b=e.target.closest("#par button[data-p]");if(!b)return;S.par=S.par||{};S.par[b.dataset.p]=!S.par[b.dataset.p];save();calc();});
+function PH(id,r){const L=((r.ph||{})[id]||[]).filter(x=>x[1]>0);if(!L.length)return "";const f=v=>v>=100?n0(v):v>=10?n1(v):nf(2).format(v);
+  return `<div class="uf"><div class="uf-t">Uso por fase · por mês</div>`+L.map(([l,q,u])=>`<div class="uf-r"><span>${l}</span><b>${f(q/12)} ${u}</b></div>`).join("")+`</div>`;}
+document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("details.more")){S.op=S.op||{};S.op[d.dataset.id]=d.open;save();}},true);
+document.addEventListener("click",e=>{if(e.target.id==="adv-btn"){S.adv=!S.adv;save();calc();}});
+function liveMort(r){const M={e_mm:[r.leitoes,"leitões desmamados a mais por mês",12],e_mc:[r.desmamados,"leitões a mais saindo da creche por mês",12],e_mt:[r.saidaCreche,"suínos a mais vendidos por mês",12]};Object.entries(M).forEach(([k,[base,txt,div]])=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}const v=base*(S[k]||0)/100/div;el.textContent=`≈ ${v>=10?n0(v):n1(v)} ${txt}`;});}
 function calc(){
-  paintPar();const s=effS(S),r=model(s);
+  paintPar();const s=effS(S),r=model(s);liveMort(r);
   document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.matrizes));
   document.getElementById("resumo").textContent=`${n0(r.leitoes/52)} leitões nascidos por semana · ${n0(r.feedTot/1000/12)} t de ração por mês · ${n0(r.vendidos)} suínos vendidos por ano`;
   document.getElementById("t-mes").textContent=brlK(r.total/12);
@@ -520,12 +559,11 @@ function calc(){
   const actV=document.activeElement?document.activeElement.value:"",actP=(()=>{try{return document.activeElement.selectionStart}catch(e){return null}})();
   document.getElementById("cards").innerHTML=r.prod.map(p=>{const on=S.on[p.id];return `<article class="card${on?"":" off"}">
     <h3>${p.nome}<label class="chk2"><input type="checkbox" id="on_${p.id}" ${on?"checked":""}> incluir</label></h3>
-    <p class="proto">${p.proto}</p>
-    ${CIN(p.id)}
+    ${CIN(p.id,false)}
     ${p.man?`<div class="mans">${MAN[p.man].map(m=>`<label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]} <em>${n0(s[m[2]])} dias</em></label>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
-    <div class="trio"><div><b>${qf(p.emb/52)}</b><span>por semana</span></div><div><b>${qf(p.emb)}</b><span>por ano</span></div><div><b>${n0(p.extra[0]/12)}</b><span>${p.extra[1]} por mês</span></div></div>
     <div class="money"><span>Investimento</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
+    <details class="more" data-id="${p.id}"${S.op&&S.op[p.id]?" open":""}><summary>Ver detalhes</summary><div><p class="proto">${p.proto}</p>${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
   </article>`;}).join("");
   if(act&&(act.startsWith("ov_")||act.startsWith("od_"))){const el=document.getElementById(act);if(el){el.focus();}}
   if(act&&act.startsWith("cx_")){const el=document.getElementById(act);if(el){el.value=actV;el.focus();try{if(actP!=null)el.setSelectionRange(actP,actP);}catch(e){}}}
