@@ -266,6 +266,19 @@ details.be-more>.be-row{margin:0 10px 10px}
 .mrow>.chk2{grid-column:1;grid-row:1}
 .mrow>.dd{grid-column:2;grid-row:1/span 2;align-self:center}
 .mrow>.std{grid-column:1!important;grid-row:2;margin:-3px 0 1px 26px!important;font-size:11px}
+.num,.ci>div,.fx-d,.dd,.hp{background:var(--surface)!important;border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--line))!important;cursor:text;transition:border-color .15s,box-shadow .15s}
+.num:hover,.ci>div:hover,.fx-d:hover,.dd:hover,.hp:hover{border-color:var(--accent)!important}
+.num:focus-within,.ci>div:focus-within,.fx-d:focus-within,.dd:focus-within,.hp:focus-within{border-color:var(--accent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.num::before,.ci>div::before,.fx-d::before,.dd::before{content:"✎";color:var(--accent);opacity:.6;font-size:13px;flex:0 0 auto}
+.num::before{padding-left:9px}
+.bignum .num::before{font-size:18px;padding-left:12px}
+.num:has(select)::before{content:none}
+.num:has(select){cursor:pointer}
+.num input,.ci input,.fx-d input,.dd input,.hp input{cursor:text}
+.num input:focus,.ci input:focus,.fx-d input:focus,.dd input:focus,.hp input:focus{outline:none}
+.gname{background:var(--surface)!important;border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--line))!important}
+.gname:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.edit-tip{color:var(--accent);font-weight:600}
 </style>
 
 <style>
@@ -308,7 +321,7 @@ details.be-more>.be-row{margin:0 10px 10px}
     <div class="brand">
       <small>IMEVE · Avicultura de postura · Ferramenta do vendedor</small>
       <h1>Calculadora Vendedor · Poedeiras</h1>
-      <p class="note" style="margin:6px 0 0;max-width:640px">Siga os passos: <b>1</b> a granja, <b>2</b> os produtos, <b>3</b> onde a granja vai melhorar e <b>4</b> o retorno. O resumo do retorno fica sempre no rodapé.</p>
+      <p class="note" style="margin:6px 0 0;max-width:640px">Siga os passos: <b>1</b> a granja, <b>2</b> os produtos, <b>3</b> onde a granja vai melhorar e <b>4</b> o retorno. O resumo do retorno fica sempre no rodapé. <span class="edit-tip">✎ Os números nas caixas com lápis podem ser editados.</span></p>
     </div>
     <div class="actions"><button class="btn" id="info-btn" type="button" aria-pressed="false">Informações</button><button class="btn" id="reset" type="button">Restaurar padrões</button></div>
   </header>
