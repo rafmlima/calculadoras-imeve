@@ -278,6 +278,16 @@ details.be-more>.be-row{margin:0 10px 10px}
 .gname{background:var(--surface)!important;border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--line))!important}
 .gname:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
 .edit-tip{color:var(--accent);font-weight:600}
+.refs-h{margin:18px 0 6px;font:700 16px var(--f-display)}
+ol.refs{margin:6px 0 0;padding-left:20px;display:grid;gap:8px;font-size:13px;line-height:1.45}
+ol.refs li b{font-weight:700}
+ol.refs .what{display:block;color:var(--muted);font-size:12.5px}
+ol.refs .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:0 6px;margin-left:4px}
+details.phd{margin-top:2px}
+details.phd>summary{cursor:pointer;list-style:none;color:var(--accent);font:700 13px var(--f-body);padding:6px 0}
+details.phd>summary::-webkit-details-marker{display:none}
+details.phd>summary::before{content:"▸ "}
+details.phd[open]>summary::before{content:"▾ "}
 </style>
 
 <style>
@@ -582,7 +592,7 @@ function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(
 document.addEventListener("click",e=>{const b=e.target.closest("#par button[data-p]");if(!b)return;S.par=S.par||{};S.par[b.dataset.p]=!S.par[b.dataset.p];save();calc();});
 function PH(id,r){const L=((r.ph||{})[id]||[]).filter(x=>x[1]>0);if(!L.length)return "";const f=v=>v>=100?n0(v):v>=10?n1(v):nf(2).format(v);
   return `<div class="uf"><div class="uf-t">Uso por fase · por mês</div>`+L.map(([l,q,u])=>`<div class="uf-r"><span>${l}</span><b>${f(q/12)} ${u}</b></div>`).join("")+`</div>`;}
-document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("details.more")){S.op=S.op||{};S.op[d.dataset.id]=d.open;save();}},true);
+document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("details.more")){S.op2=S.op2||{};S.op2[d.dataset.id]=d.open;save();}},true);
 document.addEventListener("click",e=>{if(e.target.id==="adv-btn"){S.adv=!S.adv;save();calc();}});
 function liveMort(r){const M={e_mm:[r.leitoes,"leitões desmamados a mais por mês",12],e_mc:[r.desmamados,"leitões a mais saindo da creche por mês",12],e_mt:[r.saidaCreche,"suínos a mais vendidos por mês",12]};Object.entries(M).forEach(([k,[base,txt,div]])=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}const v=base*(S[k]||0)/100/div;el.textContent=`≈ ${v>=10?n0(v):n1(v)} ${txt}`;});}
 const FX={dbi:()=>[["d_gest","Gestação",1],["d_lact","Lactação",1],["d_p1","Pré-inicial 1",1],["d_p2","Pré-inicial 2",1],["d_i1","Inicial 1",1],["d_i2","Inicial 2",1],["d_cre","Crescimento",1],["d_term","Terminação",1]]};
@@ -680,7 +690,7 @@ function calc(){
     ${p.man&&!(MAN[p.man].some(m=>S.mn[m[0]])||S.mn[OX[p.man]])?`<p class="fx-hint">Marque abaixo em quais manejos o produto vai entrar.</p>`:""}${p.man?`<div class="mans">${MAN[p.man].map(m=>`<div class="mrow"><label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]}</label><span class="dd"><input type="text" inputmode="numeric" id="cx_${m[2]}" value="${S[m[2]]}"${on?"":" disabled"}><small>dias</small></span>${STD[m[2]]?`<small class="std">IMEVE: ${STD[m[2]]}</small>`:""}</div>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
     <div class="money"><span>Faturamento potencial</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
-    ${FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true)?`<p class="fx-hint">Marque abaixo em quais rações o produto vai entrar.</p>`:""}<details class="more" data-id="${p.id}"${(S.op&&S.op[p.id])||(FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true))?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
+    ${FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true)?`<p class="fx-hint">Use o protocolo IMEVE ou abra “Ver detalhes” para marcar em quais rações o produto vai entrar.</p>`:""}<details class="more" data-id="${p.id}"${(S.op2&&S.op2[p.id])?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
   </article>`;}).join("");
   if(act&&(act.startsWith("ov_")||act.startsWith("od_"))){const el=document.getElementById(act);if(el){el.focus();}}
   if(act&&act.startsWith("cx_")){const el=document.getElementById(act);if(el){el.value=actV;el.focus();try{if(actP!=null)el.setSelectionRange(actP,actP);}catch(e){}}}

@@ -279,6 +279,16 @@ details.be-more>.be-row{margin:0 10px 10px}
 .gname{background:var(--surface)!important;border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--line))!important}
 .gname:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
 .edit-tip{color:var(--accent);font-weight:600}
+.refs-h{margin:18px 0 6px;font:700 16px var(--f-display)}
+ol.refs{margin:6px 0 0;padding-left:20px;display:grid;gap:8px;font-size:13px;line-height:1.45}
+ol.refs li b{font-weight:700}
+ol.refs .what{display:block;color:var(--muted);font-size:12.5px}
+ol.refs .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:0 6px;margin-left:4px}
+details.phd{margin-top:2px}
+details.phd>summary{cursor:pointer;list-style:none;color:var(--accent);font:700 13px var(--f-body);padding:6px 0}
+details.phd>summary::-webkit-details-marker{display:none}
+details.phd>summary::before{content:"▸ "}
+details.phd[open]>summary::before{content:"▾ "}
 </style>
 
 <style>
@@ -405,14 +415,18 @@ details.be-more>.be-row{margin:0 10px 10px}
     <p>Potencial é o consumo se a granja usar o programa completo. Use como referência de tamanho de oportunidade, não como pedido garantido.</p>
   <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
   <p><b>Preço do ovo</b>: referências de 13/10/2026, por caixa de 30 dúzias (360 ovos): Cepea Bastos (SP) branco R$ 132,32 e vermelho R$ 145,00; Ceagesp branco grande R$ 164,70 e vermelho extra R$ 191,29; Ceasa Campinas branco grande R$ 150,00; Ceasa BH branco grande R$ 138,00. Para quem vende por dúzia, divida o preço da caixa por 30 ou use o preço praticado na região. Custo de produção: estimativa com a ração em cerca de 70% do custo; ajuste para a granja.</p>
-    <p><b>Doses padrão</b>: site e especificações técnicas IMEVE (DBI SUI Pó, PAS-TR+, PAS-BAC TR, DBA, DBA + PAS, Polimeve e Eletroaminovit). Quando a recomendação é uma faixa de uso, a calculadora usa o maior valor da faixa. Todas podem ser ajustadas.</p></footer>
+    <p><b>Doses padrão</b>: site e especificações técnicas IMEVE (DBI SUI Pó, PAS-TR+, PAS-BAC TR, DBA, DBA + PAS, Polimeve e Eletroaminovit). Quando a recomendação é uma faixa de uso, a calculadora usa o maior valor da faixa. Todas podem ser ajustadas.</p>
+  <h3 class="refs-h">Referências científicas</h3>
+  <p>Trabalhos que embasam os resultados esperados. Os mais recentes vêm primeiro. A marca <span class="tag">bactéria dos produtos IMEVE</span> indica estudos com as mesmas espécies dos produtos IMEVE: <i>Bacillus subtilis</i> e <i>Bacillus cereus</i> var. <i>toyoi</i> (PAS-TR+, PAS-BAC TR e Polimeve), <i>Lactobacillus acidophilus</i>, <i>Enterococcus faecium</i> e <i>Bifidobacterium bifidum</i> (DBA e Polimeve). Toque em “Abrir” para ver o trabalho.</p>
+  <ol class="refs"><li>Mbajiorgu, C. A.; Ogbuewu, I. P.; Mabelebele, M. (2025). <b>Meta-Analysis of Bacillus in Laying Hen Nutrition: Feed Intake, Feed Conversion Ratio and Egg Productive Indices</b>. American Journal of Animal and Veterinary Sciences, 20(2), 133–143. doi:10.3844/ajavsp.2025.133.143. <a href="https://thescipub.com/abstract/ajavsp.2025.133.143" target="_blank" rel="noopener">Abrir</a><span class="tag">bactéria dos produtos IMEVE</span><span class="what">18 ensaios controlados: Bacillus melhorou a conversão alimentar, a postura, o peso e a massa de ovos, sem aumentar o consumo de ração.</span></li><li>Demey, V. et al. (2024). <b>Meta-análise de 62 estudos em 25 países com probiótico em poedeiras</b> (Pediococcus acidilactici, Lallemand). <a href="https://www.thepoultrysite.com/articles/20-years-of-breakthrough-probiotic-performance-in-layers" target="_blank" rel="noopener">Abrir</a><span class="what">+2,7% de postura, −3,1% na conversão, +0,6 g no peso do ovo, −21% de ovos quebrados ou desclassificados e −33% de mortalidade (3,1% contra 4,6%). Outra bactéria, mas é a base mais ampla para trincados e mortalidade.</span></li><li>Tsai, M.-Y. et al. (2023). <b>Effect of dietary supplementation of Bacillus subtilis TLRI 211-1 on laying performance, egg quality and blood characteristics of Leghorn layers</b>. Animal Bioscience. doi:10.5713/ab.22.0274. <a href="https://doi.org/10.5713/ab.22.0274" target="_blank" rel="noopener">Abrir</a><span class="tag">bactéria dos produtos IMEVE</span><span class="what">Poedeiras de 65 a 73 semanas: conversão de 1,79 para 1,70 (−5%) e postura de 90,1% para 92,9%.</span></li><li><b>Effects of a commercial Bacillus subtilis supplementation on late lay hen performance, egg quality, and microbial communities</b>. Journal of Applied Poultry Research, set. 2023. <a href="https://doaj.org/article/d7bc426ac6cf4a87814754123c229fba" target="_blank" rel="noopener">Abrir</a><span class="tag">bactéria dos produtos IMEVE</span><span class="what">Galinhas no fim do ciclo: mais ovos por ave/dia e ovos mais pesados com B. subtilis.</span></li><li>Kumalasari, C.; Adriani, L.; Asmara, I. Y.; Nazri, N. (2023). <b>Administration of Probiotics to Increase Egg Production and Extend the Productivity on Late-Phase Laying Hen: A Review</b>. Advances in Animal and Veterinary Sciences, 11(8), 1236–1249. <a href="https://researcherslinks.com/current-issues/Administration-of-Probiotics-to-Increase-Egg-Production-and-Extend-the-Productivity-on-Late-Phase-Laying-Hen-A-Review/33/8/6382/html" target="_blank" rel="noopener">Abrir</a><span class="tag">bactéria dos produtos IMEVE</span><span class="what">Revisão sobre galinhas acima de 60 semanas: com Bacillus, de +0,6 a +6,3 pontos de postura. Base da persistência de postura.</span></li><li>Nour, M. A. et al. (2021). <b>Productive performance, fertility and hatchability, blood indices and gut microbial load in laying quails as affected by two types of probiotic bacteria</b>. Saudi Journal of Biological Sciences, 28(11), 6544–6555. doi:10.1016/j.sjbs.2021.07.030. <a href="https://doi.org/10.1016/j.sjbs.2021.07.030" target="_blank" rel="noopener">Abrir</a><span class="tag">bactéria dos produtos IMEVE</span><span class="what">B. toyonensis (antigo B. cereus var. toyoi) e Bifidobacterium bifidum: mais ovos, melhor conversão (3,98 para 3,15) e ovos mais pesados em codornas de postura.</span></li><li>Incharoen, T. et al. (2025). <b>Dietary Bacillus toyonensis BCT-7112T supplementation influences performance, egg quality, ammonia emission, and cecal microbiome in laying ducks</b>. Veterinary Sciences, 12(3), 259. doi:10.3390/vetsci12030259. <a href="https://doi.org/10.3390/vetsci12030259" target="_blank" rel="noopener">Abrir</a><span class="tag">bactéria dos produtos IMEVE</span><span class="what">Cepa do antigo B. cereus var. toyoi: ovos mais pesados, casca mais grossa e menos amônia na cama.</span></li><li>Abdelqader, A.; Al-Fataftah, A. R.; Daş, G. (2013). <b>Effects of dietary Bacillus subtilis and inulin supplementation on performance, eggshell quality, intestinal morphology and microflora composition of laying hens in the late phase of production</b>. Animal Feed Science and Technology. <span class="tag">bactéria dos produtos IMEVE</span><span class="what">B. subtilis no fim do ciclo (64 a 75 semanas): cerca de 4 pontos a mais de postura e casca melhor. Referência mais antiga.</span></li></ol>
+</footer>
 </div>
 
 <script>
 (function(){
 const FEEDS={dba:["DBA Concentrado","pr_dba","d_dba1","d_dba2"],dbapas:["DBA + PAS Concentrado","pr_dbapas","d_dbapas1","d_dbapas2"],pas:["PAS-TR+ Concentrado","pr_pas","d_pas1","d_pas2"],pasbac:["PAS-BAC TR Concentrado","pr_pasbac","d_pasbac1","d_pasbac2"]};
 const DEF={
-  p_ovo:4.41067, c_dz:2.90, ovoUn:"cx", p_racao:1.35, p_racao_r:1.45, p_pint:4.50, postura:85, e_pos:1.5, e_per:2, e_wper:60, e_mp:1.0, e_mr:0.5,
+  p_ovo:4.41067, c_dz:2.90, ovoUn:"cx", p_racao:1.35, p_racao_r:1.45, p_pint:4.50, postura:85, e_pos:1.5, e_per:2, e_wper:60, e_ca:3, e_trc:20, p_desc:4, v_desc:50, e_mp:1.0, e_mr:0.5,
   aves:100000, modo:"aves", qtr:80, recria:true, racao:"dba",
   sem_ini:17, sem_desc:90, kg_rec:5.41, g_post:107, mr:3.2, mp:5.5,
   a_pint:0.03, a_rec:0.07, a_trans:0.11, a_post:0.17,
@@ -432,13 +446,14 @@ const FIELDS={
   "sec-prem":[
     ["postura","Postura média por ave alojada","","%",0.5],["p_racao","Preço da ração de postura","estimativa","R$/kg",0.05],["p_racao_r","Preço da ração de recria","estimativa","R$/kg",0.05],["p_pint","Preço da pintainha","estimativa","R$/ave",0.1],
     ["sem_ini","Idade de transferência para a postura","","semanas",1],["sem_desc","Idade de descarte","","semanas",1],
-    ["kg_rec","Ração na cria e recria","por ave, até a transferência","kg",0.1],["g_post","Ração na postura","por ave por dia","g/dia",1],
+    ["kg_rec","Ração na cria e recria","por ave, até a transferência","kg",0.1],["g_post","Ração na postura","por ave por dia","g/dia",1],["p_desc","Ovos trincados ou desclassificados","% da produção","%",0.5],["v_desc","Valor do ovo desclassificado","% do preço do ovo bom","%",5],
     ["a_pint","Água da pintainha (1ª semana)","por ave","L/dia",0.01],["a_rec","Água da franga na recria","por ave","L/dia",0.01],
     ["a_trans","Água na transferência","por ave","L/dia",0.01],["a_post","Água da galinha no calor","por ave","L/dia",0.01]],
   "sec-efeitos":[
     ["e_pos","Produção de ovos","% a mais · Granja Ino: +6,3%","%",0.1],["e_per","Persistência de postura na fase final","pontos % a mais de postura · Bacillus após 60 sem.: +0,6 a +6,3 (Abdelqader 2013: +4)","p.p.",0.1],["e_wper","Fase final começa na semana","a partir dela o lote mantém a postura mais alta","semana",1],
     ["e_mp","Redução da mortalidade na postura","pontos percentuais · ex.: de 8% para 7,5% = 0,5","p.p.",0.1],
-    ["e_mr","Redução da mortalidade na recria","pontos percentuais","p.p.",0.1]],
+    ["e_mr","Redução da mortalidade na recria","pontos percentuais","p.p.",0.1],
+    ["e_ca","Economia de ração na postura","% a menos de ração para os mesmos ovos · B. subtilis: −5% (Tsai 2023) · meta-análise: −3,1%","%",0.1],["e_trc","Menos ovos trincados e desclassificados","% a menos de perdas · meta-análise: −21% (Demey 2024)","%",1]],
   "sec-dose":[
     ["d_dba1","DBA Concentrado na recria","","g/t",25],["d_dba2","DBA Concentrado na postura","","g/t",25],["d_dbapas1","DBA + PAS na recria","","g/t",25],["d_dbapas2","DBA + PAS na postura","","g/t",25],
     ["d_pas1","PAS-TR+ na recria","","g/t",25],["d_pas2","PAS-TR+ na postura","","g/t",25],["d_pasbac1","PAS-BAC TR na recria","","g/t",25],["d_pasbac2","PAS-BAC TR na postura","","g/t",25],
@@ -529,7 +544,7 @@ function renderBE(items){
   const el=document.getElementById("be");if(!el)return;
   let all=items.filter(it=>it.on&&it.custo>0);if(all.filter(x=>!x.prog).length<=1)all=all.filter(x=>!x.prog);
   const cats=[];all.forEach(it=>it.ind.forEach(i=>{if(i.u>0&&!cats.includes(i.c))cats.push(i.c);}));
-  const order=["peso","ovos","pers","mort","conv"].filter(c=>cats.includes(c));
+  const order=["peso","ovos","pers","mort","conv","trc"].filter(c=>cats.includes(c));
   let f="todos";const selP=PARS.map(p=>p[0]).filter(c=>S.par&&S.par[c]);
   const fb=document.getElementById("be-f");
   if(fb)fb.innerHTML="";
@@ -543,7 +558,7 @@ function renderBE(items){
   {const pr=el.querySelector(".be-row.prog"),o=[...el.querySelectorAll(".be-row:not(.prog)")];if(pr&&o.length){const d=document.createElement("details");d.className="be-more";d.open=!!S.beOpen;d.innerHTML=`<summary>Ver por produto e fase (${o.length})</summary>`;o.forEach(x=>d.appendChild(x));el.insertBefore(pr,el.firstChild);el.appendChild(d);d.addEventListener("toggle",()=>{S.beOpen=d.open;save();});}}
 }
 const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return [[F[1],"Preço","R$/kg"]];},pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
-const PARS=[["ovos","Produção de ovos",["e_pos"]],["pers","Persistência de postura",["e_per","e_wper"],["e_per"]],["mort","Mortalidade",["e_mp","e_mr"]]];
+const PARS=[["ovos","Produção de ovos",["e_pos"]],["pers","Persistência de postura",["e_per","e_wper"],["e_per"]],["mort","Mortalidade",["e_mp","e_mr"]],["conv","Economia de ração",["e_ca"]],["trc","Menos trincados",["e_trc"]]];
 function CIN(id,adv){const L0=typeof CI[id]==="function"?CI[id]():CI[id];if(!L0)return "";const L=L0.filter(e=>!String(e[0]).startsWith("pr_")&&(e[3]==="x")===!!adv);if(!L.length)return "";
   return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div>${STD[k]?`<small class="std">Padrão IMEVE: ${STD[k]}</small>`:""}</label>`).join("")+`</div>`;}
 function effS(S0){const s=Object.assign({},S0);Object.values(FX).forEach(fn=>fn().forEach(([k])=>{if(!(S0.fx&&S0.fx[k]===true)&&typeof s[k]==="number")s[k]=0;}));PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
@@ -557,7 +572,7 @@ function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(
 document.addEventListener("click",e=>{const b=e.target.closest("#par button[data-p]");if(!b)return;S.par=S.par||{};S.par[b.dataset.p]=!S.par[b.dataset.p];save();calc();});
 function PH(id,r){const L=((r.ph||{})[id]||[]).filter(x=>x[1]>0);if(!L.length)return "";const f=v=>v>=100?n0(v):v>=10?n1(v):nf(2).format(v);
   return `<div class="uf"><div class="uf-t">Uso por fase · por mês</div>`+L.map(([l,q,u])=>`<div class="uf-r"><span>${l}</span><b>${f(q/12)} ${u}</b></div>`).join("")+`</div>`;}
-document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("details.more")){S.op=S.op||{};S.op[d.dataset.id]=d.open;save();}},true);
+document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("details.more")){S.op2=S.op2||{};S.op2[d.dataset.id]=d.open;save();}},true);
 document.addEventListener("click",e=>{if(e.target.id==="adv-btn"){S.adv=!S.adv;save();calc();}});
 function liveMort(r){const M={e_mp:[r.aloj,"galinhas a mais por ano",1],e_mr:[r.pint,"frangas a mais por ano",1]};Object.entries(M).forEach(([k,[base,txt,div]])=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}const v=base*(S[k]||0)/100/div;el.textContent=`≈ ${v>=10?n0(v):n1(v)} ${txt}`;});}
 const FX={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return (S.recria?[[F[2],"Recria (cria, recria e pré-postura)",1]]:[]).concat([[F[3],"Postura",1]]);}};
@@ -602,7 +617,9 @@ function sbar(){const el=document.getElementById("sbar-in");if(!el)return;const 
   el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investe por mês</span></div><div class="it"><b>${brlK(R.b/12)}</b><span>volta por mês</span></div><div class="it"><b>${(R.liq<0?"− ":"")+brlK(Math.abs(R.liq/12))}</b><span>ganho líquido/mês</span></div><div class="it"><b>R$ ${nf(2).format(R.roi)}</b><span>para cada R$ 1</span></div><button class="go" id="sbar-go" type="button">Ver detalhes ↓</button>`;}
 function liveX(){const L=(k,t)=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}el.textContent=t;};
   if(document.getElementById("e_p7")&&typeof S.e_p7==="number"){const g=S.e_p7/20*S.e_k7/100*S.peso*1000;L("e_p7",`≈ +${n0(g)} g por ave no abate (+${nf(2).format(S.e_p7/20*S.e_k7)}%)`);}
-  if(document.getElementById("e_per")&&typeof S.e_per==="number"){const r=window.__r||{},aves=r.aves||S.aves||0,dz=aves*FRP(S)*365*S.e_per/100/12/12;L("e_per",`≈ +${n0(dz)} dúzias de ovos por mês`);}}
+  if(document.getElementById("e_per")&&typeof S.e_per==="number"){const r=window.__r||{},aves=r.aves||S.aves||0,dz=aves*FRP(S)*365*S.e_per/100/12/12;L("e_per",`≈ +${n0(dz)} dúzias de ovos por mês`);}
+  if(document.getElementById("e_trc")&&typeof S.e_trc==="number"){const r=window.__r||{},aves=r.aves||S.aves||0,dz=aves*365*(S.postura/100)*S.p_desc/100*S.e_trc/100/12/12;L("e_trc",`≈ +${n0(dz)} dúzias vendidas como ovo bom por mês`);}
+  if(document.getElementById("e_ca")&&typeof S.e_ca==="number"&&S.g_post){const r=window.__r||{},aves=r.aves||S.aves||0,v=aves*S.g_post/1000*365*S.p_racao*S.e_ca/100/12;L("e_ca",`≈ −${nf(1).format(S.g_post*S.e_ca/100)} g de ração por ave/dia · ${brlK(v)} por mês`);}}
 function FRP(s){const a=Math.max(1,s.sem_desc-s.sem_ini);return Math.min(1,Math.max(0,(s.sem_desc-(s.e_wper||60))/a));}
 function cas7(id){if(id==="e_p7"||id==="e_k7"){S.e_peso=Math.round(S.e_p7/20*S.e_k7*100)/100;}}
 function pBR(t){t=String(t).trim().replace(/\s/g,"");if(t.includes(","))t=t.replace(/\./g,"").replace(",",".");else if(/^-?\d{1,3}(\.\d{3})+$/.test(t))t=t.replace(/\./g,"");return parseFloat(t);}
@@ -623,14 +640,14 @@ function calc(){
   {const on=s.on, mn=s.mn, any=on.feed||(on.pol&&(MAN.pol.some(m=>mn[m[0]])||mn.po))||(on.ele&&(MAN.ele.some(m=>mn[m[0]])||mn.eo));
    const L=Math.max(1,s.sem_desc-s.sem_ini), dz=s.p_ovo, pz=s.postura/100;
    let b=0;
-   if(any){b+=r.aves*365*pz/12*dz*s.e_pos/100;b+=r.aves*FRP(s)*365/12*dz*s.e_per/100;
+   if(any){b+=r.aves*365*pz/12*dz*s.e_pos/100;b+=r.aves*FRP(s)*365/12*dz*s.e_per/100;b+=r.aves*s.g_post/1000*365*s.p_racao*s.e_ca/100;b+=r.aves*365*pz*s.p_desc/100*s.e_trc/100*(dz/12)*(1-s.v_desc/100);
      b+=r.aloj*(L/52)*s.e_mp/200*(365*pz/12*dz-s.g_post/1000*365*s.p_racao);
      if(s.recria)b+=r.pint*s.e_mr/100*(s.p_pint+0.5*s.kg_rec*s.p_racao_r);}
    const inv=r.total, liq=b-inv, roi=inv>0?b/inv:0, dzAno=r.aves*365*pz/12;window.__roi={inv,b,liq,roi};
    const g=[[brlK(inv/12),"investimento por mês"],[brlK(b/12),"retorno estimado por mês"],[(liq<0?"− ":"")+brlK(Math.abs(liq/12)),"ganho líquido por mês"],[inv>0?"R$ "+nf(2).format(roi):"–","volta para cada R$ 1"],
      ["R$ "+nf(3).format(dzAno>0?inv/dzAno:0),"investimento por dúzia"],["R$ "+nf(2).format(r.aves>0?inv/r.aves:0),"investimento por ave/ano"]];
    document.getElementById("roi-flow").innerHTML=g.map(([v,sp],i)=>`<div><b${i===2||i===3?(liq<0?' style="color:var(--bad)"':' style="color:var(--good)"'):''}>${v}</b><span>${sp}</span></div>`).join("");
-   document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`O produtor investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de mais ovos, maior persistência de postura, menos mortalidade na postura e na recria. Estimativa com premissas conservadoras; o cálculo detalhado é feito pelo técnico.`;RED((s.p_ovo-s.c_dz)*r.aves*365*(s.postura/100)/12/12,liq/12,"a granja");}
+   document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`O produtor investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de mais ovos, maior persistência de postura, economia de ração, menos ovos trincados, menos mortalidade na postura e na recria. Estimativa com premissas conservadoras; o cálculo detalhado é feito pelo técnico.`;RED((s.p_ovo-s.c_dz)*r.aves*365*(s.postura/100)/12/12,liq/12,"a granja");}
   {const L=Math.max(1,s.sem_desc-s.sem_ini),dz=s.p_ovo,pz=s.postura/100,FD=FEEDS[s.racao]||FEEDS.dba,fn=FD[0],fp=FD[1],on=s.on;
   const pts=v=>"−"+(v<0.1?nf(3).format(v):n2(v))+" ponto %", cv=v=>"−"+nf(3).format(v)+" kg/kg";
   const polC=L=>L*s.d_pol/1e6/0.1*s.pr_pol, eleC=L=>L*s.d_ele/1e5*s.pr_ele;
@@ -638,9 +655,11 @@ function calc(){
   const I={
    pos:{c:"ovos",lab:"Produção de ovos",u:r.aves*365*pz/12*dz/100,fmt:v=>"+"+n2(v)+"% de ovos",ref:s.e_pos,sub:v=>"≈ +"+nf(2).format(365*pz*v/100)+" ovo por ave/ano"},
    per:{c:"pers",lab:"Persistência após a semana "+n0(s.e_wper||60),u:r.aves*FRP(s)*365/12*dz/100,fmt:v=>"+"+n2(v)+" pontos de postura",ref:s.e_per,sub:v=>"≈ +"+n0(r.aves*FRP(s)*365*v/100/12/12)+" dúzias por mês"},
+   ca:{c:"conv",lab:"Economia de ração na postura",u:r.aves*s.g_post/1000*365*s.p_racao/100,fmt:v=>"−"+n2(v)+"% de ração",ref:s.e_ca,sub:v=>"≈ −"+nf(1).format(s.g_post*v/100)+" g por ave/dia"},
+   trc:{c:"trc",lab:"Ovos trincados e desclassificados",u:r.aves*365*pz*s.p_desc/100/100*(dz/12)*(1-s.v_desc/100),fmt:v=>"−"+n0(v)+"% de trincados",ref:s.e_trc,sub:v=>"≈ +"+n0(r.aves*365*pz*s.p_desc/100*v/100/12/12)+" dúzias boas por mês"},
    mp:{c:"mort",lab:"Mortalidade na postura",u:r.aloj*(L/52)/200*(365*pz/12*dz-s.g_post/1000*365*s.p_racao),fmt:pts,ref:s.e_mp,sub:v=>"≈ "+n0(r.aloj*v/100)+" galinhas a mais por ano"},
    mr:{c:"mort",lab:"Mortalidade na recria",u:s.recria?r.pint/100*(s.p_pint+0.5*s.kg_rec*s.p_racao_r):0,fmt:pts,ref:s.e_mr,sub:v=>"≈ "+n0(r.pint*v/100)+" frangas a mais por ano"}};
-  const R=[I.mr,I.pos],P=[I.pos,I.per,I.mp];
+  const R=[I.mr,I.pos],P=[I.pos,I.per,I.mp,I.ca,I.trc];
   renderBE([
    {on:on.feed&&s.recria,nome:fn,fase:"Recria",custo:r.feedRecKg*s[fp],pa,ind:R},
    {on:on.feed,nome:fn,fase:"Postura",custo:r.feedPostKg*s[fp],pa,ind:P},
@@ -648,7 +667,7 @@ function calc(){
    {on:on.pol,nome:"Polimeve Solúvel",fase:"Postura (manejos marcados)",custo:polC(r.sp.pol[1]),pa,ind:P},
    {on:on.ele,nome:"Eletroaminovit",fase:"Recria (manejos marcados)",custo:eleC(r.sp.ele[0]),pa,ind:R},
    {on:on.ele,nome:"Eletroaminovit",fase:"Postura (manejos marcados)",custo:eleC(r.sp.ele[1]),pa,ind:P},
-   {on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.total,pa,ind:[I.pos,I.per,I.mp,I.mr]}]);}
+   {on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.total,pa,ind:[I.pos,I.per,I.mp,I.mr,I.ca,I.trc]}]);}
   if(r.total>0&&!PARS.some(([c])=>S.par&&S.par[c])){const n=document.getElementById("roi-note");if(n)n.textContent="Para ver o retorno, escolha em “3. Resultado esperado” onde a granja vai melhorar.";}
   const act=document.activeElement&&document.activeElement.id;
   const actV=document.activeElement?document.activeElement.value:"",actP=(()=>{try{return document.activeElement.selectionStart}catch(e){return null}})();
@@ -659,7 +678,7 @@ function calc(){
     ${p.man&&!(MAN[p.man].some(m=>S.mn[m[0]])||S.mn[OX[p.man]])?`<p class="fx-hint">Marque abaixo em quais manejos o produto vai entrar.</p>`:""}${p.man?`<div class="mans">${MAN[p.man].map(m=>`<div class="mrow"><label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]}</label><span class="dd"><input type="text" inputmode="numeric" id="cx_${m[2]}" value="${S[m[2]]}"${on?"":" disabled"}><small>dias</small></span>${STD[m[2]]?`<small class="std">IMEVE: ${STD[m[2]]}</small>`:""}</div>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
     <div class="money"><span>Faturamento potencial</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
-    ${FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true)?`<p class="fx-hint">Marque abaixo em quais rações o produto vai entrar.</p>`:""}<details class="more" data-id="${p.id}"${(S.op&&S.op[p.id])||(FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true))?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
+    ${FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true)?`<p class="fx-hint">Use o protocolo IMEVE ou abra “Ver detalhes” para marcar em quais rações o produto vai entrar.</p>`:""}<details class="more" data-id="${p.id}"${(S.op2&&S.op2[p.id])?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
   </article>`;}).join("");
   if(act&&(act.startsWith("ov_")||act.startsWith("od_"))){const el=document.getElementById(act);if(el){el.focus();}}
   if(act&&act.startsWith("cx_")){const el=document.getElementById(act);if(el){el.value=actV;el.focus();try{if(actP!=null)el.setSelectionRange(actP,actP);}catch(e){}}}

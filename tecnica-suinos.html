@@ -200,6 +200,16 @@ body{padding-bottom:84px}
 .gname{background:var(--surface)!important;border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--line))!important}
 .gname:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
 .edit-tip{color:var(--accent);font-weight:600}
+.refs-h{margin:18px 0 6px;font:700 16px var(--f-display)}
+ol.refs{margin:6px 0 0;padding-left:20px;display:grid;gap:8px;font-size:13px;line-height:1.45}
+ol.refs li b{font-weight:700}
+ol.refs .what{display:block;color:var(--muted);font-size:12.5px}
+ol.refs .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:0 6px;margin-left:4px}
+details.phd{margin-top:2px}
+details.phd>summary{cursor:pointer;list-style:none;color:var(--accent);font:700 13px var(--f-body);padding:6px 0}
+details.phd>summary::-webkit-details-marker{display:none}
+details.phd>summary::before{content:"▸ "}
+details.phd[open]>summary::before{content:"▾ "}
 </style>
 
 </head>
@@ -420,12 +430,15 @@ function paintTerm(){const n=S.n_term;for(let k=1;k<=5;k++){const show=k<=n;cons
   document.querySelectorAll('[id$="_t'+k+'"]').forEach(el=>{if(el.id.startsWith("row_"))el.hidden=!show;});}}
 document.getElementById("prog").innerHTML=PRODS.map(p=>`<div class="prodbox" id="box_${p.id}">
   <div class="prodhead"><div><b>${p.nome}</b><span class="via">${p.via}</span></div><div class="quick"><button type="button" class="tp" data-tproto="${p.id}" title="Marca as fases e doses do protocolo padrão IMEVE">⚡ protocolo IMEVE</button><button type="button" data-all="${p.id}" data-v="1">todas</button><button type="button" data-all="${p.id}" data-v="0">nenhuma</button></div></div>
+  <details class="phd"><summary><span id="phc_${p.id}">Fases</span></summary>
   ${p.dose?`<div class="ph dose"><label for="${p.dose[0]}"><span>${p.dose[1]}</span></label><div class="num"><input id="${p.dose[0]}" type="text" step="${p.dose[3]}" inputmode="decimal"><span>${p.dose[2]}</span></div></div>`:""}
   ${p.uses.map(u=>{const id=p.id+"_"+u[0];return `<div class="ph" id="row_${id}"><label><input type="checkbox" id="on_${id}"><span>${u[1]}</span></label><div class="num"><input id="v_${id}" type="text" step="${p.step}" inputmode="decimal" aria-label="${p.nome}: ${u[1]}"><span>${p.un}</span></div></div>`;}).join("")}
+  </details>
 </div>`).join("");
 
 const NUMKEYS=Object.values(FIELDS).flat().map(f=>f[0]).concat(["pol_dose","ele_dose","agua_c","agua_t"]);
-function paintRows(){Object.keys(S.u).forEach(id=>{const row=document.getElementById("row_"+id);if(row)row.classList.toggle("off",!S.u[id][0]);});}
+function phCount(){PRODS.forEach(p=>{const el=document.getElementById("phc_"+p.id);if(!el)return;const n=p.uses.filter(u=>S.u[p.id+"_"+u[0]]&&S.u[p.id+"_"+u[0]][0]).length,w=p.via==="ração"?["fases","marcadas"]:["manejos","marcados"];el.textContent=`Ver ${w[0]} · ${n} de ${p.uses.length} ${w[1]}`;});}
+function paintRows(){phCount();Object.keys(S.u).forEach(id=>{const row=document.getElementById("row_"+id);if(row)row.classList.toggle("off",!S.u[id][0]);});}
 function fill(){
   NUMKEYS.forEach(k=>{document.getElementById(k).value=S[k];});
   Object.keys(S.u).forEach(id=>{const c=document.getElementById("on_"+id),v=document.getElementById("v_"+id);if(c){c.checked=!!S.u[id][0];v.value=S.u[id][1];}});
