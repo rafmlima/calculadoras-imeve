@@ -416,7 +416,7 @@ const DEF={
   d_pas1:200, d_pas2:200, d_pasbac1:200, d_pasbac2:200, d_dba1:200, d_dba2:200, d_dbapas1:200, d_dbapas2:200,
   d_pol:100, dp_aloj:5, dp_troca:4, d_ele:100, de_s2:6,
   pr_pas:82.00, pr_pasbac:79.20, pr_dba:34.80, pr_dbapas:61.92, pr_pol:26.80, pr_ele:103.00,
-  e_ca:0.03, e_mort:0.5, e_peso:1.0,
+  e_ca:0.03, e_mort:0.5, e_p7:17, e_k7:1.2, e_peso:1.0,
   a_vac:0.12, a_s45:0.30, a_calor:0.35, dp_vac:4, dp_calor:5, de_s45:14, de_calor:6,
 de_aloj:6, de_troca:6,   mn:{pa:false,pr:false,pv:false,pq:false,po:false,ea:false,er:false,e2:false,eq:false,eo:false},
   on:{feed:false,pol:false,ele:false}
@@ -436,7 +436,8 @@ const FIELDS={
   "sec-efeitos":[
     ["e_ca","Conversão alimentar","kg de ração por kg a menos","kg/kg",0.01],
     ["e_mort","Redução da mortalidade","pontos percentuais · ex.: de 8% para 7,5% = 0,5","p.p.",0.1],
-    ["e_peso","Peso no abate","% a mais","%",0.1]],
+    ["e_p7","Peso extra aos 7 dias","gramas a mais por ave · recalcula o peso no abate","g",1],["e_k7","Reflexo no abate","% de peso no abate a cada 20 g aos 7 dias · Cobb Brasil, 726 mi aves: 1,2%","%",0.1],
+    ["e_peso","Peso no abate","% a mais · recalculado pelo peso aos 7 dias · pode editar sozinho","%",0.1]],
   "sec-dose":[
     ["de_aloj","Eletroaminovit: dias no alojamento","","dias",1],["de_troca","Eletroaminovit: dias na troca de ração","","dias",1],
     ["d_pas1","PAS-TR+ até 21 dias","","g/t",25],["d_pas2","PAS-TR+ após 21 dias","","g/t",25],
@@ -465,7 +466,7 @@ const KEYS=["qtd","qtr","p_frango","c_prod"].concat(Object.values(FIELDS).flat()
 function fill(){KEYS.forEach(k=>{document.getElementById(k).value=S[k];});document.getElementById("ref").value=S.ref;}
 fill();
 document.addEventListener("input",e=>{const id=e.target.id;
-  if(KEYS.includes(id)){const v=pBR(e.target.value);S[id]=isFinite(v)?v:0;}
+  if(KEYS.includes(id)){const v=pBR(e.target.value);S[id]=isFinite(v)?v:0;cas7(id);}
   else if(id==="ref"||id==="racao"){S[id]=e.target.value;}
   else if(id&&(id.startsWith("ov_")||id.startsWith("od_"))){const v=pBR(e.target.value),k=id.slice(3);S.ox=S.ox||{};S.ox[k]=Object.assign({},oxv(S,k));S.ox[k][id[1]]=isFinite(v)?Math.max(0,v):0;}
   else if(id&&id.startsWith("mn_")){S.mn[id.slice(3)]=e.target.checked;}
@@ -545,7 +546,7 @@ function renderBE(items){
   {const pr=el.querySelector(".be-row.prog"),o=[...el.querySelectorAll(".be-row:not(.prog)")];if(pr&&o.length){const d=document.createElement("details");d.className="be-more";d.open=!!S.beOpen;d.innerHTML=`<summary>Ver por produto e fase (${o.length})</summary>`;o.forEach(x=>d.appendChild(x));el.insertBefore(pr,el.firstChild);el.appendChild(d);d.addEventListener("toggle",()=>{S.beOpen=d.open;save();});}}
 }
 const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.pas;return [[F[1],"Preço","R$/kg"]];},pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
-const PARS=[["conv","Conversão alimentar",["e_ca"]],["mort","Mortalidade",["e_mort"]],["peso","Peso no abate",["e_peso"]]];
+const PARS=[["conv","Conversão alimentar",["e_ca"]],["mort","Mortalidade",["e_mort"]],["peso","Peso",["e_p7","e_k7","e_peso"],["e_p7","e_peso"]]];
 function CIN(id,adv){const L0=typeof CI[id]==="function"?CI[id]():CI[id];if(!L0)return "";const L=L0.filter(e=>!String(e[0]).startsWith("pr_")&&(e[3]==="x")===!!adv);if(!L.length)return "";
   return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div>${STD[k]?`<small class="std">Padrão IMEVE: ${STD[k]}</small>`:""}</label>`).join("")+`</div>`;}
 function effS(S0){const s=Object.assign({},S0);Object.values(FX).forEach(fn=>fn().forEach(([k])=>{if(!(S0.fx&&S0.fx[k]===true)&&typeof s[k]==="number")s[k]=0;}));PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
@@ -553,9 +554,9 @@ function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(
   box.innerHTML=`<span>A granja vai melhorar em:</span>`+PARS.map(([c,l])=>`<button type="button" data-p="${c}" aria-pressed="${!!S.par[c]}">${l}</button>`).join("");
   PARS.forEach(([c,,show])=>show.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row)row.hidden=!S.par[c];}));
   const h=document.getElementById("par-hint");if(h)h.hidden=PARS.some(([c])=>S.par[c]);
-  const ADV=["e_cre","e_abt"],ab=document.getElementById("adv-btn"),hasAdv=ADV.some(k=>document.getElementById(k));
+  const ADV=["e_cre","e_abt","e_k7"],ab=document.getElementById("adv-btn"),hasAdv=ADV.some(k=>document.getElementById(k));
   ADV.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row&&!row.hidden)row.hidden=!S.adv;});
-  if(ab){const pesoOn=PARS.some(([c,,sh])=>S.par[c]&&sh.includes("e_cre"));ab.hidden=!(hasAdv&&pesoOn);ab.textContent=S.adv?"Esconder reflexos (Cooper)":"Ajustar reflexos do peso (Cooper)";}}
+  if(ab){const pesoOn=PARS.some(([c,,sh])=>S.par[c]&&(sh.includes("e_cre")||sh.includes("e_k7")));ab.hidden=!(hasAdv&&pesoOn);ab.textContent=S.adv?"Esconder reflexo no abate":"Ajustar reflexo no abate (Cobb)";}}
 document.addEventListener("click",e=>{const b=e.target.closest("#par button[data-p]");if(!b)return;S.par=S.par||{};S.par[b.dataset.p]=!S.par[b.dataset.p];save();calc();});
 function PH(id,r){const L=((r.ph||{})[id]||[]).filter(x=>x[1]>0);if(!L.length)return "";const f=v=>v>=100?n0(v):v>=10?n1(v):nf(2).format(v);
   return `<div class="uf"><div class="uf-t">Uso por fase · por mês</div>`+L.map(([l,q,u])=>`<div class="uf-r"><span>${l}</span><b>${f(q/12)} ${u}</b></div>`).join("")+`</div>`;}
@@ -593,9 +594,14 @@ function sbar(){const el=document.getElementById("sbar-in");if(!el)return;const 
   if(!(R.inv>0)){el.innerHTML='<span class="msg">'+SB_EMPTY+'</span>';return;}
   if(!(R.b>0)){el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investimento/mês</span></div><span class="msg">${SB_PAR}</span>`;return;}
   el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investe por mês</span></div><div class="it"><b>${brlK(R.b/12)}</b><span>volta por mês</span></div><div class="it"><b>${(R.liq<0?"− ":"")+brlK(Math.abs(R.liq/12))}</b><span>ganho líquido/mês</span></div><div class="it"><b>R$ ${nf(2).format(R.roi)}</b><span>para cada R$ 1</span></div><button class="go" id="sbar-go" type="button">Ver detalhes ↓</button>`;}
+function liveX(){const L=(k,t)=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}el.textContent=t;};
+  if(document.getElementById("e_p7")&&typeof S.e_p7==="number"){const g=S.e_p7/20*S.e_k7/100*S.peso*1000;L("e_p7",`≈ +${n0(g)} g por ave no abate (+${nf(2).format(S.e_p7/20*S.e_k7)}%)`);}
+  if(document.getElementById("e_per")&&typeof S.e_per==="number"){const r=window.__r||{},aves=r.aves||S.aves||0,dz=aves*FRP(S)*365*S.e_per/100/12/12;L("e_per",`≈ +${n0(dz)} dúzias de ovos por mês`);}}
+function FRP(s){const a=Math.max(1,s.sem_desc-s.sem_ini);return Math.min(1,Math.max(0,(s.sem_desc-(s.e_wper||60))/a));}
+function cas7(id){if(id==="e_p7"||id==="e_k7"){S.e_peso=Math.round(S.e_p7/20*S.e_k7*100)/100;}}
 function pBR(t){t=String(t).trim().replace(/\s/g,"");if(t.includes(","))t=t.replace(/\./g,"").replace(",",".");else if(/^-?\d{1,3}(\.\d{3})+$/.test(t))t=t.replace(/\./g,"");return parseFloat(t);}
 function fBR(v){if(typeof v!=="number"||!isFinite(v))return v;if(Number.isInteger(v)&&Math.abs(v)>=1000)return v.toLocaleString("pt-BR");return String(+v.toFixed(6)).replace(".",",");}
-function fmtNums(){const a=document.activeElement,L=(typeof NUMKEYS!=="undefined"?NUMKEYS:typeof KEYS!=="undefined"?KEYS:[]);
+function fmtNums(){liveX();const a=document.activeElement,L=(typeof NUMKEYS!=="undefined"?NUMKEYS:typeof KEYS!=="undefined"?KEYS:[]);
   L.forEach(k=>{const el=document.getElementById(k);if(el&&el!==a&&el.type==="text"&&typeof S[k]==="number")el.value=fBR(S[k]);});
   if(S.u)Object.keys(S.u).forEach(id=>{const el=document.getElementById("v_"+id);if(el&&el!==a&&el.type==="text")el.value=fBR(S.u[id][1]);});
   const g=document.getElementById("granja");if(g&&g!==a)g.value=S.granja||"";}
@@ -623,7 +629,7 @@ function calc(){
   const I={
    ca:{c:"conv",lab:"Conversão alimentar",u:r.kgVivo*s.p_racao,fmt:cv,ref:s.e_ca,sub:v=>"de "+nf(3).format(r.ca)+" para "+nf(3).format(r.ca-v)},
    mort:{c:"mort",lab:"Mortalidade",u:r.alojAno/100*(s.peso*s.p_frango-0.5*kgA*s.p_racao),fmt:pts,ref:s.e_mort,sub:v=>"≈ "+n0(r.alojSem*v/100)+" aves a mais por semana"},
-   peso:{c:"peso",lab:"Peso no abate",u:r.abAno/1000*(s.p_frango-r.ca*s.p_racao),fmt:v=>"+"+n0(v)+" g por ave",ref:s.e_peso/100*s.peso*1000}};
+   peso:{c:"peso",lab:"Peso no abate",u:r.abAno/1000*(s.p_frango-r.ca*s.p_racao),fmt:v=>"+"+n0(v)+" g por ave",ref:s.e_peso/100*s.peso*1000,sub:v=>s.e_k7>0?"≈ +"+n0(v*2000/(s.e_k7*s.peso*1000))+" g por ave aos 7 dias":""}};
   const A=[I.ca,I.mort,I.peso];
   renderBE([
    {on:on.feed,nome:fn,fase:"Até 21 dias",custo:r.f1/1e6*s[fd1]*s[fp],pa,ind:A},

@@ -411,7 +411,7 @@ details.be-more>.be-row{margin:0 10px 10px}
 (function(){
 const FEEDS={dba:["DBA Concentrado","pr_dba","d_dba1","d_dba2"],dbapas:["DBA + PAS Concentrado","pr_dbapas","d_dbapas1","d_dbapas2"],pas:["PAS-TR+ Concentrado","pr_pas","d_pas1","d_pas2"],pasbac:["PAS-BAC TR Concentrado","pr_pasbac","d_pasbac1","d_pasbac2"]};
 const DEF={
-  p_ovo:4.41067, c_dz:2.90, ovoUn:"cx", p_racao:1.35, p_racao_r:1.45, p_pint:4.50, postura:85, e_pos:1.5, e_mp:1.0, e_mr:0.5,
+  p_ovo:4.41067, c_dz:2.90, ovoUn:"cx", p_racao:1.35, p_racao_r:1.45, p_pint:4.50, postura:85, e_pos:1.5, e_per:2, e_wper:60, e_mp:1.0, e_mr:0.5,
   aves:100000, modo:"aves", qtr:80, recria:true, racao:"dba",
   sem_ini:17, sem_desc:90, kg_rec:5.41, g_post:107, mr:3.2, mp:5.5,
   a_pint:0.03, a_rec:0.07, a_trans:0.11, a_post:0.17,
@@ -435,7 +435,7 @@ const FIELDS={
     ["a_pint","Água da pintainha (1ª semana)","por ave","L/dia",0.01],["a_rec","Água da franga na recria","por ave","L/dia",0.01],
     ["a_trans","Água na transferência","por ave","L/dia",0.01],["a_post","Água da galinha no calor","por ave","L/dia",0.01]],
   "sec-efeitos":[
-    ["e_pos","Produção de ovos","% a mais · Granja Ino: +6,3%","%",0.1],
+    ["e_pos","Produção de ovos","% a mais · Granja Ino: +6,3%","%",0.1],["e_per","Persistência de postura no fim do lote","quantos pontos a mais de postura · estudos com Bacillus após 60 semanas: +0,6 a +6,3","pontos %",0.1],["e_wper","Fim do lote começa na semana","a partir dela a postura se mantém mais alta","semana",1],
     ["e_mp","Redução da mortalidade na postura","ex.: se a mortalidade cai de 8% para 7,5%, coloque 0,5","pontos %",0.1],
     ["e_mr","Redução da mortalidade na recria","quanto a mortalidade cai","pontos %",0.1]],
   "sec-dose":[
@@ -528,7 +528,7 @@ function renderBE(items){
   const el=document.getElementById("be");if(!el)return;
   let all=items.filter(it=>it.on&&it.custo>0);if(all.filter(x=>!x.prog).length<=1)all=all.filter(x=>!x.prog);
   const cats=[];all.forEach(it=>it.ind.forEach(i=>{if(i.u>0&&!cats.includes(i.c))cats.push(i.c);}));
-  const order=["peso","ovos","mort","conv"].filter(c=>cats.includes(c));
+  const order=["peso","ovos","pers","mort","conv"].filter(c=>cats.includes(c));
   let f="todos";const selP=PARS.map(p=>p[0]).filter(c=>S.par&&S.par[c]);
   const fb=document.getElementById("be-f");
   if(fb)fb.innerHTML="";
@@ -542,7 +542,7 @@ function renderBE(items){
   {const pr=el.querySelector(".be-row.prog"),o=[...el.querySelectorAll(".be-row:not(.prog)")];if(pr&&o.length){const d=document.createElement("details");d.className="be-more";d.open=!!S.beOpen;d.innerHTML=`<summary>Ver por produto e fase (${o.length})</summary>`;o.forEach(x=>d.appendChild(x));el.insertBefore(pr,el.firstChild);el.appendChild(d);d.addEventListener("toggle",()=>{S.beOpen=d.open;save();});}}
 }
 const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return [[F[1],"Preço","R$/kg"]];},pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
-const PARS=[["ovos","Produção de ovos",["e_pos"]],["mort","Mortalidade",["e_mp","e_mr"]]];
+const PARS=[["ovos","Produção de ovos",["e_pos"]],["pers","Persistência de postura",["e_per","e_wper"],["e_per"]],["mort","Mortalidade",["e_mp","e_mr"]]];
 function CIN(id,adv){const L0=typeof CI[id]==="function"?CI[id]():CI[id];if(!L0)return "";const L=L0.filter(e=>!String(e[0]).startsWith("pr_")&&(e[3]==="x")===!!adv);if(!L.length)return "";
   return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div>${STD[k]?`<small class="std">Padrão IMEVE: ${STD[k]}</small>`:""}</label>`).join("")+`</div>`;}
 function effS(S0){const s=Object.assign({},S0);Object.values(FX).forEach(fn=>fn().forEach(([k])=>{if(!(S0.fx&&S0.fx[k]===true)&&typeof s[k]==="number")s[k]=0;}));PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
@@ -599,9 +599,14 @@ function sbar(){const el=document.getElementById("sbar-in");if(!el)return;const 
   if(!(R.inv>0)){el.innerHTML='<span class="msg">'+SB_EMPTY+'</span>';return;}
   if(!(R.b>0)){el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investimento/mês</span></div><span class="msg">${SB_PAR}</span>`;return;}
   el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investe por mês</span></div><div class="it"><b>${brlK(R.b/12)}</b><span>volta por mês</span></div><div class="it"><b>${(R.liq<0?"− ":"")+brlK(Math.abs(R.liq/12))}</b><span>ganho líquido/mês</span></div><div class="it"><b>R$ ${nf(2).format(R.roi)}</b><span>para cada R$ 1</span></div><button class="go" id="sbar-go" type="button">Ver detalhes ↓</button>`;}
+function liveX(){const L=(k,t)=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}el.textContent=t;};
+  if(document.getElementById("e_p7")&&typeof S.e_p7==="number"){const g=S.e_p7/20*S.e_k7/100*S.peso*1000;L("e_p7",`≈ +${n0(g)} g por ave no abate (+${nf(2).format(S.e_p7/20*S.e_k7)}%)`);}
+  if(document.getElementById("e_per")&&typeof S.e_per==="number"){const r=window.__r||{},aves=r.aves||S.aves||0,dz=aves*FRP(S)*365*S.e_per/100/12/12;L("e_per",`≈ +${n0(dz)} dúzias de ovos por mês`);}}
+function FRP(s){const a=Math.max(1,s.sem_desc-s.sem_ini);return Math.min(1,Math.max(0,(s.sem_desc-(s.e_wper||60))/a));}
+function cas7(id){if(id==="e_p7"||id==="e_k7"){S.e_peso=Math.round(S.e_p7/20*S.e_k7*100)/100;}}
 function pBR(t){t=String(t).trim().replace(/\s/g,"");if(t.includes(","))t=t.replace(/\./g,"").replace(",",".");else if(/^-?\d{1,3}(\.\d{3})+$/.test(t))t=t.replace(/\./g,"");return parseFloat(t);}
 function fBR(v){if(typeof v!=="number"||!isFinite(v))return v;if(Number.isInteger(v)&&Math.abs(v)>=1000)return v.toLocaleString("pt-BR");return String(+v.toFixed(6)).replace(".",",");}
-function fmtNums(){const a=document.activeElement,L=(typeof NUMKEYS!=="undefined"?NUMKEYS:typeof KEYS!=="undefined"?KEYS:[]);
+function fmtNums(){liveX();const a=document.activeElement,L=(typeof NUMKEYS!=="undefined"?NUMKEYS:typeof KEYS!=="undefined"?KEYS:[]);
   L.forEach(k=>{const el=document.getElementById(k);if(el&&el!==a&&el.type==="text"&&typeof S[k]==="number")el.value=fBR(S[k]);});
   if(S.u)Object.keys(S.u).forEach(id=>{const el=document.getElementById("v_"+id);if(el&&el!==a&&el.type==="text")el.value=fBR(S.u[id][1]);});
   const g=document.getElementById("granja");if(g&&g!==a)g.value=S.granja||"";}
@@ -617,23 +622,24 @@ function calc(){
   {const on=s.on, mn=s.mn, any=on.feed||(on.pol&&(MAN.pol.some(m=>mn[m[0]])||mn.po))||(on.ele&&(MAN.ele.some(m=>mn[m[0]])||mn.eo));
    const L=Math.max(1,s.sem_desc-s.sem_ini), dz=s.p_ovo, pz=s.postura/100;
    let b=0;
-   if(any){b+=r.aves*365*pz/12*dz*s.e_pos/100;
+   if(any){b+=r.aves*365*pz/12*dz*s.e_pos/100;b+=r.aves*FRP(s)*365/12*dz*s.e_per/100;
      b+=r.aloj*(L/52)*s.e_mp/200*(365*pz/12*dz-s.g_post/1000*365*s.p_racao);
      if(s.recria)b+=r.pint*s.e_mr/100*(s.p_pint+0.5*s.kg_rec*s.p_racao_r);}
    const inv=r.total, liq=b-inv, roi=inv>0?b/inv:0, dzAno=r.aves*365*pz/12;window.__roi={inv,b,liq,roi};
    const g=[[brlK(inv/12),"investimento por mês"],[brlK(b/12),"retorno estimado por mês"],[(liq<0?"− ":"")+brlK(Math.abs(liq/12)),"ganho líquido por mês"],[inv>0?"R$ "+nf(2).format(roi):"–","volta para cada R$ 1"],
      ["R$ "+nf(3).format(dzAno>0?inv/dzAno:0),"investimento por dúzia"],["R$ "+nf(2).format(r.aves>0?inv/r.aves:0),"investimento por ave/ano"]];
    document.getElementById("roi-flow").innerHTML=g.map(([v,sp],i)=>`<div><b${i===2||i===3?(liq<0?' style="color:var(--bad)"':' style="color:var(--good)"'):''}>${v}</b><span>${sp}</span></div>`).join("");
-   document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`Sua granja investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de mais ovos, menos mortalidade na postura e na recria. Estimativa com premissas conservadoras; o técnico IMEVE pode detalhar o cálculo para a sua granja.`;RED((s.p_ovo-s.c_dz)*r.aves*365*(s.postura/100)/12/12,liq/12,"você");}
+   document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`Sua granja investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de mais ovos, maior persistência de postura, menos mortalidade na postura e na recria. Estimativa com premissas conservadoras; o técnico IMEVE pode detalhar o cálculo para a sua granja.`;RED((s.p_ovo-s.c_dz)*r.aves*365*(s.postura/100)/12/12,liq/12,"você");}
   {const L=Math.max(1,s.sem_desc-s.sem_ini),dz=s.p_ovo,pz=s.postura/100,FD=FEEDS[s.racao]||FEEDS.dba,fn=FD[0],fp=FD[1],on=s.on;
   const pts=v=>"−"+(v<0.1?nf(3).format(v):n2(v))+" ponto %", cv=v=>"−"+nf(3).format(v)+" kg/kg";
   const polC=L=>L*s.d_pol/1e6/0.1*s.pr_pol, eleC=L=>L*s.d_ele/1e5*s.pr_ele;
   const pa=c=>"R$ "+n2(r.aves>0?c/r.aves:0)+" por ave/ano";
   const I={
    pos:{c:"ovos",lab:"Produção de ovos",u:r.aves*365*pz/12*dz/100,fmt:v=>"+"+n2(v)+"% de ovos",ref:s.e_pos,sub:v=>"≈ +"+nf(2).format(365*pz*v/100)+" ovo por ave/ano"},
+   per:{c:"pers",lab:"Persistência após a semana "+n0(s.e_wper||60),u:r.aves*FRP(s)*365/12*dz/100,fmt:v=>"+"+n2(v)+" pontos de postura",ref:s.e_per,sub:v=>"≈ +"+n0(r.aves*FRP(s)*365*v/100/12/12)+" dúzias por mês"},
    mp:{c:"mort",lab:"Mortalidade na postura",u:r.aloj*(L/52)/200*(365*pz/12*dz-s.g_post/1000*365*s.p_racao),fmt:pts,ref:s.e_mp,sub:v=>"≈ "+n0(r.aloj*v/100)+" galinhas a mais por ano"},
    mr:{c:"mort",lab:"Mortalidade na recria",u:s.recria?r.pint/100*(s.p_pint+0.5*s.kg_rec*s.p_racao_r):0,fmt:pts,ref:s.e_mr,sub:v=>"≈ "+n0(r.pint*v/100)+" frangas a mais por ano"}};
-  const R=[I.mr,I.pos],P=[I.pos,I.mp];
+  const R=[I.mr,I.pos],P=[I.pos,I.per,I.mp];
   renderBE([
    {on:on.feed&&s.recria,nome:fn,fase:"Recria",custo:r.feedRecKg*s[fp],pa,ind:R},
    {on:on.feed,nome:fn,fase:"Postura",custo:r.feedPostKg*s[fp],pa,ind:P},
@@ -641,7 +647,7 @@ function calc(){
    {on:on.pol,nome:"Polimeve Solúvel",fase:"Postura (manejos marcados)",custo:polC(r.sp.pol[1]),pa,ind:P},
    {on:on.ele,nome:"Eletroaminovit",fase:"Recria (manejos marcados)",custo:eleC(r.sp.ele[0]),pa,ind:R},
    {on:on.ele,nome:"Eletroaminovit",fase:"Postura (manejos marcados)",custo:eleC(r.sp.ele[1]),pa,ind:P},
-   {on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.total,pa,ind:[I.pos,I.mp,I.mr]}]);}
+   {on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.total,pa,ind:[I.pos,I.per,I.mp,I.mr]}]);}
   if(r.total>0&&!PARS.some(([c])=>S.par&&S.par[c])){const n=document.getElementById("roi-note");if(n)n.textContent="Para ver o retorno, escolha em “3. Resultado esperado” onde a granja vai melhorar.";}
   const act=document.activeElement&&document.activeElement.id;
   const actV=document.activeElement?document.activeElement.value:"",actP=(()=>{try{return document.activeElement.selectionStart}catch(e){return null}})();

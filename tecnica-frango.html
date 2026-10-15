@@ -324,7 +324,7 @@ const DEF={
   p_frango:4.81, ref:"integracao", c_prod:4.85, p_racao:1.82, p_pint:2.45,
   pr_pas:82.00, pr_pasbac:79.20, pr_dba:34.80, pr_dbapas:61.92, pr_pol:26.80, pr_ele:103.00,
   pol_dose:100, ele_dose:100,
-  e_ca:0.03, e_mort:0.5, e_peso:1.0,
+  e_ca:0.03, e_mort:0.5, e_p7:17, e_k7:1.2, e_peso:1.0,
   u:{}
 };
 const FEEDPH=[["pi","Pré-inicial (1 a 7 dias)","ini"],["ini","Inicial (8 a 21 dias)","ini"],["cre","Crescimento (22 a 35 dias)","fin"],["fin","Final / abate (36 dias ao abate)","fin"]];
@@ -374,7 +374,8 @@ const FIELDS={
   "sec-efeitos":[
     ["e_ca","Melhora da conversão alimentar","kg de ração/kg de frango a menos","kg/kg",0.01],
     ["e_mort","Redução da mortalidade","pontos percentuais","p.p.",0.1],
-    ["e_peso","Aumento do peso de abate","% a mais","%",0.1]]
+    ["e_p7","Peso extra aos 7 dias","gramas a mais por ave · recalcula o peso no abate","g",1],["e_k7","Reflexo no abate","% de peso no abate a cada 20 g aos 7 dias · Cobb Brasil, 726 mi aves: 1,2%","%",0.1],
+    ["e_peso","Aumento do peso de abate","% a mais · recalculado pelo peso aos 7 dias · pode editar sozinho","%",0.1]]
 };
 const KEY="calc-frango-v1-z-d";
 let S=JSON.parse(JSON.stringify(DEF));
@@ -402,7 +403,7 @@ function fill(){
 fill();
 document.addEventListener("input",e=>{
   const id=e.target.id; if(!id)return;
-  if(NUMKEYS.includes(id)){const v=pBR(e.target.value);S[id]=isFinite(v)?v:0;}
+  if(NUMKEYS.includes(id)){const v=pBR(e.target.value);S[id]=isFinite(v)?v:0;cas7(id);}
   else if(id.startsWith("on_")){S.u[id.slice(3)][0]=e.target.checked;paintRows();}
   else if(id.startsWith("v_")){const v=pBR(e.target.value);S.u[id.slice(2)][1]=isFinite(v)?v:0;}
   else if(id==="cliente"){S.cliente=e.target.value;}
@@ -498,7 +499,7 @@ function beTec(r,G,GI,PROG,pa){
   items.push({on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.invest,pa,ind:PROG});
   renderBE(items);
 }
-const PARS=[["conv","Conversão alimentar",["e_ca"]],["mort","Mortalidade",["e_mort"]],["peso","Peso no abate",["e_peso"]]];
+const PARS=[["conv","Conversão alimentar",["e_ca"]],["mort","Mortalidade",["e_mort"]],["peso","Peso",["e_p7","e_k7","e_peso"],["e_p7","e_peso"]]];
 function effS(S0){const s=Object.assign({},S0);PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
 function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(!box)return;
   box.innerHTML=`<span>A granja vai melhorar em:</span>`+PARS.map(([c,l])=>`<button type="button" data-p="${c}" aria-pressed="${!!S.par[c]}">${l}</button>`).join("");
@@ -516,7 +517,7 @@ function calc(){
   const I={
    ca:{c:"conv",lab:"Conversão alimentar",u:r.kgVivo*s.p_racao,fmt:cv,ref:s.e_ca,sub:v=>"de "+nf(3).format(r.ca)+" para "+nf(3).format(r.ca-v)},
    mort:{c:"mort",lab:"Mortalidade",u:r.alojAno/100*(s.peso*s.p_frango-0.5*r.kgAve*s.p_racao),fmt:pts,ref:s.e_mort,sub:v=>"≈ "+n0(s.aloj*v/100)+" aves a mais por semana"},
-   peso:{c:"peso",lab:"Peso no abate",u:r.abAno/1000*(s.p_frango-r.ca*s.p_racao),fmt:v=>"+"+n0(v)+" g por ave",ref:s.e_peso/100*s.peso*1000}};
+   peso:{c:"peso",lab:"Peso no abate",u:r.abAno/1000*(s.p_frango-r.ca*s.p_racao),fmt:v=>"+"+n0(v)+" g por ave",ref:s.e_peso/100*s.peso*1000,sub:v=>s.e_k7>0?"≈ +"+n0(v*2000/(s.e_k7*s.peso*1000))+" g por ave aos 7 dias":""}};
   const A=[I.ca,I.mort,I.peso];
   beTec(r,{ini:"Fase inicial",fin:"Crescimento e final"},{ini:A,fin:A},A,pa);}
   const kgf=v=>(v<1000?n2(v/1000):n1(v/1000))+" t";
@@ -559,9 +560,14 @@ function calc(){
   document.getElementById("flow").innerHTML=f.map(([b,sp])=>`<div><b>${b}</b><span>${sp}</span></div>`).join("");
 }
 const SPN="Frango de Corte";
+function liveX(){const L=(k,t)=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}el.textContent=t;};
+  if(document.getElementById("e_p7")&&typeof S.e_p7==="number"){const g=S.e_p7/20*S.e_k7/100*S.peso*1000;L("e_p7",`≈ +${n0(g)} g por ave no abate (+${nf(2).format(S.e_p7/20*S.e_k7)}%)`);}
+  if(document.getElementById("e_per")&&typeof S.e_per==="number"){const r=window.__r||{},aves=r.aves||S.aves||0,dz=aves*FRP(S)*365*S.e_per/100/12/12;L("e_per",`≈ +${n0(dz)} dúzias de ovos por mês`);}}
+function FRP(s){const a=Math.max(1,s.sem_desc-s.sem_ini);return Math.min(1,Math.max(0,(s.sem_desc-(s.e_wper||60))/a));}
+function cas7(id){if(id==="e_p7"||id==="e_k7"){S.e_peso=Math.round(S.e_p7/20*S.e_k7*100)/100;}}
 function pBR(t){t=String(t).trim().replace(/\s/g,"");if(t.includes(","))t=t.replace(/\./g,"").replace(",",".");else if(/^-?\d{1,3}(\.\d{3})+$/.test(t))t=t.replace(/\./g,"");return parseFloat(t);}
 function fBR(v){if(typeof v!=="number"||!isFinite(v))return v;if(Number.isInteger(v)&&Math.abs(v)>=1000)return v.toLocaleString("pt-BR");return String(+v.toFixed(6)).replace(".",",");}
-function fmtNums(){const a=document.activeElement,L=(typeof NUMKEYS!=="undefined"?NUMKEYS:typeof KEYS!=="undefined"?KEYS:[]);
+function fmtNums(){liveX();const a=document.activeElement,L=(typeof NUMKEYS!=="undefined"?NUMKEYS:typeof KEYS!=="undefined"?KEYS:[]);
   L.forEach(k=>{const el=document.getElementById(k);if(el&&el!==a&&el.type==="text"&&typeof S[k]==="number")el.value=fBR(S[k]);});
   if(S.u)Object.keys(S.u).forEach(id=>{const el=document.getElementById("v_"+id);if(el&&el!==a&&el.type==="text")el.value=fBR(S.u[id][1]);});
   const g=document.getElementById("granja");if(g&&g!==a)g.value=S.granja||"";}
