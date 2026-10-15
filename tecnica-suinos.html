@@ -153,6 +153,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .be-i small{font-size:12.5px;font-weight:600}
 .be-i em{font-style:normal;font-size:12px;font-weight:600;color:var(--good)}
 .be-i em.no{color:var(--bad)}
+.be-q{margin:-4px 0 0;font-size:13px;font-weight:600;color:var(--fg)}
 .bef{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:2px 0 4px}
 .bef>span{font-size:12.5px;color:var(--muted);font-weight:600;margin-right:2px}
 .bef button{border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:600 13px var(--f-display);padding:6px 12px;border-radius:999px;cursor:pointer}
@@ -228,7 +229,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
       </section>
       <section class="panel" data-only="cliente">
         <h2>Quanto cada produto precisa melhorar para se pagar</h2>
-        <p class="note" style="margin:0 0 10px">Por produto e por fase: o investimento e o resultado mínimo que já paga esse investimento. Basta <b>um</b> dos resultados de cada linha; o que passar disso é lucro.</p>
+        <p class="note" style="margin:0 0 10px">Como ler: cada quadro mostra o <b>mínimo</b> que a granja precisa melhorar para aquele produto se pagar sozinho. Se melhorar mais do que isso, a diferença é lucro.</p>
         <div class="bef" id="be-f"></div>
         <div class="be" id="be"></div>
       </section>
@@ -504,7 +505,7 @@ const BEFT={peso:"Se melhorar só o peso",mort:"Se melhorar só a mortalidade",c
 document.addEventListener("click",e=>{const b=e.target.closest("#be-f button[data-f]");if(!b)return;S.beF=b.dataset.f;save();calc();});
 function renderBE(items){
   const el=document.getElementById("be");if(!el)return;
-  const all=items.filter(it=>it.on&&it.custo>0);
+  let all=items.filter(it=>it.on&&it.custo>0);if(all.filter(x=>!x.prog).length<=1)all=all.filter(x=>!x.prog);
   const cats=[];all.forEach(it=>it.ind.forEach(i=>{if(i.u>0&&!cats.includes(i.c))cats.push(i.c);}));
   const order=["peso","ovos","mort","conv"].filter(c=>cats.includes(c));
   let f=S.beF||"todos"; if(f!=="todos"&&!order.includes(f))f="todos";
@@ -514,8 +515,8 @@ function renderBE(items){
   if(!all.length){el.innerHTML='<p class="note" style="margin:0">Inclua ao menos um produto para ver a análise.</p>';return;}
   if(!rows.length){el.innerHTML='<p class="note" style="margin:0">Nenhum produto marcado atua nesse resultado.</p>';return;}
   el.innerHTML=(f!=="todos"?`<p class="note" style="margin:0;font-weight:600">${BEFT[f]}: quanto cada produto precisa para se pagar sozinho.</p>`:"")+rows.map(it=>{const ind=it.ind;return `<div class="be-row${it.prog?" prog":""}">
-   <div class="be-h"><div><b>${it.nome}</b> <span class="be-f">· ${it.fase}</span></div><div class="be-c"><b>${brlK(it.custo/12)}</b> por mês · ${it.pa(it.custo)}</div></div>
-   <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">No valor simulado (${i.fmt(i.ref)}): cada R$ 1 investido volta R$ ${nf(2).format(x)}${x>=1.005?" · paga e sobra":x>=0.995?" · empata":" · não paga sozinho"}</em>`:""}</div>`;}).join(""):'<p class="note" style="margin:0">Com os preços atuais nenhum indicador cobre o custo.</p>'}</div></div>`;}).join("");
+   <div class="be-h"><div><b>${it.nome}</b> <span class="be-f">· ${it.fase}</span></div><div class="be-c">Custa <b>${brlK(it.custo/12)}</b> por mês · ${it.pa(it.custo)}</div></div>${ind.length>1?`<p class="be-q">Para se pagar, basta <b>um</b> destes resultados:</p>`:`<p class="be-q">Para se pagar, basta este resultado:</p>`}
+   <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">Se a granja tiver ${i.fmt(i.ref)} (valor simulado): cada R$ 1 investido volta R$ ${nf(2).format(x)} → ${x>=1.005?"paga e sobra":x>=0.995?"empata":"não paga sozinho"}</em>`:""}</div>`;}).join(""):'<p class="note" style="margin:0">Com os preços atuais nenhum indicador cobre o custo.</p>'}</div></div>`;}).join("");
 }
 function beTec(r,G,GI,PROG,pa){
   const grp={},ix=id=>PRODS.findIndex(p=>p.id===id);
