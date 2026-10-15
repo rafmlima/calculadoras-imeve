@@ -289,6 +289,8 @@ details.phd>summary{cursor:pointer;list-style:none;color:var(--accent);font:700 
 details.phd>summary::-webkit-details-marker{display:none}
 details.phd>summary::before{content:"▸ "}
 details.phd[open]>summary::before{content:"▾ "}
+.uf-sum{grid-column:1/-1;border-bottom:0!important;border-top:2px solid var(--line);margin-top:2px;padding-top:6px!important;font-weight:700}
+.uf-sum b{color:var(--accent)}
 </style>
 
 <style>
@@ -573,7 +575,7 @@ function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(
   if(ab){const pesoOn=PARS.some(([c,,sh])=>S.par[c]&&sh.includes("e_cre"));ab.hidden=!(hasAdv&&pesoOn);ab.textContent=S.adv?"Esconder reflexos (Cooper)":"Ajustar reflexos do peso (Cooper)";}}
 document.addEventListener("click",e=>{const b=e.target.closest("#par button[data-p]");if(!b)return;S.par=S.par||{};S.par[b.dataset.p]=!S.par[b.dataset.p];save();calc();});
 function PH(id,r){const L=((r.ph||{})[id]||[]).filter(x=>x[1]>0);if(!L.length)return "";const f=v=>v>=100?n0(v):v>=10?n1(v):nf(2).format(v);
-  return `<div class="uf"><div class="uf-t">Uso por fase · por mês</div>`+L.map(([l,q,u])=>`<div class="uf-r"><span>${l}</span><b>${f(q/12)} ${u}</b></div>`).join("")+`</div>`;}
+  return `<div class="uf"><div class="uf-t">Uso por fase · por mês</div>`+L.map(([l,q,u])=>`<div class="uf-r"><span>${l}</span><b>${f(q/12)} ${u}</b></div>`).join("")+(()=>{const T={};L.forEach(([,q,u])=>T[u]=(T[u]||0)+q);return `<div class="uf-r uf-sum"><span>Total por mês</span><b>${Object.entries(T).map(([u,q])=>f(q/12)+" "+u).join(" + ")}</b></div>`;})()+`</div>`;}
 document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("details.more")){S.op2=S.op2||{};S.op2[d.dataset.id]=d.open;save();}},true);
 document.addEventListener("click",e=>{if(e.target.id==="adv-btn"){S.adv=!S.adv;save();calc();}});
 function liveMort(r){const M={e_mort:[r.alojSem,"aves a mais por semana",1]};Object.entries(M).forEach(([k,[base,txt,div]])=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}const v=base*(S[k]||0)/100/div;el.textContent=`≈ ${v>=10?n0(v):n1(v)} ${txt}`;});}
