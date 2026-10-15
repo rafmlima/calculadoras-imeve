@@ -218,6 +218,13 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .bignum .num input::-webkit-inner-spin-button,.bignum .num input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .bignum .num input{-moz-appearance:textfield}
 .bignum .num input{min-width:0;width:100%;transition:font-size .1s}
+.std{display:block;font-size:11.5px;font-weight:600;color:var(--good);margin-top:1px}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:4px 10px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)}
+.mrow .std{grid-column:1/-1;margin:-2px 0 2px 22px}
+.dd{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:0 6px}
+.dd input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--fg);font:700 14px var(--f-display);padding:5px 0;text-align:right;outline:none}
+.dd small{font-size:11.5px;color:var(--muted);margin-left:4px}
+.fx-r .std{grid-column:1/-1;margin:-2px 0 2px 26px}
 </style>
 
 <style>
@@ -317,7 +324,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     </section>
 
 
-    <details class="sec">
+    <details class="sec" hidden>
       <summary>Doses usadas no cálculo <span class="hint">protocolo IMEVE</span></summary>
       <div class="body" id="sec-dose"></div>
     </details>
@@ -471,7 +478,7 @@ function renderBE(items){
 const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return [[F[1],"Preço","R$/kg"],[F[2],"Dose na ração","g/t"]];},pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
 const PARS=[["ovos","Produção de ovos",["e_pos"]],["mort","Mortalidade",["e_mp","e_mr"]]];
 function CIN(id,adv){const L0=typeof CI[id]==="function"?CI[id]():CI[id];if(!L0)return "";const L=L0.filter(e=>!String(e[0]).startsWith("pr_")&&(e[3]==="x")===!!adv);if(!L.length)return "";
-  return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div></label>`).join("")+`</div>`;}
+  return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div>${STD[k]?`<small class="std">Padrão IMEVE: ${STD[k]}</small>`:""}</label>`).join("")+`</div>`;}
 function effS(S0){const s=Object.assign({},S0);Object.values(FX).forEach(fn=>fn().forEach(([k])=>{if(!(S0.fx&&S0.fx[k]===true)&&typeof s[k]==="number")s[k]=0;}));PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
 function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(!box)return;
   box.innerHTML=`<span>A granja vai melhorar em:</span>`+PARS.map(([c,l])=>`<button type="button" data-p="${c}" aria-pressed="${!!S.par[c]}">${l}</button>`).join("");
@@ -488,9 +495,10 @@ document.addEventListener("click",e=>{if(e.target.id==="adv-btn"){S.adv=!S.adv;s
 function liveMort(r){const M={e_mp:[r.aloj,"galinhas a mais por ano",1],e_mr:[r.pint,"frangas a mais por ano",1]};Object.entries(M).forEach(([k,[base,txt,div]])=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}const v=base*(S[k]||0)/100/div;el.textContent=`≈ ${v>=10?n0(v):n1(v)} ${txt}`;});}
 const FX={feed:()=>(S.recria?[["rec","Recria (cria, recria e pré-postura)",0]]:[]).concat([["post","Postura",0]])};
 function FXR(id){const L=FX[id]?FX[id]():null;if(!L)return "";S.fx=S.fx||{};
-  return `<div class="fx"><div class="uf-t">Em quais rações usar · marque as fases</div>`+L.map(([k,l,hasDose])=>{const on=S.fx[k]===true;return `<div class="fx-r${on?"":" off"}"><label><input type="checkbox" id="fx_${k}" ${on?"checked":""}><span>${l}</span></label>${hasDose?`<div class="fx-d"><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"${on?"":" disabled"}><em>g/t</em></div>`:"<span></span>"}</div>`;}).join("")+`</div>`;}
+  return `<div class="fx"><div class="uf-t">Em quais rações usar · marque as fases</div>`+L.map(([k,l,hasDose])=>{const on=S.fx[k]===true;return `<div class="fx-r${on?"":" off"}"><label><input type="checkbox" id="fx_${k}" ${on?"checked":""}><span>${l}</span></label>${hasDose?`<div class="fx-d"><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"${on?"":" disabled"}><em>g/t</em></div>`:"<span></span>"}${STD[k]?`<small class="std">Padrão IMEVE: ${STD[k]}</small>`:""}</div>`;}).join("")+`</div>`;}
 function fitBig(){const c=fitBig.c||(fitBig.c=document.createElement("canvas").getContext("2d"));document.querySelectorAll(".bignum .num input").forEach(i=>{if(!i.offsetParent)return;const cs=getComputedStyle(i);c.font=`800 28px ${cs.fontFamily}`;const w=c.measureText(String(i.value||"")).width;const avail=i.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-14;const fs=w>0&&w>avail?Math.max(13,Math.floor(28*avail/w)):28;i.style.fontSize=fs+"px";});}
 document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest(".bignum"))fitBig();});
+const STD={"d_dba": "200 g/t (faixa de 100 a 200 g/t)", "d_dbapas": "200 g/t (faixa de 100 a 200 g/t)", "d_pas": "200 g/t (faixa de 100 a 200 g/t)", "d_pasbac": "200 g/t (faixa de 100 a 200 g/t)", "d_pol": "100 g/1000 L", "d_ele": "100 mL/100 L (faixa 50 a 100)", "dp_pint": "5 dias", "dp_trans": "4 dias (2 antes e 2 depois)", "dp_vac": "4 dias por vacinação (2 antes e 2 depois)", "dp_calor": "durante o período de calor ou frio", "de_pint": "6 dias (faixa 4 a 6)", "de_trans": "6 dias (faixa 4 a 6)", "de_vac": "6 dias por vacinação (faixa 4 a 6)", "de_calor": "6 dias (faixa 4 a 6) por evento"};
 function calc(){
   fitBig();paintPar();const s=effS(S),r=model(s);liveMort(r);
   document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.aves));
@@ -533,7 +541,7 @@ function calc(){
   document.getElementById("cards").innerHTML=r.prod.map(p=>{const on=s.on[p.id];return `<article class="card${on?"":" off"}">
     <h3>${p.head||p.nome}<label class="chk2"><input type="checkbox" id="on_${p.id}" ${on?"checked":""}> incluir</label></h3>
     ${CIN(p.id,false)}
-    ${p.man?`<div class="mans">${MAN[p.man].map(m=>`<label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]} <em>${n0(s[m[2]])} dias</em></label>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
+    ${p.man?`<div class="mans">${MAN[p.man].map(m=>`<div class="mrow"><label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]}</label><span class="dd"><input type="text" inputmode="numeric" id="cx_${m[2]}" value="${S[m[2]]}"${on?"":" disabled"}><small>dias</small></span>${STD[m[2]]?`<small class="std">Padrão IMEVE: ${STD[m[2]]}</small>`:""}</div>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
     <div class="money"><span>Investimento</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
     ${FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true)?`<p class="fx-hint">Marque abaixo em quais rações o produto vai entrar.</p>`:""}<details class="more" data-id="${p.id}"${(S.op&&S.op[p.id])||(FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true))?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
