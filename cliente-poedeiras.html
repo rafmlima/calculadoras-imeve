@@ -378,13 +378,13 @@ body{padding-bottom:84px}
 
 <script>
 (function(){
-const FEEDS={dba:["DBA Concentrado","pr_dba","d_dba"],dbapas:["DBA + PAS Concentrado","pr_dbapas","d_dbapas"],pas:["PAS-TR+ Concentrado","pr_pas","d_pas"],pasbac:["PAS-BAC TR Concentrado","pr_pasbac","d_pasbac"]};
+const FEEDS={dba:["DBA Concentrado","pr_dba","d_dba1","d_dba2"],dbapas:["DBA + PAS Concentrado","pr_dbapas","d_dbapas1","d_dbapas2"],pas:["PAS-TR+ Concentrado","pr_pas","d_pas1","d_pas2"],pasbac:["PAS-BAC TR Concentrado","pr_pasbac","d_pasbac1","d_pasbac2"]};
 const DEF={
   p_ovo:4.41067, c_dz:2.90, ovoUn:"cx", p_racao:1.35, p_racao_r:1.45, p_pint:4.50, postura:85, e_pos:1.5, e_mp:1.0, e_mr:0.5,
   aves:100000, modo:"aves", qtr:80, recria:true, racao:"dba",
   sem_ini:17, sem_desc:90, kg_rec:5.41, g_post:107, mr:3.2, mp:5.5,
   a_pint:0.03, a_rec:0.07, a_trans:0.11, a_post:0.17,
-  d_dba:200, d_dbapas:200, d_pas:200, d_pasbac:200,
+  d_dba1:200, d_dba2:200, d_dbapas1:200, d_dbapas2:200, d_pas1:200, d_pas2:200, d_pasbac1:200, d_pasbac2:200,
   d_pol:100, dp_pint:5, dp_vac:15, dp_trans:4, d_ele:100, de_trans:6, de_calor:10,
   pr_dba:34.80, pr_dbapas:61.92, pr_pas:82.00, pr_pasbac:79.20, pr_pol:26.80, pr_ele:103.00,
   dp_calor:10, de_pint:6, de_vac:15,
@@ -408,8 +408,8 @@ const FIELDS={
     ["e_mp","Redução da mortalidade na postura","ex.: se a mortalidade cai de 8% para 7,5%, coloque 0,5","pontos %",0.1],
     ["e_mr","Redução da mortalidade na recria","quanto a mortalidade cai","pontos %",0.1]],
   "sec-dose":[
-    ["d_dba","DBA Concentrado na ração","","g/t",25],["d_dbapas","DBA + PAS na ração","","g/t",25],
-    ["d_pas","PAS-TR+ na ração","","g/t",25],["d_pasbac","PAS-BAC TR na ração","","g/t",25],
+    ["d_dba1","DBA Concentrado na recria","","g/t",25],["d_dba2","DBA Concentrado na postura","","g/t",25],["d_dbapas1","DBA + PAS na recria","","g/t",25],["d_dbapas2","DBA + PAS na postura","","g/t",25],
+    ["d_pas1","PAS-TR+ na recria","","g/t",25],["d_pas2","PAS-TR+ na postura","","g/t",25],["d_pasbac1","PAS-BAC TR na recria","","g/t",25],["d_pasbac2","PAS-BAC TR na postura","","g/t",25],
     ["d_pol","Polimeve na água","","g/1000L",10],["dp_pint","Polimeve: dias no alojamento das pintainhas","","dias",1],
     ["dp_vac","Polimeve: dias nas vacinações da recria","total no lote","dias",1],["dp_trans","Polimeve: dias na transferência","","dias",1],
     ["d_ele","Eletroaminovit na água","","mL/100L",5],["de_trans","Eletroaminovit: dias na transferência","","dias",1],
@@ -418,7 +418,7 @@ const FIELDS={
     ["de_vac","Eletroaminovit: dias nas vacinações da recria","total no lote","dias",1],
     ["de_calor","Eletroaminovit: dias de calor na postura","por ano","dias",1]]
 };
-const KEY="potencial-poedeiras-v1-cliente-v5-d-m";
+const KEY="potencial-poedeiras-v1-cliente-v5-d-m-f2";
 let S=JSON.parse(JSON.stringify(DEF));S.ox={};
 try{const sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv)S=Object.assign(JSON.parse(JSON.stringify(DEF)),sv,{on:Object.assign({},DEF.on,sv.on||{}),mn:Object.assign({},DEF.mn,sv.mn||{}),ox:Object.assign({},sv.ox||{})});}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
@@ -467,8 +467,8 @@ function model(s){
   r.pint=s.recria?r.aloj/(1-s.mr/100):0;
   const vivoRec=r.pint*(1-s.mr/200);
   r.feedRec=vivoRec*s.kg_rec; r.feedPost=s.aves*s.g_post/1000*365; r.feedTot=r.feedRec+r.feedPost;
-  const [fn,fp,fd]=FEEDS[s.racao]||FEEDS.dba;
-  const fxo=s.fx||{};r.feedRecU=fxo.rec===true?r.feedRec:0;r.feedPostU=fxo.post===true?r.feedPost:0;r.feedKg=(r.feedRecU+r.feedPostU)/1e6*s[fd];
+  const [fn,fp,fd1,fd2]=FEEDS[s.racao]||FEEDS.dba;
+  const fxo=s.fx||{};r.feedRecU=fxo[fd1]===true&&s.recria?r.feedRec:0;r.feedPostU=fxo[fd2]===true?r.feedPost:0;r.feedRecKg=r.feedRecU/1e6*s[fd1];r.feedPostKg=r.feedPostU/1e6*s[fd2];r.feedKg=r.feedRecKg+r.feedPostKg;
   const WA={pp:s.recria?r.pint*s.a_pint:0,pv:s.recria?vivoRec*s.a_rec:0,pt:r.aloj*s.a_trans,pq:s.aves*s.a_post,ep:s.recria?r.pint*s.a_pint:0,ev:s.recria?vivoRec*s.a_rec:0,et:r.aloj*s.a_trans,eq:s.aves*s.a_post,po:s.aves*s.a_post,eo:s.aves*s.a_post};
   const manL=p=>{let t=MAN[p].filter(m=>s.mn[m[0]]).reduce((a,m)=>a+WA[m[0]]*s[m[2]],0);const o=OX[p];if(s.mn[o]){const x=oxv(s,o);t+=WA[o]*x.v*x.d;}return t;};
   const manK=(p,ks)=>{let t=MAN[p].filter(m=>s.mn[m[0]]&&ks.includes(m[0])).reduce((a,m)=>a+WA[m[0]]*s[m[2]],0);const o=OX[p];if(s.mn[o]&&ks.includes(o)){const x=oxv(s,o);t+=WA[o]*x.v*x.d;}return t;};
@@ -477,9 +477,9 @@ function model(s){
   r.eleL=manL("ele")*s.d_ele/100/1000;
   const sel=`<select id="racao" aria-label="Probiótico na ração" style="border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--fg);font:600 14px var(--f-body);padding:6px 8px;max-width:100%">${Object.entries(FEEDS).map(([k,v])=>`<option value="${k}"${k===s.racao?" selected":""}>${v[0]}</option>`).join("")}</select>`;
   const mq=p=>{const out=[];MAN[p].forEach(m=>{if(s.mn[m[0]])out.push([m[1],WA[m[0]]*s[m[2]]]);});const o=OX[p];if(s.mn[o]){const x=oxv(s,o);out.push(["Outros manejos",WA[o]*x.v*x.d]);}return out;};
-  r.ph={feed:(s.recria?[["Recria",r.feedRecU/1e6*s[fd],"kg"]]:[]).concat([["Postura",r.feedPostU/1e6*s[fd],"kg"]]),pol:mq("pol").map(([l,L])=>[l,L*s.d_pol/1e6,"kg"]),ele:mq("ele").map(([l,L])=>[l,L*s.d_ele/1e5,"L"])};
+  r.ph={feed:(s.recria?[["Recria",r.feedRecKg,"kg"]]:[]).concat([["Postura",r.feedPostKg,"kg"]]),pol:mq("pol").map(([l,L])=>[l,L*s.d_pol/1e6,"kg"]),ele:mq("ele").map(([l,L])=>[l,L*s.d_ele/1e5,"L"])};
   r.prod=[
-    {id:"feed",nome:"Probiótico na ração",head:sel,proto:`${fn} a ${n0(s[fd])} g/t em todas as rações${s.recria?" (recria e postura)":" (postura)"}`,emb:r.feedKg,embUn:"kg",extra:[r.feedKg/25,"baldes/sacos de 25 kg por mês"],custo:r.feedKg*s[fp]},
+    {id:"feed",nome:"Probiótico na ração",head:sel,proto:`${fn}: ${s.recria?"recria "+n0(s[fd1])+" g/t · ":""}postura ${n0(s[fd2])} g/t`,emb:r.feedKg,embUn:"kg",extra:[r.feedKg/25,"baldes/sacos de 25 kg por mês"],custo:r.feedKg*s[fp]},
     {id:"pol",nome:"Polimeve Solúvel",proto:manTxt("pol",s),man:"pol",emb:r.polKg,embUn:"kg",extra:[r.polKg/0.1,"sachês de 100 g por mês"],custo:r.polKg/0.1*s.pr_pol},
     {id:"ele",nome:"Eletroaminovit",proto:manTxt("ele",s),man:"ele",emb:r.eleL,embUn:"litros",extra:[r.eleL,"frascos de 1 L por mês"],custo:r.eleL*s.pr_ele}
   ];
@@ -508,7 +508,7 @@ function renderBE(items){
    <div class="be-h"><div><b>${it.nome}</b> <span class="be-f">· ${it.fase}</span></div><div class="be-c">Custa <b>${brlK(it.custo/12)}</b> por mês · ${it.pa(it.custo)}</div></div>${ind.length>1?`<p class="be-q">Para se pagar, basta <b>um</b> destes resultados:</p>`:`<p class="be-q">Para se pagar, basta este resultado:</p>`}
    <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b><small class="be-eq">= empata: cada R$ 1 investido volta R$ 1</small>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">Com o resultado do passo 2 (${i.fmt(i.ref)}): cada R$ 1 investido volta R$ ${nf(2).format(x)} → ${x>=1.005?"paga e sobra":x>=0.995?"empata":"não paga sozinho"}</em>`:""}</div>`;}).join(""):'<p class="note" style="margin:0">Com os preços atuais nenhum indicador cobre o custo.</p>'}</div></div>`;}).join("");
 }
-const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return [[F[1],"Preço","R$/kg"],[F[2],"Dose na ração","g/t"]];},pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
+const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return [[F[1],"Preço","R$/kg"]];},pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
 const PARS=[["ovos","Produção de ovos",["e_pos"]],["mort","Mortalidade",["e_mp","e_mr"]]];
 function CIN(id,adv){const L0=typeof CI[id]==="function"?CI[id]():CI[id];if(!L0)return "";const L=L0.filter(e=>!String(e[0]).startsWith("pr_")&&(e[3]==="x")===!!adv);if(!L.length)return "";
   return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div>${STD[k]?`<small class="std">Padrão IMEVE: ${STD[k]}</small>`:""}</label>`).join("")+`</div>`;}
@@ -526,12 +526,12 @@ function PH(id,r){const L=((r.ph||{})[id]||[]).filter(x=>x[1]>0);if(!L.length)re
 document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("details.more")){S.op=S.op||{};S.op[d.dataset.id]=d.open;save();}},true);
 document.addEventListener("click",e=>{if(e.target.id==="adv-btn"){S.adv=!S.adv;save();calc();}});
 function liveMort(r){const M={e_mp:[r.aloj,"galinhas a mais por ano",1],e_mr:[r.pint,"frangas a mais por ano",1]};Object.entries(M).forEach(([k,[base,txt,div]])=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}const v=base*(S[k]||0)/100/div;el.textContent=`≈ ${v>=10?n0(v):n1(v)} ${txt}`;});}
-const FX={feed:()=>(S.recria?[["rec","Recria (cria, recria e pré-postura)",0]]:[]).concat([["post","Postura",0]])};
+const FX={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return (S.recria?[[F[2],"Recria (cria, recria e pré-postura)",1]]:[]).concat([[F[3],"Postura",1]]);}};
 function FXR(id){const L=FX[id]?FX[id]():null;if(!L)return "";S.fx=S.fx||{};
   return `<div class="fx"><div class="uf-t">Em quais rações usar · marque as fases</div>`+L.map(([k,l,hasDose])=>{const on=S.fx[k]===true;return `<div class="fx-r${on?"":" off"}"><label><input type="checkbox" id="fx_${k}" ${on?"checked":""}><span>${l}</span></label>${hasDose?`<div class="fx-d"><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>g/t</em></div>`:"<span></span>"}${STD[k]?`<small class="std">Padrão IMEVE: ${STD[k]}</small>`:""}</div>`;}).join("")+`</div>`;}
 function fitBig(){const c=fitBig.c||(fitBig.c=document.createElement("canvas").getContext("2d"));document.querySelectorAll(".bignum .num input").forEach(i=>{if(!i.offsetParent)return;const cs=getComputedStyle(i);c.font=`800 28px ${cs.fontFamily}`;const w=c.measureText(String(i.value||"")).width;const avail=i.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-14;const fs=w>0&&w>avail?Math.max(13,Math.floor(28*avail/w)):28;i.style.fontSize=fs+"px";});}
 document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest(".bignum"))fitBig();});
-const STD={"d_dba": "200 g/t (faixa de 100 a 200 g/t)", "d_dbapas": "200 g/t (faixa de 100 a 200 g/t)", "d_pas": "200 g/t (faixa de 100 a 200 g/t)", "d_pasbac": "200 g/t (faixa de 100 a 200 g/t)", "d_pol": "100 g/1000 L", "d_ele": "100 mL/100 L (faixa 50 a 100)", "dp_pint": "5 dias", "dp_trans": "4 dias (2 antes e 2 depois)", "dp_vac": "4 dias por vacinação (2 antes e 2 depois)", "dp_calor": "durante o período de calor ou frio", "de_pint": "6 dias (faixa 4 a 6)", "de_trans": "6 dias (faixa 4 a 6)", "de_vac": "6 dias por vacinação (faixa 4 a 6)", "de_calor": "6 dias (faixa 4 a 6) por evento"};
+const STD={"d_dba1": "200 g/t (faixa de 100 a 200 g/t)", "d_dba2": "200 g/t (faixa de 100 a 200 g/t)", "d_dbapas1": "200 g/t (faixa de 100 a 200 g/t)", "d_dbapas2": "200 g/t (faixa de 100 a 200 g/t)", "d_pas1": "200 g/t (faixa de 100 a 200 g/t)", "d_pas2": "200 g/t (faixa de 100 a 200 g/t)", "d_pasbac1": "200 g/t (faixa de 100 a 200 g/t)", "d_pasbac2": "200 g/t (faixa de 100 a 200 g/t)", "d_pol": "100 g/1000 L", "d_ele": "100 mL/100 L (faixa 50 a 100)", "dp_pint": "5 dias", "dp_trans": "4 dias (2 antes e 2 depois)", "dp_vac": "4 dias por vacinação (2 antes e 2 depois)", "dp_calor": "durante o período de calor ou frio", "de_pint": "6 dias (faixa 4 a 6)", "de_trans": "6 dias (faixa 4 a 6)", "de_vac": "6 dias por vacinação (faixa 4 a 6)", "de_calor": "6 dias (faixa 4 a 6) por evento"};
 function RED(resMes,liqMes,quem){const el=document.getElementById("redbox");if(!el)return;
   if(!(resMes<0&&liqMes>0)){el.hidden=true;return;}
   const sem=resMes-liqMes,x=sem/resMes;el.hidden=false;
@@ -545,7 +545,7 @@ document.addEventListener("input",e=>{const id=e.target.id;if(id==="ovo_un"){S.o
 function ovoFlow(r,s){const el=document.getElementById("ovo-flow");if(!el)return;const dz=S.ovoUn==="dz",ovosDia=(r.aves||0)*(s.postura||0)/100,un=dz?12:360,q=ovosDia/un,uL=dz?"dúzias":"caixas",pu=s.p_ovo*(dz?1:30),cu=s.c_dz*(dz?1:30),mg=pu-cu,qm=q*365/12;
   const g=[[n0(ovosDia),"ovos por dia"],[qf(q),uL+" por dia"],[qf(q*7),uL+" por semana"],[qf(qm),uL+" por mês"],[brlK(qm*pu),"faturamento por mês"],[brlK(qm*cu),"custo de produção por mês"],[(mg<0?"− ":"")+brlK(Math.abs(qm*mg)),"resultado por mês"],[(mg<0?"− ":"")+"R$ "+nf(2).format(Math.abs(mg)),"margem por "+(dz?"dúzia":"caixa")]];
   el.innerHTML=g.map(([v,l],i)=>`<div><b${i>=6&&mg<0?' style="color:var(--bad)"':''}>${v}</b><span>${l}</span></div>`).join("");}
-const PROTO={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return {fx:(S.recria?["rec"]:[]).concat(["post"]),v:{[F[2]]:200}};},pol:{mn:["pp","pt"],v:{d_pol:100,dp_pint:5,dp_trans:4}},ele:{mn:["et"],v:{d_ele:100,de_trans:6}}};
+const PROTO={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return {fx:(S.recria?[F[2]]:[]).concat([F[3]]),v:{[F[2]]:200,[F[3]]:200}};},pol:{mn:["pp","pt"],v:{d_pol:100,dp_pint:5,dp_trans:4}},ele:{mn:["et"],v:{d_ele:100,de_trans:6}}};
 const PU={feed:()=>[(FEEDS[S.racao]||FEEDS.dba)[1],"kg"],pol:["pr_pol","sachê 100 g"],ele:["pr_ele","frasco 1 L"]};
 const GRN=()=>n0((window.__r||{}).aves||0)+" aves em postura";
 const SPN="Poedeiras",SB_EMPTY="Inclua um produto e escolha o resultado esperado para ver o retorno aqui.",SB_PAR="Escolha no passo 3 onde a granja vai melhorar.";
@@ -585,7 +585,7 @@ function calc(){
      ["R$ "+nf(3).format(dzAno>0?inv/dzAno:0),"investimento por dúzia"],["R$ "+nf(2).format(r.aves>0?inv/r.aves:0),"investimento por ave/ano"]];
    document.getElementById("roi-flow").innerHTML=g.map(([v,sp],i)=>`<div><b${i===2||i===3?(liq<0?' style="color:var(--bad)"':' style="color:var(--good)"'):''}>${v}</b><span>${sp}</span></div>`).join("");
    document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`Sua granja investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de mais ovos, menos mortalidade na postura e na recria. Estimativa com premissas conservadoras; o técnico IMEVE pode detalhar o cálculo para a sua granja.`;RED((s.p_ovo-s.c_dz)*r.aves*365*(s.postura/100)/12/12,liq/12,"você");}
-  {const L=Math.max(1,s.sem_desc-s.sem_ini),dz=s.p_ovo,pz=s.postura/100,FD=FEEDS[s.racao]||FEEDS.dba,fn=FD[0],fp=FD[1],fd=FD[2],on=s.on;
+  {const L=Math.max(1,s.sem_desc-s.sem_ini),dz=s.p_ovo,pz=s.postura/100,FD=FEEDS[s.racao]||FEEDS.dba,fn=FD[0],fp=FD[1],on=s.on;
   const pts=v=>"−"+(v<0.1?nf(3).format(v):n2(v))+" ponto %", cv=v=>"−"+nf(3).format(v)+" kg/kg";
   const polC=L=>L*s.d_pol/1e6/0.1*s.pr_pol, eleC=L=>L*s.d_ele/1e5*s.pr_ele;
   const pa=c=>"R$ "+n2(r.aves>0?c/r.aves:0)+" por ave/ano";
@@ -595,8 +595,8 @@ function calc(){
    mr:{c:"mort",lab:"Mortalidade na recria",u:s.recria?r.pint/100*(s.p_pint+0.5*s.kg_rec*s.p_racao_r):0,fmt:pts,ref:s.e_mr,sub:v=>"≈ "+n0(r.pint*v/100)+" frangas a mais por ano"}};
   const R=[I.mr,I.pos],P=[I.pos,I.mp];
   renderBE([
-   {on:on.feed&&s.recria,nome:fn,fase:"Recria",custo:r.feedRecU/1e6*s[fd]*s[fp],pa,ind:R},
-   {on:on.feed,nome:fn,fase:"Postura",custo:r.feedPostU/1e6*s[fd]*s[fp],pa,ind:P},
+   {on:on.feed&&s.recria,nome:fn,fase:"Recria",custo:r.feedRecKg*s[fp],pa,ind:R},
+   {on:on.feed,nome:fn,fase:"Postura",custo:r.feedPostKg*s[fp],pa,ind:P},
    {on:on.pol,nome:"Polimeve Solúvel",fase:"Recria (manejos marcados)",custo:polC(r.sp.pol[0]),pa,ind:R},
    {on:on.pol,nome:"Polimeve Solúvel",fase:"Postura (manejos marcados)",custo:polC(r.sp.pol[1]),pa,ind:P},
    {on:on.ele,nome:"Eletroaminovit",fase:"Recria (manejos marcados)",custo:eleC(r.sp.ele[0]),pa,ind:R},
