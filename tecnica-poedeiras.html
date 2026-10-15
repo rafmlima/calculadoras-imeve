@@ -159,6 +159,9 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .bef button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 [hidden]{display:none!important}
 .be-eq{display:block;font-size:12.5px;font-weight:700;color:var(--muted)}
+.redbox{border:1px solid var(--bad);background:color-mix(in srgb,var(--bad) 9%,transparent);border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45}
+.redbox b{font-weight:800}
+.redbox .big{display:block;font:800 20px var(--f-display);color:var(--bad);margin-top:4px}
 </style>
 
 </head>
@@ -222,6 +225,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
           <div class="k"><div class="v" id="k-invdz">–</div><div class="l">investimento por dúzia</div></div>
         </div>
         <div class="verdict" id="verdict">–</div>
+        <div class="redbox" id="redbox" hidden style="margin-top:10px"></div>
       </section>
       <section class="panel" data-only="cliente">
         <h2>De onde vem o retorno</h2>
@@ -275,7 +279,7 @@ const DEF={
   sem_ini:17, sem_p1:45, sem_p2:65, sem_desc:90, mr:3.2, mp:5.5,
   r_ini:1.05, r_cre:2.04, r_des:1.32, r_pre:1.00, g_p1:104, g_p2:108, g_p3:110,
   a_pint:0.03, a_rec:0.07, a_trans:0.11, a_post:0.17,
-  p_ovo:4.41, p_racao:1.35, p_racao_r:1.45, p_pint:4.50,
+  p_ovo:4.41, c_dz:2.90, p_racao:1.35, p_racao_r:1.45, p_pint:4.50,
   pr_dba:34.80, pr_dbapas:61.92, pr_pas:82.00, pr_pasbac:79.20, pr_pol:26.80, pr_ele:103.00,
   pol_dose:100, ele_dose:100,
   e_pos:1.5, e_mp:1.0, e_mr:0.5, e_ca:0,
@@ -322,7 +326,8 @@ const FIELDS={
     ["a_trans","Franga na transferência","por ave","L/dia",0.01],
     ["a_post","Galinha em postura no calor","por ave","L/dia",0.01]],
   "sec-precos":[
-    ["p_ovo","Ovo","R$ 132/cx 30 dz em Bastos = R$ 4,41","R$/dúzia",0.05],
+    ["p_ovo","Preço do ovo","Cepea Bastos 13/10/2026: R$ 132,32/caixa de 30 dz = R$ 4,41/dz","R$/dúzia",0.05],
+    ["c_dz","Custo de produção do ovo","estimativa: ração ≈ 70% do custo · R$ 87/caixa · ajuste para a granja","R$/dúzia",0.05],
     ["p_racao","Ração de postura","estimativa · ajustar","R$/kg",0.05],
     ["p_racao_r","Ração de cria e recria","estimativa · ajustar","R$/kg",0.05],
     ["p_pint","Pintainha de 1 dia","estimativa · ajustar","R$/ave",0.1],
@@ -484,6 +489,10 @@ function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(
   PARS.forEach(([c,,show])=>show.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row)row.hidden=!S.par[c];}));
   const h=document.getElementById("par-hint");if(h)h.hidden=PARS.some(([c])=>S.par[c]);}
 document.addEventListener("click",e=>{const b=e.target.closest("#par button[data-p]");if(!b)return;S.par=S.par||{};S.par[b.dataset.p]=!S.par[b.dataset.p];save();calc();});
+function RED(resMes,liqMes,quem){const el=document.getElementById("redbox");if(!el)return;
+  if(!(resMes<0&&liqMes>0)){el.hidden=true;return;}
+  const sem=resMes-liqMes,x=sem/resMes;el.hidden=false;
+  el.innerHTML=`<b>A granja está trabalhando no vermelho:</b> o preço de venda está abaixo do custo de produção. Com o programa IMEVE, o prejuízo é de <b>${brlK(-resMes)} por mês</b>. Sem o programa, ${quem} perderia <b>${brlK(-sem)} por mês</b> (${brlK(liqMes)} a mais).<span class="big">Sem o probiótico, perderia ${nf(x<1.1?2:1).format(x)} vezes mais (+${nf((x-1)*100<10?1:0).format((x-1)*100)}% de prejuízo).</span>`;}
 function calc(){
   paintPar();const s=effS(S), r=model(s), W=52, M=12;
   {const pz=s.postura/100,pOvo=s.p_ovo/12,L=r.L,kgRec=s.r_ini+s.r_cre+s.r_des+s.r_pre,mg=365*pz*pOvo-r.gMed/1000*365*s.p_racao;
@@ -510,6 +519,7 @@ function calc(){
     const items=[["Mais ovos",r.b.pos,r.cov.pos],["Mortalidade postura",r.b.mp,r.cov.pos],["Mortalidade recria",r.b.mr,r.cov.rec&&s.recria_on],["Economia de ração",r.b.ca,r.cov.pos]];
     const max=Math.max(r.invest,...items.map(i=>Math.abs(i[1])),1);
     if(r.invest>0&&!PARS.some(([c])=>S.par&&S.par[c])){const vv=document.getElementById("verdict");if(vv){vv.classList.remove("neg");vv.textContent="Para ver o retorno, escolha em “Resultado esperado” onde a granja vai melhorar (produção de ovos, mortalidade ou economia de ração).";}}
+    RED((s.p_ovo-s.c_dz)*r.dz/12,r.liq/12,"a granja");
     document.getElementById("bars").innerHTML=items.map(([l,val,on])=>`<div class="bar"><span>${l}${on?"":" <span class='note'>(sem produto)</span>"}</span><div class="track"><div class="fill" style="width:${Math.max(0,val)/max*100}%"></div></div><span class="amt">${brlK(val)}</span></div>`).join("")+
       `<div class="bar cost"><span><b>Investimento IMEVE</b></span><div class="track"><div class="fill" style="width:${r.invest/max*100}%"></div></div><span class="amt">${brlK(r.invest)}</span></div>`;
   }

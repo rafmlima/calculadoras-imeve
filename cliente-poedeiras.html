@@ -290,6 +290,17 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
       <label class="chk2" style="font-size:14px;color:var(--fg)"><input type="checkbox" id="recria"> A granja cria e recria as próprias frangas</label>
       <p class="note" id="resumo" style="margin:0"></p>
     </section>
+    <section class="size" aria-label="Mercado do ovo">
+      <label>Mercado do ovo e produção da granja</label>
+      <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr))">
+        <div class="row"><label for="ovo_un">Vende por<em>caixa = 30 dúzias (360 ovos)</em></label><div class="num"><select id="ovo_un" style="width:100%;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px"><option value="cx">Caixa</option><option value="dz">Dúzia</option></select></div></div>
+        <div class="row"><label for="ovo_in">Preço do ovo<em>Cepea Bastos 13/10/2026: branco R$ 132,32 · vermelho R$ 145,00 por caixa</em></label><div class="num"><input id="ovo_in" type="text" inputmode="decimal"><span class="ovo_u">R$/caixa</span></div></div>
+        <div class="row"><label for="cdz_in">Custo de produção do ovo<em>estimativa: ração ≈ 70% do custo · ajuste para a granja</em></label><div class="num"><input id="cdz_in" type="text" inputmode="decimal"><span class="ovo_u">R$/caixa</span></div></div>
+        <div class="row" hidden><label for="p_ovo">Preço do ovo<em>Bastos (Cepea) 13/10/2026: R$ 4,41/dz (R$ 132/cx)</em></label><div class="num"><input id="p_ovo" type="number" step="0.05" inputmode="decimal"><span>R$/dúzia</span></div></div>
+        <div class="row" hidden><label for="c_dz">Custo de produção do ovo<em>estimativa: ração ≈ 70% do custo · ajuste para a granja</em></label><div class="num"><input id="c_dz" type="number" step="0.05" inputmode="decimal"><span>R$/dúzia</span></div></div>
+      </div>
+      <div class="flow" id="ovo-flow"></div>
+    </section>
     <section class="size" aria-label="Preços dos produtos">
       <label>Preços dos produtos</label>
       <p class="note" style="margin:0">Coloque o preço que você vai praticar com este cliente.</p>
@@ -313,13 +324,6 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     </details>
     <section class="size" aria-label="Retorno para o produtor">
       <label>3. Quanto você investe e quanto volta</label>
-      <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr))">
-        <div class="row"><label for="ovo_un">Vende por<em>caixa = 30 dúzias (360 ovos)</em></label><div class="num"><select id="ovo_un" style="width:100%;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px"><option value="cx">Caixa</option><option value="dz">Dúzia</option></select></div></div>
-        <div class="row"><label for="ovo_in">Preço do ovo<em>Cepea Bastos 13/10/2026: branco R$ 132,32 · vermelho R$ 145,00 por caixa</em></label><div class="num"><input id="ovo_in" type="text" inputmode="decimal"><span class="ovo_u">R$/caixa</span></div></div>
-        <div class="row"><label for="cdz_in">Custo de produção do ovo<em>estimativa: ração ≈ 70% do custo · ajuste para a granja</em></label><div class="num"><input id="cdz_in" type="text" inputmode="decimal"><span class="ovo_u">R$/caixa</span></div></div>
-        <div class="row" hidden><label for="p_ovo">Preço do ovo<em>Bastos (Cepea) 13/10/2026: R$ 4,41/dz (R$ 132/cx)</em></label><div class="num"><input id="p_ovo" type="number" step="0.05" inputmode="decimal"><span>R$/dúzia</span></div></div>
-        <div class="row" hidden><label for="c_dz">Custo de produção do ovo<em>estimativa: ração ≈ 70% do custo · ajuste para a granja</em></label><div class="num"><input id="c_dz" type="number" step="0.05" inputmode="decimal"><span>R$/dúzia</span></div></div>
-      </div>
       <div class="flow" id="roi-flow"></div>
       <p class="note" id="roi-note" style="margin:0"></p>
       <div class="redbox" id="redbox" hidden></div>
@@ -518,8 +522,11 @@ function syncOvo(force){const k=S.ovoUn==="dz"?1:30,a=force?"":document.activeEl
   document.querySelectorAll(".ovo_u").forEach(e=>e.textContent=k===1?"R$/dúzia":"R$/caixa");}
 document.addEventListener("input",e=>{const id=e.target.id;if(id==="ovo_un"){S.ovoUn=e.target.value;save();calc();syncOvo(true);return;}
   if(id==="ovo_in"||id==="cdz_in"){const k=S.ovoUn==="dz"?1:30;let t=String(e.target.value).trim();if(t.includes(","))t=t.replace(/\./g,"").replace(",",".");const v=parseFloat(t);if(isFinite(v)){S[id==="ovo_in"?"p_ovo":"c_dz"]=v/k;save();calc();}}});
+function ovoFlow(r,s){const el=document.getElementById("ovo-flow");if(!el)return;const dz=S.ovoUn==="dz",ovosDia=(r.aves||0)*(s.postura||0)/100,un=dz?12:360,q=ovosDia/un,uL=dz?"dúzias":"caixas",pu=s.p_ovo*(dz?1:30),cu=s.c_dz*(dz?1:30),mg=pu-cu,qm=q*365/12;
+  const g=[[n0(ovosDia),"ovos por dia"],[qf(q),uL+" por dia"],[qf(q*7),uL+" por semana"],[qf(qm),uL+" por mês"],[brlK(qm*pu),"faturamento por mês"],[brlK(qm*cu),"custo de produção por mês"],[(mg<0?"− ":"")+brlK(Math.abs(qm*mg)),"resultado por mês"],[(mg<0?"− ":"")+"R$ "+nf(2).format(Math.abs(mg)),"margem por "+(dz?"dúzia":"caixa")]];
+  el.innerHTML=g.map(([v,l],i)=>`<div><b${i>=6&&mg<0?' style="color:var(--bad)"':''}>${v}</b><span>${l}</span></div>`).join("");}
 function calc(){
-  fitBig();syncOvo();paintPar();const s=effS(S),r=model(s);liveMort(r);
+  fitBig();syncOvo();paintPar();const s=effS(S),r=model(s);liveMort(r);ovoFlow(r,s);
   document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.aves));
   document.querySelectorAll("#presets-r button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.qtr));
   document.getElementById("resumo").textContent=`${S.modo==="racao"?"≈ "+n0(r.aves)+" galinhas em postura · ":""}${n0(r.aves*0.85)} ovos por dia · ${n0(r.feedTot/1000/12)} t de ração por mês · ${s.recria?n0(r.pint)+" pintainhas por ano":n0(r.aloj)+" frangas compradas por ano"}`;
