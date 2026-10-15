@@ -157,6 +157,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .bef>span{font-size:12.5px;color:var(--muted);font-weight:600;margin-right:2px}
 .bef button{border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:600 13px var(--f-display);padding:6px 12px;border-radius:999px;cursor:pointer}
 .bef button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+[hidden]{display:none!important}
 </style>
 
 </head>
@@ -202,8 +203,8 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
         <div class="body" id="sec-precos"></div>
       </details>
       <details class="sec" data-only="cliente" open>
-        <summary>Resultado esperado <span class="hint">premissas do ROI</span></summary>
-        <div class="body" id="sec-efeitos"></div>
+        <summary>Resultado esperado <span class="hint">escolha onde a granja vai melhorar</span></summary>
+        <div class="body"><div class="bef" id="par"></div><p class="note" id="par-hint" style="margin:0">Toque em uma ou mais opções acima (conversão, mortalidade ou peso). Só aparecem e só entram na conta os campos escolhidos.</p><div id="sec-efeitos" style="display:grid;gap:8px"></div></div>
       </details>
     </div>
 
@@ -434,10 +435,10 @@ function renderBE(items){
   let all=items.filter(it=>it.on&&it.custo>0);if(all.filter(x=>!x.prog).length<=1)all=all.filter(x=>!x.prog);
   const cats=[];all.forEach(it=>it.ind.forEach(i=>{if(i.u>0&&!cats.includes(i.c))cats.push(i.c);}));
   const order=["peso","ovos","mort","conv"].filter(c=>cats.includes(c));
-  let f=S.beF||"todos"; if(f!=="todos"&&!order.includes(f))f="todos";
+  let f="todos";const selP=PARS.map(p=>p[0]).filter(c=>S.par&&S.par[c]);
   const fb=document.getElementById("be-f");
-  if(fb)fb.innerHTML=all.length?`<span>Mostrar:</span>`+["todos"].concat(order).map(k=>`<button type="button" data-f="${k}" aria-pressed="${k===f}">${BEF[k]}</button>`).join(""):"";
-  const rows=all.map(it=>Object.assign({},it,{ind:it.ind.filter(i=>i.u>0&&(f==="todos"||i.c===f))})).filter(it=>it.ind.length||f==="todos");
+  if(fb)fb.innerHTML="";
+  const rows=all.map(it=>Object.assign({},it,{ind:it.ind.filter(i=>i.u>0&&(!selP.length||selP.includes(i.c)))})).filter(it=>it.ind.length||f==="todos");
   if(!all.length){el.innerHTML='<p class="note" style="margin:0">Inclua ao menos um produto para ver a análise.</p>';return;}
   if(!rows.length){el.innerHTML='<p class="note" style="margin:0">Nenhum produto marcado atua nesse resultado.</p>';return;}
   el.innerHTML=(f!=="todos"?`<p class="note" style="margin:0;font-weight:600">${BEFT[f]}: quanto cada produto precisa para se pagar sozinho.</p>`:"")+rows.map(it=>{const ind=it.ind;return `<div class="be-row${it.prog?" prog":""}">
@@ -451,8 +452,15 @@ function beTec(r,G,GI,PROG,pa){
   items.push({on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.invest,pa,ind:PROG});
   renderBE(items);
 }
+const PARS=[["conv","Conversão alimentar",["e_ca"]],["mort","Mortalidade",["e_mort"]],["peso","Peso no abate",["e_peso"]]];
+function effS(S0){const s=Object.assign({},S0);PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
+function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(!box)return;
+  box.innerHTML=`<span>A granja vai melhorar em:</span>`+PARS.map(([c,l])=>`<button type="button" data-p="${c}" aria-pressed="${!!S.par[c]}">${l}</button>`).join("");
+  PARS.forEach(([c,,show])=>show.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row)row.hidden=!S.par[c];}));
+  const h=document.getElementById("par-hint");if(h)h.hidden=PARS.some(([c])=>S.par[c]);}
+document.addEventListener("click",e=>{const b=e.target.closest("#par button[data-p]");if(!b)return;S.par=S.par||{};S.par[b.dataset.p]=!S.par[b.dataset.p];save();calc();});
 function calc(){
-  const s=S, r=model(s), W=52, M=12;
+  paintPar();const s=effS(S), r=model(s), W=52, M=12;
   {const pa=c=>"R$ "+nf(3).format(r.alojAno>0?c/r.alojAno:0)+" por ave alojada";
   const pts=v=>"−"+(v<0.1?nf(3).format(v):n2(v))+" ponto %", cv=v=>"−"+nf(3).format(v)+" kg/kg";
   const I={
@@ -476,6 +484,7 @@ function calc(){
          :`Para ${nome}, cada R$ 1,00 investido no programa retorna R$ ${n2(r.roi)}: ${brlK(r.benef)} de ganho para ${brlK(r.invest)} de investimento no ano.`;
     const items=[["Conversão alimentar",r.b.ca,r.shareFeed>0],["Mortalidade",r.b.mort,r.cov.ini||r.cov.fin],["Peso de abate",r.b.peso,r.cov.ini||r.cov.fin]];
     const max=Math.max(r.invest,...items.map(i=>Math.abs(i[1])),1);
+    if(r.invest>0&&!PARS.some(([c])=>S.par&&S.par[c])){const vv=document.getElementById("verdict");if(vv){vv.classList.remove("neg");vv.textContent="Para ver o retorno, escolha em “Resultado esperado” onde a granja vai melhorar (conversão, mortalidade ou peso).";}}
     document.getElementById("bars").innerHTML=items.map(([l,val,on])=>`<div class="bar"><span>${l}${on?"":" <span class='note'>(sem produto)</span>"}</span><div class="track"><div class="fill" style="width:${Math.max(0,val)/max*100}%"></div></div><span class="amt">${brlK(val)}</span></div>`).join("")+
       `<div class="bar cost"><span><b>Investimento IMEVE</b></span><div class="track"><div class="fill" style="width:${r.invest/max*100}%"></div></div><span class="amt">${brlK(r.invest)}</span></div>`;}
   set("p-mes",brlK(r.invest/M)); set("p-ano",brlK(r.invest)); set("p-mil",r.alojAno>0?brl(r.invest/r.alojAno*1000):"–");
