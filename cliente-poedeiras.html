@@ -213,6 +213,10 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .fx-d input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--fg);font:700 14px var(--f-display);padding:6px 0;text-align:right;outline:none}
 .fx-d em{font-style:normal;font-size:12px;margin-left:6px;color:var(--muted)}
 .fx-r.off .fx-d{opacity:.45}
+.bignum .num{flex:0 1 340px!important;max-width:100%!important}
+.bignum .num input::-webkit-inner-spin-button,.bignum .num input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.bignum .num input{-moz-appearance:textfield}
+.bignum .num input{min-width:0;width:100%;transition:font-size .1s}
 </style>
 
 <style>
@@ -484,8 +488,10 @@ function liveMort(r){const M={e_mp:[r.aloj,"galinhas a mais por ano",1],e_mr:[r.
 const FX={feed:()=>(S.recria?[["rec","Recria (cria, recria e pré-postura)",0]]:[]).concat([["post","Postura",0]])};
 function FXR(id){const L=FX[id]?FX[id]():null;if(!L)return "";S.fx=S.fx||{};
   return `<div class="fx"><div class="uf-t">Em quais rações usar · marque as fases</div>`+L.map(([k,l,hasDose])=>{const on=S.fx[k]!==false;return `<div class="fx-r${on?"":" off"}"><label><input type="checkbox" id="fx_${k}" ${on?"checked":""}><span>${l}</span></label>${hasDose?`<div class="fx-d"><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"${on?"":" disabled"}><em>g/t</em></div>`:"<span></span>"}</div>`;}).join("")+`</div>`;}
+function fitBig(){const c=fitBig.c||(fitBig.c=document.createElement("canvas").getContext("2d"));document.querySelectorAll(".bignum .num input").forEach(i=>{if(!i.offsetParent)return;const cs=getComputedStyle(i);c.font=`800 28px ${cs.fontFamily}`;const w=c.measureText(String(i.value||"")).width;const avail=i.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-14;const fs=w>0&&w>avail?Math.max(13,Math.floor(28*avail/w)):28;i.style.fontSize=fs+"px";});}
+document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest(".bignum"))fitBig();});
 function calc(){
-  paintPar();const s=effS(S),r=model(s);liveMort(r);
+  fitBig();paintPar();const s=effS(S),r=model(s);liveMort(r);
   document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.aves));
   document.querySelectorAll("#presets-r button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.qtr));
   document.getElementById("resumo").textContent=`${S.modo==="racao"?"≈ "+n0(r.aves)+" galinhas em postura · ":""}${n0(r.aves*0.85)} ovos por dia · ${n0(r.feedTot/1000/12)} t de ração por mês · ${s.recria?n0(r.pint)+" pintainhas por ano":n0(r.aloj)+" frangas compradas por ano"}`;
