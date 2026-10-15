@@ -228,6 +228,25 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .redbox{border:1px solid var(--bad);background:color-mix(in srgb,var(--bad) 9%,transparent);border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45}
 .redbox b{font-weight:800}
 .redbox .big{display:block;font:800 20px var(--f-display);color:var(--bad);margin-top:4px}
+.sbar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--accent);color:var(--accent-ink);box-shadow:0 -4px 18px rgba(0,0,0,.18)}
+.sbar .in{max-width:1240px;margin:0 auto;padding:10px max(16px,env(safe-area-inset-left,0px));display:flex;gap:6px 22px;align-items:center;flex-wrap:wrap}
+.sbar .it{display:flex;flex-direction:column;line-height:1.1}
+.sbar .it b{font:800 18px var(--f-display);font-variant-numeric:tabular-nums}
+.sbar .it span{font-size:11.5px;opacity:.85}
+.sbar .msg{font-size:13.5px;font-weight:600}
+.sbar .go{margin-left:auto;border:1px solid rgba(255,255,255,.6);background:transparent;color:inherit;font:700 13px var(--f-body);border-radius:999px;padding:7px 12px;cursor:pointer}
+body{padding-bottom:84px}
+@media (max-width:600px){.sbar .it b{font-size:15px}.sbar .in{gap:4px 14px}.sbar .go{display:none}}
+.pbtn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:700 13px var(--f-body);border-radius:999px;padding:6px 12px;cursor:pointer;justify-self:start}
+.pbtn:hover{filter:brightness(1.1)}
+.pwrap{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 4px}.pwrap .pnote{font-size:12px;color:var(--muted);flex:1 1 180px;line-height:1.35}
+.hp{display:inline-flex;align-items:center;gap:4px;font:600 13px var(--f-body);color:var(--muted);border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:2px 8px;margin-top:6px}
+.hp input{width:70px;border:0;background:transparent;color:var(--fg);font:800 15px var(--f-display);text-align:right;outline:none;padding:3px 0}
+.h3wrap{display:grid;gap:2px}
+.subh{margin:10px 0 0;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.share{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.share button,.share a{border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:700 13px var(--f-body);border-radius:999px;padding:8px 14px;cursor:pointer;text-decoration:none}
+.share a.wa{background:#25D366;color:#073b1c;border-color:#25D366}
 </style>
 
 <style>
@@ -270,14 +289,14 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     <div class="brand">
       <small>IMEVE · Avicultura de postura · Para o produtor</small>
       <h1>Calculadora Cliente · Poedeiras</h1>
-      <p class="note" style="margin:6px 0 0;max-width:640px">Siga os passos: <b>1</b> escolha os produtos, <b>2</b> diga onde a granja vai melhorar e <b>3</b> veja o retorno.</p>
+      <p class="note" style="margin:6px 0 0;max-width:640px">Siga os passos: <b>1</b> a granja, <b>2</b> os produtos, <b>3</b> onde a granja vai melhorar e <b>4</b> o retorno. O resumo do retorno fica sempre no rodapé.</p>
     </div>
     <div class="actions"><button class="btn" id="info-btn" type="button" aria-pressed="false">Informações</button><button class="btn" id="reset" type="button">Restaurar padrões</button></div>
   </header>
 
   <div class="stack">
     <section class="size">
-      <label>Informe os dados da sua granja</label>
+      <label>1. A granja · informe os dados da sua granja</label>
       <div class="tabs" role="tablist" id="modo-tabs" style="flex-wrap:wrap;border-radius:14px"><button type="button" role="tab" data-m="aves">Galinhas em postura</button><button type="button" role="tab" data-m="racao">Ração produzida por semana</button></div>
       <div class="bignum" id="blk-q">
         <div class="num"><input id="aves" type="number" step="1000" min="0" inputmode="numeric" aria-label="Galinhas em postura"><span>aves em postura</span></div>
@@ -289,9 +308,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
       </div>
       <label class="chk2" style="font-size:14px;color:var(--fg)"><input type="checkbox" id="recria"> A granja cria e recria as próprias frangas</label>
       <p class="note" id="resumo" style="margin:0"></p>
-    </section>
-    <section class="size" aria-label="Mercado do ovo">
-      <label>Mercado do ovo e produção da granja</label>
+      <p class="subh">Mercado do ovo · preço, custo e produção da granja</p>
       <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr))">
         <div class="row"><label for="ovo_un">Vende por<em>caixa = 30 dúzias (360 ovos)</em></label><div class="num"><select id="ovo_un" style="width:100%;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px"><option value="cx">Caixa</option><option value="dz">Dúzia</option></select></div></div>
         <div class="row"><label for="ovo_in">Preço do ovo<em>Cepea Bastos 13/10/2026: branco R$ 132,32 · vermelho R$ 145,00 por caixa</em></label><div class="num"><input id="ovo_in" type="text" inputmode="decimal"><span class="ovo_u">R$/caixa</span></div></div>
@@ -301,13 +318,13 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
       </div>
       <div class="flow" id="ovo-flow"></div>
     </section>
-    <section class="size" aria-label="Preços dos produtos">
+    <section class="size" aria-label="Preços dos produtos" hidden>
       <label>Preços dos produtos</label>
       <p class="note" style="margin:0">Coloque o preço que você vai praticar com este cliente.</p>
       <div id="sec-precos"></div>
     </section>
     <section class="size" aria-label="Produtos">
-      <label>1. Produtos do programa</label>
+      <label>2. Produtos do programa</label>
       <p class="note" style="margin:0">Marque “incluir” nos produtos que vai oferecer. A dose já vem preenchida.</p>
       <div class="cards" id="cards"></div>
     </section>
@@ -319,18 +336,19 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     </section>
 
     <details class="sec" open>
-      <summary>2. Resultado esperado com o programa <span class="hint">escolha onde a granja vai melhorar</span></summary>
+      <summary>3. Resultado esperado com o programa <span class="hint">escolha onde a granja vai melhorar</span></summary>
       <div class="body"><div class="bef" id="par"></div><p class="note" id="par-hint" style="margin:0">Toque em uma ou mais opções acima (produção de ovos ou mortalidade). Só aparecem e só entram na conta os campos escolhidos.</p><div id="sec-efeitos" style="display:grid;gap:8px"></div><button type="button" class="lnk" id="adv-btn" hidden></button></div>
     </details>
     <section class="size" aria-label="Retorno para o produtor">
-      <label>3. Quanto você investe e quanto volta</label>
+      <label>4. Quanto você investe e quanto volta</label>
       <div class="flow" id="roi-flow"></div>
       <p class="note" id="roi-note" style="margin:0"></p>
       <div class="redbox" id="redbox" hidden></div>
+      <div class="share"><a class="wa" id="wa-sum" href="#" target="_blank" rel="noopener">Enviar resumo pelo WhatsApp</a><button type="button" id="copy-sum">Copiar resumo</button></div>
     </section>
     <section class="size" aria-label="Quanto cada produto precisa melhorar">
-      <label>4. Quanto cada produto precisa melhorar para se pagar</label>
-      <p class="note" style="margin:0">O <b>mínimo</b> que a granja precisa melhorar para cada produto se pagar (cada R$ 1 investido volta R$ 1). Esse mínimo não depende do passo 2; o passo 2 só aparece embaixo, para comparar. Acima do mínimo, é lucro.</p>
+      <label>5. Quanto cada produto precisa melhorar para se pagar</label>
+      <p class="note" style="margin:0">O mínimo que a sua granja precisa melhorar para cada produto se pagar. Acima disso, é lucro.</p>
       <div class="bef" id="be-f"></div>
         <div class="be" id="be"></div>
     </section>
@@ -347,6 +365,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     </details>
   </div>
 
+  <div class="sbar" role="status" aria-live="polite"><div class="in" id="sbar-in"></div></div>
   <footer id="info"><h2 class="info-h">Informações</h2>
     <p><b>Como o cálculo funciona</b>: granja de postura padrão com galinhas de várias idades (poedeira branca, referência Hy-Line W-80): transferência para a postura com 17 semanas, descarte com 90 semanas, 5,4 kg de ração por ave na cria e recria e 107 g de ração por ave por dia na postura. As mortalidades médias de recria e postura já estão descontadas. Semana = ano ÷ 52; mês = ano ÷ 12.</p>
     <p><b>Doses</b>: Especificações Técnicas IMEVE. DBA Concentrado, DBA + PAS, PAS-TR+ e PAS-BAC TR: 200 g/t (maior valor da faixa de 100 a 200 g/t), em todas as rações. Polimeve: 100 g para 1.000 L de água no alojamento das pintainhas (5 dias), nas vacinações da recria (15 dias no lote) e na transferência para a postura (5 dias). Eletroaminovit: 100 mL por 100 L de água na transferência (6 dias) e no estresse calórico da postura (10 dias por ano).</p>
@@ -386,8 +405,8 @@ const FIELDS={
     ["a_trans","Água na transferência","por ave","L/dia",0.01],["a_post","Água da galinha no calor","por ave","L/dia",0.01]],
   "sec-efeitos":[
     ["e_pos","Produção de ovos","% a mais · Granja Ino: +6,3%","%",0.1],
-    ["e_mp","Redução da mortalidade na postura","pontos percentuais · ex.: de 8% para 7,5% = 0,5","p.p.",0.1],
-    ["e_mr","Redução da mortalidade na recria","pontos percentuais","p.p.",0.1]],
+    ["e_mp","Redução da mortalidade na postura","ex.: se a mortalidade cai de 8% para 7,5%, coloque 0,5","pontos %",0.1],
+    ["e_mr","Redução da mortalidade na recria","quanto a mortalidade cai","pontos %",0.1]],
   "sec-dose":[
     ["d_dba","DBA Concentrado na ração","","g/t",25],["d_dbapas","DBA + PAS na ração","","g/t",25],
     ["d_pas","PAS-TR+ na ração","","g/t",25],["d_pasbac","PAS-BAC TR na ração","","g/t",25],
@@ -482,7 +501,8 @@ function renderBE(items){
   const fb=document.getElementById("be-f");
   if(fb)fb.innerHTML="";
   const rows=all.map(it=>Object.assign({},it,{ind:it.ind.filter(i=>i.u>0&&(!selP.length||selP.includes(i.c)))})).filter(it=>it.ind.length||f==="todos");
-  if(!all.length){el.innerHTML='<p class="note" style="margin:0">Inclua ao menos um produto para ver a análise.</p>';return;}
+  if(!all.length){window.__beTxt=[];el.innerHTML='<p class="note" style="margin:0">Inclua ao menos um produto para ver a análise.</p>';return;}
+  window.__beTxt=rows.filter(it=>!it.prog).map(it=>({n:it.nome+" ("+it.fase+")",i:it.ind.map(i=>{const v=it.custo/i.u;return i.lab+" "+i.fmt(v)+(i.sub?" ("+i.sub(v)+")":"");})}));
   if(!rows.length){el.innerHTML='<p class="note" style="margin:0">Nenhum produto marcado atua nesse resultado.</p>';return;}
   el.innerHTML=(f!=="todos"?`<p class="note" style="margin:0;font-weight:600">${BEFT[f]}: quanto cada produto precisa para se pagar sozinho.</p>`:"")+rows.map(it=>{const ind=it.ind;return `<div class="be-row${it.prog?" prog":""}">
    <div class="be-h"><div><b>${it.nome}</b> <span class="be-f">· ${it.fase}</span></div><div class="be-c">Custa <b>${brlK(it.custo/12)}</b> por mês · ${it.pa(it.custo)}</div></div>${ind.length>1?`<p class="be-q">Para se pagar, basta <b>um</b> destes resultados:</p>`:`<p class="be-q">Para se pagar, basta este resultado:</p>`}
@@ -497,7 +517,7 @@ function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(
   box.innerHTML=`<span>A granja vai melhorar em:</span>`+PARS.map(([c,l])=>`<button type="button" data-p="${c}" aria-pressed="${!!S.par[c]}">${l}</button>`).join("");
   PARS.forEach(([c,,show])=>show.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row)row.hidden=!S.par[c];}));
   const h=document.getElementById("par-hint");if(h)h.hidden=PARS.some(([c])=>S.par[c]);
-  const ADV=["e_cre","e_abt"],ab=document.getElementById("adv-btn"),hasAdv=ADV.some(k=>document.getElementById(k));
+  const ADV=[],ab=document.getElementById("adv-btn"),hasAdv=ADV.some(k=>document.getElementById(k));
   ADV.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row&&!row.hidden)row.hidden=!S.adv;});
   if(ab){const pesoOn=PARS.some(([c,,sh])=>S.par[c]&&sh.includes("e_cre"));ab.hidden=!(hasAdv&&pesoOn);ab.textContent=S.adv?"Esconder reflexos (Cooper)":"Ajustar reflexos do peso (Cooper)";}}
 document.addEventListener("click",e=>{const b=e.target.closest("#par button[data-p]");if(!b)return;S.par=S.par||{};S.par[b.dataset.p]=!S.par[b.dataset.p];save();calc();});
@@ -525,8 +545,29 @@ document.addEventListener("input",e=>{const id=e.target.id;if(id==="ovo_un"){S.o
 function ovoFlow(r,s){const el=document.getElementById("ovo-flow");if(!el)return;const dz=S.ovoUn==="dz",ovosDia=(r.aves||0)*(s.postura||0)/100,un=dz?12:360,q=ovosDia/un,uL=dz?"dúzias":"caixas",pu=s.p_ovo*(dz?1:30),cu=s.c_dz*(dz?1:30),mg=pu-cu,qm=q*365/12;
   const g=[[n0(ovosDia),"ovos por dia"],[qf(q),uL+" por dia"],[qf(q*7),uL+" por semana"],[qf(qm),uL+" por mês"],[brlK(qm*pu),"faturamento por mês"],[brlK(qm*cu),"custo de produção por mês"],[(mg<0?"− ":"")+brlK(Math.abs(qm*mg)),"resultado por mês"],[(mg<0?"− ":"")+"R$ "+nf(2).format(Math.abs(mg)),"margem por "+(dz?"dúzia":"caixa")]];
   el.innerHTML=g.map(([v,l],i)=>`<div><b${i>=6&&mg<0?' style="color:var(--bad)"':''}>${v}</b><span>${l}</span></div>`).join("");}
+const PROTO={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return {fx:(S.recria?["rec"]:[]).concat(["post"]),v:{[F[2]]:200}};},pol:{mn:["pp","pt"],v:{d_pol:100,dp_pint:5,dp_trans:4}},ele:{mn:["et"],v:{d_ele:100,de_trans:6}}};
+const PU={feed:()=>[(FEEDS[S.racao]||FEEDS.dba)[1],"kg"],pol:["pr_pol","sachê 100 g"],ele:["pr_ele","frasco 1 L"]};
+const GRN=()=>n0((window.__r||{}).aves||0)+" aves em postura";
+const SPN="Poedeiras",SB_EMPTY="Inclua um produto e escolha o resultado esperado para ver o retorno aqui.",SB_PAR="Escolha no passo 3 onde a granja vai melhorar.";
+function PUf(id){const u=PU[id];return typeof u==="function"?u():u;}
+function PNm(p){return p.id==="feed"&&typeof FEEDS!=="undefined"?(FEEDS[S.racao]||Object.values(FEEDS)[0])[0]:p.nome;}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-proto]");if(b){let P=PROTO[b.dataset.proto];if(typeof P==="function")P=P();if(!P)return;S.fx=S.fx||{};S.mn=S.mn||{};(P.fx||[]).forEach(k=>S.fx[k]=true);(P.mn||[]).forEach(k=>S.mn[k]=true);Object.entries(P.v||{}).forEach(([k,v])=>{S[k]=v;const el=document.getElementById(k);if(el)el.value=v;});save();calc();return;}
+  if(e.target.id==="copy-sum"){const t=resumoTxt();try{navigator.clipboard.writeText(t);e.target.textContent="Copiado!";setTimeout(()=>e.target.textContent="Copiar resumo",1500);}catch(x){}}
+  if(e.target.id==="sbar-go"){const el=document.querySelector('[aria-label="Retorno para o produtor"]');if(el)el.scrollIntoView({behavior:"smooth"});}});
+function resumoTxt(){const R=window.__roi||{},L=[];L.push("*Programa IMEVE · "+SPN+"*");
+  L.push("Granja: "+GRN());
+  const prods=(window.__prods||[]).filter(p=>S.on[p.id]&&p.custo>0);if(prods.length){L.push("");L.push("*Produtos*");prods.forEach(p=>L.push("• "+PNm(p)+": "+brl(p.custo/12)+"/mês"));}
+  if(R.inv>0&&R.b>0){L.push("");L.push("*Investimento e retorno*");L.push("Investe "+brlK(R.inv/12)+"/mês e recebe cerca de "+brlK(R.b/12)+"/mês");L.push("Para cada R$ 1 investido, voltam R$ "+nf(2).format(R.roi));}
+  else if(R.inv>0){L.push("");L.push("Investimento: "+brlK(R.inv/12)+"/mês");}
+  const be=window.__beTxt||[];if(be.length){L.push("");L.push("*Para se pagar, basta um destes resultados:*");be.forEach(x=>{L.push("• "+x.n+": "+x.i.join(" ou "));});}
+  const rb=document.getElementById("redbox");if(rb&&!rb.hidden){L.push("");L.push("*Atenção:* "+rb.innerText.replace(/\n/g," "));}
+  return L.join("\n");}
+function sbar(){const el=document.getElementById("sbar-in");if(!el)return;const R=window.__roi||{};
+  if(!(R.inv>0)){el.innerHTML='<span class="msg">'+SB_EMPTY+'</span>';return;}
+  if(!(R.b>0)){el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investimento/mês</span></div><span class="msg">${SB_PAR}</span>`;return;}
+  el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investe por mês</span></div><div class="it"><b>${brlK(R.b/12)}</b><span>volta por mês</span></div><div class="it"><b>${(R.liq<0?"− ":"")+brlK(Math.abs(R.liq/12))}</b><span>ganho líquido/mês</span></div><div class="it"><b>R$ ${nf(2).format(R.roi)}</b><span>para cada R$ 1</span></div><button class="go" id="sbar-go" type="button">Ver detalhes ↓</button>`;}
 function calc(){
-  fitBig();syncOvo();paintPar();const s=effS(S),r=model(s);liveMort(r);ovoFlow(r,s);
+  fitBig();syncOvo();paintPar();const s=effS(S),r=model(s);window.__prods=r.prod;window.__r=r;liveMort(r);ovoFlow(r,s);
   document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.aves));
   document.querySelectorAll("#presets-r button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.qtr));
   document.getElementById("resumo").textContent=`${S.modo==="racao"?"≈ "+n0(r.aves)+" galinhas em postura · ":""}${n0(r.aves*0.85)} ovos por dia · ${n0(r.feedTot/1000/12)} t de ração por mês · ${s.recria?n0(r.pint)+" pintainhas por ano":n0(r.aloj)+" frangas compradas por ano"}`;
@@ -539,7 +580,7 @@ function calc(){
    if(any){b+=r.aves*365*pz/12*dz*s.e_pos/100;
      b+=r.aloj*(L/52)*s.e_mp/200*(365*pz/12*dz-s.g_post/1000*365*s.p_racao);
      if(s.recria)b+=r.pint*s.e_mr/100*(s.p_pint+0.5*s.kg_rec*s.p_racao_r);}
-   const inv=r.total, liq=b-inv, roi=inv>0?b/inv:0, dzAno=r.aves*365*pz/12;
+   const inv=r.total, liq=b-inv, roi=inv>0?b/inv:0, dzAno=r.aves*365*pz/12;window.__roi={inv,b,liq,roi};
    const g=[[brlK(inv/12),"investimento por mês"],[brlK(b/12),"retorno estimado por mês"],[(liq<0?"− ":"")+brlK(Math.abs(liq/12)),"ganho líquido por mês"],[inv>0?"R$ "+nf(2).format(roi):"–","volta para cada R$ 1"],
      ["R$ "+nf(3).format(dzAno>0?inv/dzAno:0),"investimento por dúzia"],["R$ "+nf(2).format(r.aves>0?inv/r.aves:0),"investimento por ave/ano"]];
    document.getElementById("roi-flow").innerHTML=g.map(([v,sp],i)=>`<div><b${i===2||i===3?(liq<0?' style="color:var(--bad)"':' style="color:var(--good)"'):''}>${v}</b><span>${sp}</span></div>`).join("");
@@ -561,11 +602,12 @@ function calc(){
    {on:on.ele,nome:"Eletroaminovit",fase:"Recria (manejos marcados)",custo:eleC(r.sp.ele[0]),pa,ind:R},
    {on:on.ele,nome:"Eletroaminovit",fase:"Postura (manejos marcados)",custo:eleC(r.sp.ele[1]),pa,ind:P},
    {on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.total,pa,ind:[I.pos,I.mp,I.mr]}]);}
-  if(r.total>0&&!PARS.some(([c])=>S.par&&S.par[c])){const n=document.getElementById("roi-note");if(n)n.textContent="Para ver o retorno, escolha em “2. Resultado esperado” onde a granja vai melhorar.";}
+  if(r.total>0&&!PARS.some(([c])=>S.par&&S.par[c])){const n=document.getElementById("roi-note");if(n)n.textContent="Para ver o retorno, escolha em “3. Resultado esperado” onde a granja vai melhorar.";}
   const act=document.activeElement&&document.activeElement.id;
   const actV=document.activeElement?document.activeElement.value:"",actP=(()=>{try{return document.activeElement.selectionStart}catch(e){return null}})();
   document.getElementById("cards").innerHTML=r.prod.map(p=>{const on=s.on[p.id];return `<article class="card${on?"":" off"}">
-    <h3>${p.head||p.nome}<label class="chk2"><input type="checkbox" id="on_${p.id}" ${on?"checked":""}> incluir</label></h3>
+    <h3><span class="h3wrap">${p.head||p.nome}${on&&PUf(p.id)?`<span class="hp">R$ <input type="text" inputmode="decimal" id="cx_${PUf(p.id)[0]}" value="${nf(2).format(S[PUf(p.id)[0]])}"> / ${PUf(p.id)[1]}</span>`:""}</span><label class="chk2"><input type="checkbox" id="on_${p.id}" ${on?"checked":""}> incluir</label></h3>
+    ${on&&PROTO[p.id]?`<div class="pwrap"><button type="button" class="pbtn" data-proto="${p.id}">⚡ Preencher com o protocolo IMEVE</button><span class="pnote">1 clique marca as fases e doses recomendadas. Depois é só desmarcar o que a granja não vai usar.</span></div>`:""}
     ${CIN(p.id,false)}
     ${p.man&&!(MAN[p.man].some(m=>S.mn[m[0]])||S.mn[OX[p.man]])?`<p class="fx-hint">Marque abaixo em quais manejos o produto vai entrar.</p>`:""}${p.man?`<div class="mans">${MAN[p.man].map(m=>`<div class="mrow"><label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]}</label><span class="dd"><input type="text" inputmode="numeric" id="cx_${m[2]}" value="${S[m[2]]}"${on?"":" disabled"}><small>dias</small></span>${STD[m[2]]?`<small class="std">Padrão IMEVE: ${STD[m[2]]}</small>`:""}</div>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
@@ -574,7 +616,8 @@ function calc(){
   </article>`;}).join("");
   if(act&&(act.startsWith("ov_")||act.startsWith("od_"))){const el=document.getElementById(act);if(el){el.focus();}}
   if(act&&act.startsWith("cx_")){const el=document.getElementById(act);if(el){el.value=actV;el.focus();try{if(actP!=null)el.setSelectionRange(actP,actP);}catch(e){}}}
-}
+
+  sbar();{const a=document.getElementById("wa-sum");if(a)a.href="https://wa.me/?text="+encodeURIComponent(resumoTxt());}}
 calc();
 })();
 </script>

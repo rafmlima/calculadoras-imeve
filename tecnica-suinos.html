@@ -162,7 +162,26 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .redbox{border:1px solid var(--bad);background:color-mix(in srgb,var(--bad) 9%,transparent);border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45}
 .redbox b{font-weight:800}
 .redbox .big{display:block;font:800 20px var(--f-display);color:var(--bad);margin-top:4px}
-</style>
+.sbar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--accent);color:var(--accent-ink);box-shadow:0 -4px 18px rgba(0,0,0,.18)}
+.sbar .in{max-width:1240px;margin:0 auto;padding:10px max(16px,env(safe-area-inset-left,0px));display:flex;gap:6px 22px;align-items:center;flex-wrap:wrap}
+.sbar .it{display:flex;flex-direction:column;line-height:1.1}
+.sbar .it b{font:800 18px var(--f-display);font-variant-numeric:tabular-nums}
+.sbar .it span{font-size:11.5px;opacity:.85}
+.sbar .msg{font-size:13.5px;font-weight:600}
+.sbar .go{margin-left:auto;border:1px solid rgba(255,255,255,.6);background:transparent;color:inherit;font:700 13px var(--f-body);border-radius:999px;padding:7px 12px;cursor:pointer}
+body{padding-bottom:84px}
+@media (max-width:600px){.sbar .it b{font-size:15px}.sbar .in{gap:4px 14px}.sbar .go{display:none}}
+.pbtn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:700 13px var(--f-body);border-radius:999px;padding:6px 12px;cursor:pointer;justify-self:start}
+.pbtn:hover{filter:brightness(1.1)}
+.pwrap{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 4px}.pwrap .pnote{font-size:12px;color:var(--muted);flex:1 1 180px;line-height:1.35}
+.hp{display:inline-flex;align-items:center;gap:4px;font:600 13px var(--f-body);color:var(--muted);border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:2px 8px;margin-top:6px}
+.hp input{width:70px;border:0;background:transparent;color:var(--fg);font:800 15px var(--f-display);text-align:right;outline:none;padding:3px 0}
+.h3wrap{display:grid;gap:2px}
+.subh{margin:10px 0 0;font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.share{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.share button,.share a{border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:700 13px var(--f-body);border-radius:999px;padding:8px 14px;cursor:pointer;text-decoration:none}
+.share a.wa{background:#25D366;color:#073b1c;border-color:#25D366}
+.tp{background:var(--accent)!important;color:var(--accent-ink)!important;border:1px solid var(--accent)!important;text-decoration:none!important;border-radius:999px!important;padding:3px 10px!important;font-weight:700!important}</style>
 
 </head>
 <body>
@@ -226,6 +245,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
         </div>
         <div class="verdict" id="verdict">–</div>
         <div class="redbox" id="redbox" hidden style="margin-top:10px"></div>
+        <div class="share"><a class="wa" id="wa-sum" href="#" target="_blank" rel="noopener">Enviar resumo pelo WhatsApp</a><button type="button" id="copy-sum">Copiar resumo</button></div>
       </section>
       <section class="panel" data-only="cliente">
         <h2>De onde vem o retorno</h2>
@@ -274,6 +294,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
       </section>
   </div>
 
+  <div class="sbar" role="status" aria-live="polite"><div class="in" id="sbar-in"></div></div>
   <footer id="info"><h2 class="info-h">Informações</h2>
     <p><b>Índices padrão</b> (editáveis): Agriness, Relatório Anual (anos-base 2023 e 2024: ~30 desmamados/porca/ano, 2,35 partos/porca/ano, 8,9% de mortalidade na maternidade); Embrapa Suínos e Aves, coeficientes técnicos do custo de produção (<a href="https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/1149413/1/COT592.pdf" target="_blank" rel="noopener">COT 592, 2022</a>: desmame aos 26 d, creche de 39 d com 27,2 kg de ração/leitão; divisão da creche em pré-inicial 1 e 2 e inicial 1 e 2 conforme a prática de campo (pré-inicial 1 de 0,3 a 0,5 kg e pré-inicial 2 de 0,8 a 1 kg por leitão), abate a 125 kg, CA de terminação ~2,3; programa de crescimento e terminação com 1 ração de crescimento e 2 a 5 de terminação, distribuídas pela curva de consumo por idade do Sistema FAEP/SENAR-PR (2025), 1.107 kg de ração/matriz/ano).</p>
     <p><b>Preços de mercado</b>: suíno vivo na Bolsa de Suínos de MG (fechada) R$ 7,00/kg em 08/10/2026, depois de R$ 5,30 em setembro; custo de produção em MG ~R$ 6,00/kg (ASEMG com metodologia Embrapa, set/2026) e Embrapa ICPSuíno SC R$ 6,35/kg vivo (ago/2026); padrão adotado R$ 6,10, com ração respondendo por ~72% do custo. Ajuste para a praça do cliente.</p>
@@ -378,7 +399,7 @@ const TSPLIT={2:[82,105],3:[52,63,72],4:[38,44,50,55],5:[30,34,38,42,43]};
 function paintTerm(){const n=S.n_term;for(let k=1;k<=5;k++){const show=k<=n;const fr=document.getElementById("r_t"+k);if(fr)fr.closest(".row").hidden=!show;
   document.querySelectorAll('[id$="_t'+k+'"]').forEach(el=>{if(el.id.startsWith("row_"))el.hidden=!show;});}}
 document.getElementById("prog").innerHTML=PRODS.map(p=>`<div class="prodbox" id="box_${p.id}">
-  <div class="prodhead"><div><b>${p.nome}</b><span class="via">${p.via}</span></div><div class="quick"><button type="button" data-all="${p.id}" data-v="1">todas</button><button type="button" data-all="${p.id}" data-v="0">nenhuma</button></div></div>
+  <div class="prodhead"><div><b>${p.nome}</b><span class="via">${p.via}</span></div><div class="quick"><button type="button" class="tp" data-tproto="${p.id}" title="Marca as fases e doses do protocolo padrão IMEVE">⚡ protocolo IMEVE</button><button type="button" data-all="${p.id}" data-v="1">todas</button><button type="button" data-all="${p.id}" data-v="0">nenhuma</button></div></div>
   ${p.dose?`<div class="ph dose"><label for="${p.dose[0]}"><span>${p.dose[1]}</span></label><div class="num"><input id="${p.dose[0]}" type="number" step="${p.dose[3]}" inputmode="decimal"><span>${p.dose[2]}</span></div></div>`:""}
   ${p.uses.map(u=>{const id=p.id+"_"+u[0];return `<div class="ph" id="row_${id}"><label><input type="checkbox" id="on_${id}"><span>${u[1]}</span></label><div class="num"><input id="v_${id}" type="number" step="${p.step}" inputmode="decimal" aria-label="${p.nome}: ${u[1]}"><span>${p.un}</span></div></div>`;}).join("")}
 </div>`).join("");
@@ -610,6 +631,23 @@ function calc(){
     [n0(r.feedTot/1000)+" t","ração por ano"],[n0(r.feedTot/12/1000)+" t","ração por mês"],[n1(r.feedTot/52/1000)+" t","ração por semana"],[n2(r.caGranja),"conversão da granja"]];
   document.getElementById("flow").innerHTML=f.map(([b,sp])=>`<div><b>${b}</b><span>${sp}</span></div>`).join("");
 }
+const SPN="Suínos";
+function __tecPost(){const s=effS(S),r=model(s);window.__roi={inv:r.invest,b:r.benef,liq:r.liq,roi:r.roi};window.__prods=r.prod;sbar();const a=document.getElementById("wa-sum");if(a)a.href="https://wa.me/?text="+encodeURIComponent(resumoTxt());}
+function resumoTxt(){const R=window.__roi||{},L=[];L.push("*Programa IMEVE · "+SPN+"*");if(S.cliente)L.push("Granja: "+S.cliente);
+  const prods=(window.__prods||[]).filter(p=>p.custo>0);if(prods.length){L.push("");L.push("*Produtos*");prods.forEach(p=>L.push("• "+p.nome+": "+brl(p.custo/12)+"/mês"));}
+  if(R.inv>0&&R.b>0){L.push("");L.push("*Investimento e retorno*");L.push("Investe "+brlK(R.inv/12)+"/mês e recebe cerca de "+brlK(R.b/12)+"/mês");L.push("Para cada R$ 1 investido, voltam R$ "+nf(2).format(R.roi));}
+  else if(R.inv>0){L.push("");L.push("Investimento: "+brlK(R.inv/12)+"/mês");}
+  const rb=document.getElementById("redbox");if(rb&&!rb.hidden){L.push("");L.push("*Atenção:* "+rb.innerText.replace(/\n/g," "));}
+  return L.join("\n");}
+function sbar(){const el=document.getElementById("sbar-in");if(!el)return;const R=window.__roi||{};
+  if(!(R.inv>0)){el.innerHTML='<span class="msg">Marque as fases do Programa IMEVE e escolha o resultado esperado para ver o retorno aqui.</span>';return;}
+  if(!(R.b>0)){el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investimento/mês</span></div><span class="msg">Escolha em “Resultado esperado” onde a granja vai melhorar.</span>`;return;}
+  el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investe por mês</span></div><div class="it"><b>${brlK(R.b/12)}</b><span>volta por mês</span></div><div class="it"><b>${(R.liq<0?"− ":"")+brlK(Math.abs(R.liq/12))}</b><span>ganho líquido/mês</span></div><div class="it"><b>R$ ${nf(2).format(R.roi)}</b><span>para cada R$ 1</span></div><button class="go" id="sbar-go" type="button">Ver detalhes ↓</button>`;}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-tproto]");if(b){const p=PRODS.find(x=>x.id===b.dataset.tproto);if(!p)return;p.uses.forEach(u=>{S.u[p.id+"_"+u[0]]=[p.via==="ração"?true:!!u[4],u[5]];});if(p.dose)S[p.dose[0]]=DEF[p.dose[0]];save();fill();calc();return;}
+  if(e.target.id==="copy-sum"){try{navigator.clipboard.writeText(resumoTxt());e.target.textContent="Copiado!";setTimeout(()=>e.target.textContent="Copiar resumo",1500);}catch(x){}}
+  if(e.target.id==="sbar-go"){const el=document.getElementById("k-roi-box");if(el)el.scrollIntoView({behavior:"smooth",block:"center"});}});
+const __c0=calc;calc=function(){__c0.apply(this,arguments);__tecPost();};
+
 calc();
 })();
 </script>
