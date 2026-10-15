@@ -225,6 +225,9 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .dd input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--fg);font:700 14px var(--f-display);padding:5px 0;text-align:right;outline:none}
 .dd small{font-size:11.5px;color:var(--muted);margin-left:4px}
 .fx-r .std{grid-column:1/-1;margin:-2px 0 2px 26px}
+.redbox{border:1px solid var(--bad);background:color-mix(in srgb,var(--bad) 9%,transparent);border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45}
+.redbox b{font-weight:800}
+.redbox .big{display:block;font:800 20px var(--f-display);color:var(--bad);margin-top:4px}
 </style>
 
 <style>
@@ -305,6 +308,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
       <label>3. Para o produtor: quanto ele investe e quanto volta</label>
       <div class="flow" id="roi-flow"></div>
       <p class="note" id="roi-note" style="margin:0"></p>
+      <div class="redbox" id="redbox" hidden></div>
     </section>
     <section class="size" aria-label="Quanto cada produto precisa melhorar">
       <label>4. Quanto cada produto precisa melhorar para se pagar</label>
@@ -536,6 +540,10 @@ function FXR(id){const L=FX[id]?FX[id]():null;if(!L)return "";S.fx=S.fx||{};
 function fitBig(){const c=fitBig.c||(fitBig.c=document.createElement("canvas").getContext("2d"));document.querySelectorAll(".bignum .num input").forEach(i=>{if(!i.offsetParent)return;const cs=getComputedStyle(i);c.font=`800 28px ${cs.fontFamily}`;const w=c.measureText(String(i.value||"")).width;const avail=i.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-14;const fs=w>0&&w>avail?Math.max(13,Math.floor(28*avail/w)):28;i.style.fontSize=fs+"px";});}
 document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest(".bignum"))fitBig();});
 const STD={"d_liq": "4 mL (2 mL ao nascer + 2 mL no dia do ferro)", "d_gest": "500 g/t, a partir do 85º dia (faixa 300 a 500)", "d_lact": "500 g/t", "d_p1": "1.000 g/t", "d_p2": "1.000 g/t (10 primeiros dias pós-desmame)", "d_i1": "500 g/t", "d_i2": "500 g/t", "d_cre": "500 g/t", "d_term": "500 g/t", "d_pol": "200 g/1000 L (100 g para 500 L)", "d_ele": "50 mL/100 L (faixa 25 a 50)", "dias_pol_c": "4 dias", "dias_pol_t": "4 dias", "dias_pol_m": "4 dias (2 antes e 2 depois)", "dias_pol_q": "durante o período de calor ou frio", "dias_ele": "6 dias (faixa 4 a 6)", "dias_ele_t": "6 dias (faixa 4 a 6)", "dias_ele_v": "6 dias (faixa 4 a 6)", "dias_ele_q": "6 dias (faixa 4 a 6)"};
+function RED(resMes,liqMes,quem){const el=document.getElementById("redbox");if(!el)return;
+  if(!(resMes<0&&liqMes>0)){el.hidden=true;return;}
+  const sem=resMes-liqMes,x=sem/resMes;el.hidden=false;
+  el.innerHTML=`<b>A granja está trabalhando no vermelho:</b> o preço de venda está abaixo do custo de produção. Com o programa IMEVE, o prejuízo é de <b>${brlK(-resMes)} por mês</b>. Sem o programa, ${quem} perderia <b>${brlK(-sem)} por mês</b> (${brlK(liqMes)} a mais).<span class="big">Sem o probiótico, perderia ${nf(x<1.1?2:1).format(x)} vezes mais (+${nf((x-1)*100<10?1:0).format((x-1)*100)}% de prejuízo).</span>`;}
 function calc(){
   fitBig();paintPar();const s=effS(S),r=model(s);liveMort(r);
   document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.matrizes));
@@ -558,7 +566,7 @@ function calc(){
    const g=[[brlK(inv/12),"investimento por mês"],[brlK(b/12),"retorno estimado por mês"],[(liq<0?"− ":"")+brlK(Math.abs(liq/12)),"ganho líquido por mês"],[inv>0?"R$ "+nf(2).format(roi):"–","volta para cada R$ 1"],
      ["R$ "+nf(2).format(r.vendidos>0?inv/r.vendidos:0),"investimento por suíno"],["R$ "+nf(2).format(r.vendidos>0?b/r.vendidos:0),"retorno por suíno"]];
    document.getElementById("roi-flow").innerHTML=g.map(([v,sp],i)=>`<div><b${i===2||i===3?(liq<0?' style="color:var(--bad)"':' style="color:var(--good)"'):''}>${v}</b><span>${sp}</span></div>`).join("");
-   document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`O produtor investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de menos mortalidade, leitões mais pesados e melhor conversão alimentar. Estimativa com premissas conservadoras; o cálculo detalhado é feito pelo técnico.`;}
+   document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`O produtor investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de menos mortalidade, leitões mais pesados e melhor conversão alimentar. Estimativa com premissas conservadoras; o cálculo detalhado é feito pelo técnico.`;RED((s.p_suino-s.c_prod)*r.vendidos*s.p_abate/12,liq/12,"a granja");}
   {const mc=s.mc/100,mt=s.mt/100,termKg=s.r_cre+s.r_term,valor=s.p_abate*s.p_suino,creKg=s.p1+s.p2+s.i1+s.i2,vend=r.vendidos,f=r.feed,dk=(k,d)=>f[k]/1e6*d*s.pr_dbi,on=S.on;
   const pts=v=>"−"+(v<0.1?nf(3).format(v):n2(v))+" ponto %", cv=v=>"−"+nf(3).format(v)+" kg/kg";
   const polC=L=>L*s.d_pol/1e6/0.1*s.pr_pol, eleC=L=>L*s.d_ele/1e5*s.pr_ele;

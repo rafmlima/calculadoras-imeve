@@ -225,6 +225,9 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .dd input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--fg);font:700 14px var(--f-display);padding:5px 0;text-align:right;outline:none}
 .dd small{font-size:11.5px;color:var(--muted);margin-left:4px}
 .fx-r .std{grid-column:1/-1;margin:-2px 0 2px 26px}
+.redbox{border:1px solid var(--bad);background:color-mix(in srgb,var(--bad) 9%,transparent);border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45}
+.redbox b{font-weight:800}
+.redbox .big{display:block;font:800 20px var(--f-display);color:var(--bad);margin-top:4px}
 </style>
 
 <style>
@@ -310,11 +313,16 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     </details>
     <section class="size" aria-label="Retorno para o produtor">
       <label>3. Quanto você investe e quanto volta</label>
-      <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
-        <div class="row"><label for="p_ovo">Preço do ovo<em>Bastos (Cepea) 13/10/2026: R$ 4,41/dz (R$ 132/cx)</em></label><div class="num"><input id="p_ovo" type="number" step="0.05" inputmode="decimal"><span>R$/dúzia</span></div></div>
+      <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr))">
+        <div class="row"><label for="ovo_un">Vende por<em>caixa = 30 dúzias (360 ovos)</em></label><div class="num"><select id="ovo_un" style="width:100%;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px"><option value="cx">Caixa</option><option value="dz">Dúzia</option></select></div></div>
+        <div class="row"><label for="ovo_in">Preço do ovo<em>Cepea Bastos 13/10/2026: branco R$ 132,32 · vermelho R$ 145,00 por caixa</em></label><div class="num"><input id="ovo_in" type="text" inputmode="decimal"><span class="ovo_u">R$/caixa</span></div></div>
+        <div class="row"><label for="cdz_in">Custo de produção do ovo<em>estimativa: ração ≈ 70% do custo · ajuste para a granja</em></label><div class="num"><input id="cdz_in" type="text" inputmode="decimal"><span class="ovo_u">R$/caixa</span></div></div>
+        <div class="row" hidden><label for="p_ovo">Preço do ovo<em>Bastos (Cepea) 13/10/2026: R$ 4,41/dz (R$ 132/cx)</em></label><div class="num"><input id="p_ovo" type="number" step="0.05" inputmode="decimal"><span>R$/dúzia</span></div></div>
+        <div class="row" hidden><label for="c_dz">Custo de produção do ovo<em>estimativa: ração ≈ 70% do custo · ajuste para a granja</em></label><div class="num"><input id="c_dz" type="number" step="0.05" inputmode="decimal"><span>R$/dúzia</span></div></div>
       </div>
       <div class="flow" id="roi-flow"></div>
       <p class="note" id="roi-note" style="margin:0"></p>
+      <div class="redbox" id="redbox" hidden></div>
     </section>
     <section class="size" aria-label="Quanto cada produto precisa melhorar">
       <label>4. Quanto cada produto precisa melhorar para se pagar</label>
@@ -341,14 +349,15 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     <p><b>Retorno estimado</b>: estimativa simplificada com premissas conservadoras (1,5% a mais de ovos, 1 ponto a menos de mortalidade na postura e 0,5 na recria), valorizadas pelo preço do ovo, da ração e da pintainha. Referência: ensaio IMEVE na Granja Ino com DBA Concentrado (+6,3% de ovos por ave alojada e mortalidade de 3,0% contra 4,8%).</p>
     <p>Os valores são estimativas para a granja usando o programa completo e podem variar conforme o manejo, a sanidade e os preços praticados.</p>
   <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
-  <p><b>Doses padrão</b>: site e especificações técnicas IMEVE (DBI SUI Pó, PAS-TR+, PAS-BAC TR, DBA, DBA + PAS, Polimeve e Eletroaminovit). Quando a recomendação é uma faixa de uso, a calculadora usa o maior valor da faixa. Todas podem ser ajustadas.</p></footer>
+  <p><b>Preço do ovo</b>: referências de 13/10/2026, por caixa de 30 dúzias (360 ovos): Cepea Bastos (SP) branco R$ 132,32 e vermelho R$ 145,00; Ceagesp branco grande R$ 164,70 e vermelho extra R$ 191,29; Ceasa Campinas branco grande R$ 150,00; Ceasa BH branco grande R$ 138,00. Para quem vende por dúzia, divida o preço da caixa por 30 ou use o preço praticado na região. Custo de produção: estimativa com a ração em cerca de 70% do custo; ajuste para a granja.</p>
+    <p><b>Doses padrão</b>: site e especificações técnicas IMEVE (DBI SUI Pó, PAS-TR+, PAS-BAC TR, DBA, DBA + PAS, Polimeve e Eletroaminovit). Quando a recomendação é uma faixa de uso, a calculadora usa o maior valor da faixa. Todas podem ser ajustadas.</p></footer>
 </div>
 
 <script>
 (function(){
 const FEEDS={dba:["DBA Concentrado","pr_dba","d_dba"],dbapas:["DBA + PAS Concentrado","pr_dbapas","d_dbapas"],pas:["PAS-TR+ Concentrado","pr_pas","d_pas"],pasbac:["PAS-BAC TR Concentrado","pr_pasbac","d_pasbac"]};
 const DEF={
-  p_ovo:4.41, p_racao:1.35, p_racao_r:1.45, p_pint:4.50, postura:85, e_pos:1.5, e_mp:1.0, e_mr:0.5,
+  p_ovo:4.41067, c_dz:2.90, ovoUn:"cx", p_racao:1.35, p_racao_r:1.45, p_pint:4.50, postura:85, e_pos:1.5, e_mp:1.0, e_mr:0.5,
   aves:100000, modo:"aves", qtr:80, recria:true, racao:"dba",
   sem_ini:17, sem_desc:90, kg_rec:5.41, g_post:107, mr:3.2, mp:5.5,
   a_pint:0.03, a_rec:0.07, a_trans:0.11, a_post:0.17,
@@ -400,7 +409,7 @@ const qf=v=>v>=100?n0(v):n1(v);
 const brl=v=>"R$ "+nf(0).format(v);
 const brlK=v=>Math.abs(v)>=1e6?"R$ "+nf(2).format(v/1e6)+" mi":Math.abs(v)>=1e4?"R$ "+nf(0).format(v/1e3)+" mil":brl(v);
 document.getElementById("presets").innerHTML=PRE.map(v=>`<button type="button" data-v="${v}">${v>=1e6?n0(v/1e6)+" milhão":n0(v/1000)+" mil"}</button>`).join("");
-const KEYS=["aves","qtr","p_ovo"].concat(Object.values(FIELDS).flat().map(f=>f[0]));
+const KEYS=["aves","qtr","p_ovo","c_dz"].concat(Object.values(FIELDS).flat().map(f=>f[0]));
 function fill(){KEYS.forEach(k=>{document.getElementById(k).value=S[k];});document.getElementById("recria").checked=!!S.recria;}
 fill();
 document.addEventListener("input",e=>{const id=e.target.id;
@@ -499,8 +508,18 @@ function FXR(id){const L=FX[id]?FX[id]():null;if(!L)return "";S.fx=S.fx||{};
 function fitBig(){const c=fitBig.c||(fitBig.c=document.createElement("canvas").getContext("2d"));document.querySelectorAll(".bignum .num input").forEach(i=>{if(!i.offsetParent)return;const cs=getComputedStyle(i);c.font=`800 28px ${cs.fontFamily}`;const w=c.measureText(String(i.value||"")).width;const avail=i.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-14;const fs=w>0&&w>avail?Math.max(13,Math.floor(28*avail/w)):28;i.style.fontSize=fs+"px";});}
 document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest(".bignum"))fitBig();});
 const STD={"d_dba": "200 g/t (faixa de 100 a 200 g/t)", "d_dbapas": "200 g/t (faixa de 100 a 200 g/t)", "d_pas": "200 g/t (faixa de 100 a 200 g/t)", "d_pasbac": "200 g/t (faixa de 100 a 200 g/t)", "d_pol": "100 g/1000 L", "d_ele": "100 mL/100 L (faixa 50 a 100)", "dp_pint": "5 dias", "dp_trans": "4 dias (2 antes e 2 depois)", "dp_vac": "4 dias por vacinação (2 antes e 2 depois)", "dp_calor": "durante o período de calor ou frio", "de_pint": "6 dias (faixa 4 a 6)", "de_trans": "6 dias (faixa 4 a 6)", "de_vac": "6 dias por vacinação (faixa 4 a 6)", "de_calor": "6 dias (faixa 4 a 6) por evento"};
+function RED(resMes,liqMes,quem){const el=document.getElementById("redbox");if(!el)return;
+  if(!(resMes<0&&liqMes>0)){el.hidden=true;return;}
+  const sem=resMes-liqMes,x=sem/resMes;el.hidden=false;
+  el.innerHTML=`<b>A granja está trabalhando no vermelho:</b> o preço de venda está abaixo do custo de produção. Com o programa IMEVE, o prejuízo é de <b>${brlK(-resMes)} por mês</b>. Sem o programa, ${quem} perderia <b>${brlK(-sem)} por mês</b> (${brlK(liqMes)} a mais).<span class="big">Sem o probiótico, perderia ${nf(x<1.1?2:1).format(x)} vezes mais (+${nf((x-1)*100<10?1:0).format((x-1)*100)}% de prejuízo).</span>`;}
+function syncOvo(force){const k=S.ovoUn==="dz"?1:30,a=force?"":document.activeElement&&document.activeElement.id,f=v=>nf(2).format((v||0)*k);
+  const o=document.getElementById("ovo_in"),c=document.getElementById("cdz_in"),u=document.getElementById("ovo_un");if(!o)return;
+  if(a!=="ovo_in")o.value=f(S.p_ovo);if(c&&a!=="cdz_in")c.value=f(S.c_dz);u.value=S.ovoUn==="dz"?"dz":"cx";
+  document.querySelectorAll(".ovo_u").forEach(e=>e.textContent=k===1?"R$/dúzia":"R$/caixa");}
+document.addEventListener("input",e=>{const id=e.target.id;if(id==="ovo_un"){S.ovoUn=e.target.value;save();calc();syncOvo(true);return;}
+  if(id==="ovo_in"||id==="cdz_in"){const k=S.ovoUn==="dz"?1:30;let t=String(e.target.value).trim();if(t.includes(","))t=t.replace(/\./g,"").replace(",",".");const v=parseFloat(t);if(isFinite(v)){S[id==="ovo_in"?"p_ovo":"c_dz"]=v/k;save();calc();}}});
 function calc(){
-  fitBig();paintPar();const s=effS(S),r=model(s);liveMort(r);
+  fitBig();syncOvo();paintPar();const s=effS(S),r=model(s);liveMort(r);
   document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.aves));
   document.querySelectorAll("#presets-r button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.qtr));
   document.getElementById("resumo").textContent=`${S.modo==="racao"?"≈ "+n0(r.aves)+" galinhas em postura · ":""}${n0(r.aves*0.85)} ovos por dia · ${n0(r.feedTot/1000/12)} t de ração por mês · ${s.recria?n0(r.pint)+" pintainhas por ano":n0(r.aloj)+" frangas compradas por ano"}`;
@@ -517,7 +536,7 @@ function calc(){
    const g=[[brlK(inv/12),"investimento por mês"],[brlK(b/12),"retorno estimado por mês"],[(liq<0?"− ":"")+brlK(Math.abs(liq/12)),"ganho líquido por mês"],[inv>0?"R$ "+nf(2).format(roi):"–","volta para cada R$ 1"],
      ["R$ "+nf(3).format(dzAno>0?inv/dzAno:0),"investimento por dúzia"],["R$ "+nf(2).format(r.aves>0?inv/r.aves:0),"investimento por ave/ano"]];
    document.getElementById("roi-flow").innerHTML=g.map(([v,sp],i)=>`<div><b${i===2||i===3?(liq<0?' style="color:var(--bad)"':' style="color:var(--good)"'):''}>${v}</b><span>${sp}</span></div>`).join("");
-   document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`Sua granja investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de mais ovos, menos mortalidade na postura e na recria. Estimativa com premissas conservadoras; o técnico IMEVE pode detalhar o cálculo para a sua granja.`;}
+   document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`Sua granja investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de mais ovos, menos mortalidade na postura e na recria. Estimativa com premissas conservadoras; o técnico IMEVE pode detalhar o cálculo para a sua granja.`;RED((s.p_ovo-s.c_dz)*r.aves*365*(s.postura/100)/12/12,liq/12,"você");}
   {const L=Math.max(1,s.sem_desc-s.sem_ini),dz=s.p_ovo,pz=s.postura/100,FD=FEEDS[s.racao]||FEEDS.dba,fn=FD[0],fp=FD[1],fd=FD[2],on=s.on;
   const pts=v=>"−"+(v<0.1?nf(3).format(v):n2(v))+" ponto %", cv=v=>"−"+nf(3).format(v)+" kg/kg";
   const polC=L=>L*s.d_pol/1e6/0.1*s.pr_pol, eleC=L=>L*s.d_ele/1e5*s.pr_ele;
