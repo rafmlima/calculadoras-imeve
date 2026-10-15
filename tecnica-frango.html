@@ -181,7 +181,13 @@ body{padding-bottom:84px}
 .share{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .share button,.share a{border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:700 13px var(--f-body);border-radius:999px;padding:8px 14px;cursor:pointer;text-decoration:none}
 .share a.wa{background:#25D366;color:#073b1c;border-color:#25D366}
-.tp{background:var(--accent)!important;color:var(--accent-ink)!important;border:1px solid var(--accent)!important;text-decoration:none!important;border-radius:999px!important;padding:3px 10px!important;font-weight:700!important}</style>
+.tp{background:var(--accent)!important;color:var(--accent-ink)!important;border:1px solid var(--accent)!important;text-decoration:none!important;border-radius:999px!important;padding:3px 10px!important;font-weight:700!important}@media (max-width:600px){body{padding-bottom:112px}.sbar .in{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}.sbar .msg{grid-column:1/-1}}
+.btn.arm{background:var(--bad,#c0392b)!important;color:#fff!important;border-color:var(--bad,#c0392b)!important}
+.gname{width:100%;max-width:420px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--fg);font:600 15px var(--f-body);padding:9px 12px}
+.mrow>.chk2{grid-column:1;grid-row:1}
+.mrow>.dd{grid-column:2;grid-row:1/span 2;align-self:center}
+.mrow>.std{grid-column:1!important;grid-row:2;margin:-3px 0 1px 26px!important;font-size:11px}
+</style>
 
 </head>
 <body>
@@ -286,7 +292,7 @@ body{padding-bottom:84px}
   <div class="sbar" role="status" aria-live="polite"><div class="in" id="sbar-in"></div></div>
   <footer id="info"><h2 class="info-h">Informações</h2>
     <p><b>Índices padrão</b> (editáveis): Embrapa Suínos e Aves, coeficientes técnicos do custo de produção (<a href="https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/1149413/1/COT592.pdf" target="_blank" rel="noopener">COT 592, 2022</a>): frango abatido aos 43 dias com 2,9 kg, conversão 1,70 e mortalidade de 5,5%. Divisão do consumo por fase conforme o manual Cobb 500 (suplemento de desempenho 2022) e Ross 308 AP (2022), ajustada ao total da Embrapa. Água: relação água:ração de 1,8:1 a 21 °C (Aviagen, 2025).</p>
-    <p><b>Preços de mercado</b>: frango vivo nas praças de integração (SC/RS) R$ 4,75/kg e mercado independente em SP R$ 5,70/kg (Safras & Mercado, set/2026); custo de produção Embrapa ICPFrango (PR) R$ 4,85/kg vivo (ago/2026), com a ração em ~64% do custo. O preço da ração (R$ 1,82/kg) foi calculado a partir do ICPFrango: ajuste com os valores do cliente.</p>
+    <p><b>Preços de mercado</b>: frango vivo no Paraná R$ 4,81/kg (13/10/2026) e mercado independente em SP R$ 5,70/kg (Scot Consultoria, 13/10/2026); custo de produção Embrapa ICPFrango (PR) R$ 4,85/kg vivo (ago/2026), com a ração em ~64% do custo. O preço da ração (R$ 1,82/kg) foi calculado a partir do ICPFrango: ajuste com os valores do cliente.</p>
     <p><b>Doses e preços dos produtos</b>: Programa IMEVE Pollos de Engorde (PAS-TR Concentrado 200 g/t em todas as fases; Polimeve 100 g/1.000 L no alojamento, na troca de ração aos 21 dias, em vacinações e temperaturas extremas; Eletroaminovit 0,5 a 1 L/1.000 L) e Especificações Técnicas IMEVE. Preços conforme planilha comparativa interna e Proposta IMEVE/BIOAGRO; confirmar tabela vigente.</p>
     <p><b>Premissas de resultado</b>: valores conservadores. Meta-análises com <i>Bacillus</i> em frangos mostram melhora de conversão de 0,07 (lotes desafiados por coccidiose, Riaz et al., 2026) a 0,10 (sem desafio, Opazo et al., 2025) e redução das chances de mortalidade em lotes desafiados. A calculadora usa 0,03 de conversão, 0,5 ponto de mortalidade e 1% de peso. Estimativa técnica, sem garantia de resultado.</p>
   <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
@@ -301,7 +307,7 @@ const DEF={
   idade:43, peso:2.90, mort:5.5,
   r_pi:0.18, r_ini:1.00, r_cre:2.10, r_fin:1.55,
   a_aloj:0.05, a_s2:0.10, a_troca:0.20, a_vac:0.12, a_s45:0.30, a_calor:0.35,
-  p_frango:4.75, ref:"integracao", c_prod:4.85, p_racao:1.82, p_pint:2.45,
+  p_frango:4.81, ref:"integracao", c_prod:4.85, p_racao:1.82, p_pint:2.45,
   pr_pas:82.00, pr_pasbac:79.20, pr_dba:34.80, pr_dbapas:61.92, pr_pol:26.80, pr_ele:103.00,
   pol_dose:100, ele_dose:100,
   e_ca:0.03, e_mort:0.5, e_peso:1.0,
@@ -342,7 +348,7 @@ const FIELDS={
     ["a_s45","Na 4ª e 5ª semanas","por ave","L/dia",0.01],
     ["a_calor","No calor (fase final)","por ave","L/dia",0.01]],
   "sec-precos":[
-    ["p_frango","Preço do frango vivo","integração SC/RS: R$ 4,75 · independente SP: R$ 5,70","R$/kg",0.05],
+    ["p_frango","Preço do frango vivo","integração PR: R$ 4,81 (13/10/2026) · independente SP: R$ 5,70","R$/kg",0.05],
     ["c_prod","Custo de produção do frango","Embrapa ICPFrango PR ago/2026: R$ 4,85","R$/kg vivo",0.05],
     ["p_racao","Ração","estimativa pelo ICPFrango","R$/kg",0.05],
     ["pr_pas","PAS-TR+ Concentrado","conferir tabela vigente","R$/kg",0.1],
@@ -362,13 +368,13 @@ try{const saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved)S=Object.
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
 for(const [sec,list] of Object.entries(FIELDS)){
-  document.getElementById(sec).innerHTML=list.map(([k,lab,hint,unit,step])=>`<div class="row"><label for="${k}">${lab}${hint?`<em>${hint}</em>`:""}</label><div class="num"><input id="${k}" type="number" step="${step}" inputmode="decimal"><span>${unit}</span></div></div>`).join("");
+  document.getElementById(sec).innerHTML=list.map(([k,lab,hint,unit,step])=>`<div class="row"><label for="${k}">${lab}${hint?`<em>${hint}</em>`:""}</label><div class="num"><input id="${k}" type="text" step="${step}" inputmode="decimal"><span>${unit}</span></div></div>`).join("");
 }
 document.getElementById("sec-precos").insertAdjacentHTML("afterbegin",'<div class="row"><label for="ref">Referência do preço<em>integração ou mercado independente</em></label><div class="num"><select id="ref" style="width:100%;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px"><option value="integracao">Integração</option><option value="independente">Independente</option></select></div></div>');
 document.getElementById("prog").innerHTML=PRODS.map(p=>`<div class="prodbox" id="box_${p.id}">
   <div class="prodhead"><div><b>${p.nome}</b><span class="via">${p.via}</span></div><div class="quick"><button type="button" class="tp" data-tproto="${p.id}" title="Marca as fases e doses do protocolo padrão IMEVE">⚡ protocolo IMEVE</button><button type="button" data-all="${p.id}" data-v="1">todas</button><button type="button" data-all="${p.id}" data-v="0">nenhuma</button></div></div>
-  ${p.dose?`<div class="ph dose"><label for="${p.dose[0]}"><span>${p.dose[1]}</span></label><div class="num"><input id="${p.dose[0]}" type="number" step="${p.dose[3]}" inputmode="decimal"><span>${p.dose[2]}</span></div></div>`:""}
-  ${p.uses.map(u=>{const id=p.id+"_"+u[0];return `<div class="ph" id="row_${id}"><label><input type="checkbox" id="on_${id}"><span>${u[1]}</span></label><div class="num"><input id="v_${id}" type="number" step="${p.step}" inputmode="decimal" aria-label="${p.nome}: ${u[1]}"><span>${p.un}</span></div></div>`;}).join("")}
+  ${p.dose?`<div class="ph dose"><label for="${p.dose[0]}"><span>${p.dose[1]}</span></label><div class="num"><input id="${p.dose[0]}" type="text" step="${p.dose[3]}" inputmode="decimal"><span>${p.dose[2]}</span></div></div>`:""}
+  ${p.uses.map(u=>{const id=p.id+"_"+u[0];return `<div class="ph" id="row_${id}"><label><input type="checkbox" id="on_${id}"><span>${u[1]}</span></label><div class="num"><input id="v_${id}" type="text" step="${p.step}" inputmode="decimal" aria-label="${p.nome}: ${u[1]}"><span>${p.un}</span></div></div>`;}).join("")}
 </div>`).join("");
 
 const NUMKEYS=Object.values(FIELDS).flat().map(f=>f[0]).concat(["pol_dose","ele_dose"]);
@@ -382,9 +388,9 @@ function fill(){
 fill();
 document.addEventListener("input",e=>{
   const id=e.target.id; if(!id)return;
-  if(NUMKEYS.includes(id)){const v=parseFloat(e.target.value);S[id]=isFinite(v)?v:0;}
+  if(NUMKEYS.includes(id)){const v=pBR(e.target.value);S[id]=isFinite(v)?v:0;}
   else if(id.startsWith("on_")){S.u[id.slice(3)][0]=e.target.checked;paintRows();}
-  else if(id.startsWith("v_")){const v=parseFloat(e.target.value);S.u[id.slice(2)][1]=isFinite(v)?v:0;}
+  else if(id.startsWith("v_")){const v=pBR(e.target.value);S.u[id.slice(2)][1]=isFinite(v)?v:0;}
   else if(id==="cliente"){S.cliente=e.target.value;}
   else if(id==="ref"){S.ref=e.target.value;}
   else return;
@@ -393,7 +399,7 @@ document.addEventListener("input",e=>{
 document.addEventListener("change",e=>{if(e.target.type==="checkbox"||e.target.tagName==="SELECT"){e.target.dispatchEvent(new Event("input",{bubbles:true}));}});
 document.getElementById("prog").addEventListener("click",e=>{const b=e.target.closest("button[data-all]");if(!b)return;
   const pid=b.dataset.all,on=b.dataset.v==="1";Object.keys(S.u).forEach(id=>{if(id.startsWith(pid+"_"))S.u[id][0]=on;});save();fill();calc();});
-document.getElementById("reset").addEventListener("click",()=>{S=JSON.parse(JSON.stringify(DEF));save();fill();calc();});
+document.getElementById("reset").addEventListener("click",e=>{const rb=e.currentTarget;if(!rb.dataset.arm){rb.dataset.arm="1";rb.textContent="Toque de novo para apagar tudo";rb.classList.add("arm");clearTimeout(rb.__t);rb.__t=setTimeout(()=>{delete rb.dataset.arm;rb.textContent="Restaurar padrões";rb.classList.remove("arm");},4000);return;}delete rb.dataset.arm;clearTimeout(rb.__t);rb.textContent="Restaurar padrões";rb.classList.remove("arm");S=JSON.parse(JSON.stringify(DEF));save();fill();calc();});
 
 function setMode(m){document.body.classList.toggle("mode-cliente",m==="cliente");document.body.classList.toggle("mode-interno",m==="interno");
   document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.mode===m?"true":"false"));
@@ -539,7 +545,14 @@ function calc(){
   document.getElementById("flow").innerHTML=f.map(([b,sp])=>`<div><b>${b}</b><span>${sp}</span></div>`).join("");
 }
 const SPN="Frango de Corte";
-function __tecPost(){const s=effS(S),r=model(s);window.__roi={inv:r.invest,b:r.benef,liq:r.liq,roi:r.roi};window.__prods=r.prod;sbar();const a=document.getElementById("wa-sum");if(a)a.href="https://wa.me/?text="+encodeURIComponent(resumoTxt());}
+function pBR(t){t=String(t).trim().replace(/\s/g,"");if(t.includes(","))t=t.replace(/\./g,"").replace(",",".");else if(/^-?\d{1,3}(\.\d{3})+$/.test(t))t=t.replace(/\./g,"");return parseFloat(t);}
+function fBR(v){if(typeof v!=="number"||!isFinite(v))return v;if(Number.isInteger(v)&&Math.abs(v)>=1000)return v.toLocaleString("pt-BR");return String(+v.toFixed(6)).replace(".",",");}
+function fmtNums(){const a=document.activeElement,L=(typeof NUMKEYS!=="undefined"?NUMKEYS:typeof KEYS!=="undefined"?KEYS:[]);
+  L.forEach(k=>{const el=document.getElementById(k);if(el&&el!==a&&el.type==="text"&&typeof S[k]==="number")el.value=fBR(S[k]);});
+  if(S.u)Object.keys(S.u).forEach(id=>{const el=document.getElementById("v_"+id);if(el&&el!==a&&el.type==="text")el.value=fBR(S.u[id][1]);});
+  const g=document.getElementById("granja");if(g&&g!==a)g.value=S.granja||"";}
+document.addEventListener("focusout",e=>{if(e.target&&e.target.type==="text")setTimeout(fmtNums,0);});
+function __tecPost(){fmtNums();const s=effS(S),r=model(s);window.__roi={inv:r.invest,b:r.benef,liq:r.liq,roi:r.roi};window.__prods=r.prod;sbar();const a=document.getElementById("wa-sum");if(a)a.href="https://wa.me/?text="+encodeURIComponent(resumoTxt());}
 function resumoTxt(){const R=window.__roi||{},L=[];L.push("*Programa IMEVE · "+SPN+"*");if(S.cliente)L.push("Granja: "+S.cliente);
   const prods=(window.__prods||[]).filter(p=>p.custo>0);if(prods.length){L.push("");L.push("*Produtos*");prods.forEach(p=>L.push("• "+p.nome+": "+brl(p.custo/12)+"/mês"));}
   if(R.inv>0&&R.b>0){L.push("");L.push("*Investimento e retorno*");L.push("Investe "+brlK(R.inv/12)+"/mês e recebe cerca de "+brlK(R.b/12)+"/mês");L.push("Para cada R$ 1 investido, voltam R$ "+nf(2).format(R.roi));}

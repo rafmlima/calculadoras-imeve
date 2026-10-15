@@ -181,7 +181,13 @@ body{padding-bottom:84px}
 .share{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .share button,.share a{border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:700 13px var(--f-body);border-radius:999px;padding:8px 14px;cursor:pointer;text-decoration:none}
 .share a.wa{background:#25D366;color:#073b1c;border-color:#25D366}
-.tp{background:var(--accent)!important;color:var(--accent-ink)!important;border:1px solid var(--accent)!important;text-decoration:none!important;border-radius:999px!important;padding:3px 10px!important;font-weight:700!important}</style>
+.tp{background:var(--accent)!important;color:var(--accent-ink)!important;border:1px solid var(--accent)!important;text-decoration:none!important;border-radius:999px!important;padding:3px 10px!important;font-weight:700!important}@media (max-width:600px){body{padding-bottom:112px}.sbar .in{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}.sbar .msg{grid-column:1/-1}}
+.btn.arm{background:var(--bad,#c0392b)!important;color:#fff!important;border-color:var(--bad,#c0392b)!important}
+.gname{width:100%;max-width:420px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--fg);font:600 15px var(--f-body);padding:9px 12px}
+.mrow>.chk2{grid-column:1;grid-row:1}
+.mrow>.dd{grid-column:2;grid-row:1/span 2;align-self:center}
+.mrow>.std{grid-column:1!important;grid-row:2;margin:-3px 0 1px 26px!important;font-size:11px}
+</style>
 
 </head>
 <body>
@@ -219,8 +225,8 @@ body{padding-bottom:84px}
           <p class="note" style="margin:0">Marque as fases em que cada produto entra. Fase desmarcada não entra no cálculo de consumo nem no retorno.</p>
           <div id="prog" style="display:grid;gap:10px"></div>
           <div class="sub">Consumo de água (para os produtos via água)</div>
-          <div class="row"><label for="agua_c">Leitão na creche<em>por animal</em></label><div class="num"><input id="agua_c" type="number" step="0.1" inputmode="decimal"><span>L/dia</span></div></div>
-          <div class="row"><label for="agua_t">Suíno na entrada da terminação<em>por animal</em></label><div class="num"><input id="agua_t" type="number" step="0.1" inputmode="decimal"><span>L/dia</span></div></div>
+          <div class="row"><label for="agua_c">Leitão na creche<em>por animal</em></label><div class="num"><input id="agua_c" type="text" step="0.1" inputmode="decimal"><span>L/dia</span></div></div>
+          <div class="row"><label for="agua_t">Suíno na entrada da terminação<em>por animal</em></label><div class="num"><input id="agua_t" type="text" step="0.1" inputmode="decimal"><span>L/dia</span></div></div>
         </div>
       </details>
       <details class="sec" open>
@@ -391,7 +397,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 // build numeric fields
 for(const [sec,list] of Object.entries(FIELDS)){
   const el=document.getElementById(sec);
-  el.innerHTML=list.map(([k,lab,hint,unit,step])=>`<div class="row"><label for="${k}">${lab}${hint?`<em>${hint}</em>`:""}</label><div class="num"><input id="${k}" type="number" step="${step}" inputmode="decimal"><span>${unit}</span></div></div>`).join("");
+  el.innerHTML=list.map(([k,lab,hint,unit,step])=>`<div class="row"><label for="${k}">${lab}${hint?`<em>${hint}</em>`:""}</label><div class="num"><input id="${k}" type="text" step="${step}" inputmode="decimal"><span>${unit}</span></div></div>`).join("");
 }
 document.getElementById("sec-precos").insertAdjacentHTML("afterbegin",'<div class="row"><label for="bolsa">Referência do preço<em>bolsa fechada ou bolsa aberta</em></label><div class="num"><select id="bolsa" style="width:100%;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px"><option value="fechada">Bolsa fechada</option><option value="aberta">Bolsa aberta</option></select></div></div>');
 document.getElementById("r_cre").closest(".row").insertAdjacentHTML("afterend",'<div class="row"><label for="n_term">Quantas rações de terminação?<em>o consumo é redistribuído pela curva de consumo por idade</em></label><div class="num"><select id="n_term" style="width:100%;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px"><option value="2">2 rações</option><option value="3">3 rações</option><option value="4">4 rações</option><option value="5">5 rações</option></select></div></div>');
@@ -400,8 +406,8 @@ function paintTerm(){const n=S.n_term;for(let k=1;k<=5;k++){const show=k<=n;cons
   document.querySelectorAll('[id$="_t'+k+'"]').forEach(el=>{if(el.id.startsWith("row_"))el.hidden=!show;});}}
 document.getElementById("prog").innerHTML=PRODS.map(p=>`<div class="prodbox" id="box_${p.id}">
   <div class="prodhead"><div><b>${p.nome}</b><span class="via">${p.via}</span></div><div class="quick"><button type="button" class="tp" data-tproto="${p.id}" title="Marca as fases e doses do protocolo padrão IMEVE">⚡ protocolo IMEVE</button><button type="button" data-all="${p.id}" data-v="1">todas</button><button type="button" data-all="${p.id}" data-v="0">nenhuma</button></div></div>
-  ${p.dose?`<div class="ph dose"><label for="${p.dose[0]}"><span>${p.dose[1]}</span></label><div class="num"><input id="${p.dose[0]}" type="number" step="${p.dose[3]}" inputmode="decimal"><span>${p.dose[2]}</span></div></div>`:""}
-  ${p.uses.map(u=>{const id=p.id+"_"+u[0];return `<div class="ph" id="row_${id}"><label><input type="checkbox" id="on_${id}"><span>${u[1]}</span></label><div class="num"><input id="v_${id}" type="number" step="${p.step}" inputmode="decimal" aria-label="${p.nome}: ${u[1]}"><span>${p.un}</span></div></div>`;}).join("")}
+  ${p.dose?`<div class="ph dose"><label for="${p.dose[0]}"><span>${p.dose[1]}</span></label><div class="num"><input id="${p.dose[0]}" type="text" step="${p.dose[3]}" inputmode="decimal"><span>${p.dose[2]}</span></div></div>`:""}
+  ${p.uses.map(u=>{const id=p.id+"_"+u[0];return `<div class="ph" id="row_${id}"><label><input type="checkbox" id="on_${id}"><span>${u[1]}</span></label><div class="num"><input id="v_${id}" type="text" step="${p.step}" inputmode="decimal" aria-label="${p.nome}: ${u[1]}"><span>${p.un}</span></div></div>`;}).join("")}
 </div>`).join("");
 
 const NUMKEYS=Object.values(FIELDS).flat().map(f=>f[0]).concat(["pol_dose","ele_dose","agua_c","agua_t"]);
@@ -425,9 +431,9 @@ function pesoSplit(s){const pag=Math.max(0,s.e_pag),m=Math.min(pag,Math.max(0,s.
   c=Math.min(rest,s.e_cre>0?Math.max(0,s.e_pcg-s.e_pdg*s.e_cre)*s.e_abt/s.e_cre:0);return {m,c,t:rest-c};}
 document.addEventListener("input",e=>{
   const id=e.target.id; if(!id)return;
-  if(NUMKEYS.includes(id)){const v=parseFloat(e.target.value);S[id]=isFinite(v)?v:0;casc(id);}
+  if(NUMKEYS.includes(id)){const v=pBR(e.target.value);S[id]=isFinite(v)?v:0;casc(id);}
   else if(id.startsWith("on_")){S.u[id.slice(3)][0]=e.target.checked;paintRows();}
-  else if(id.startsWith("v_")){const v=parseFloat(e.target.value);S.u[id.slice(2)][1]=isFinite(v)?v:0;}
+  else if(id.startsWith("v_")){const v=pBR(e.target.value);S.u[id.slice(2)][1]=isFinite(v)?v:0;}
   else if(id==="cliente"){S.cliente=e.target.value;}
   else if(id==="bolsa"){S.bolsa=e.target.value;}
   else if(id==="n_term"){const old=S.n_term,n=+e.target.value;let tot=0;for(let k=1;k<=old;k++)tot+=S["r_t"+k];const sp=TSPLIT[n],ss=sp.reduce((a,b)=>a+b,0);
@@ -438,7 +444,7 @@ document.addEventListener("input",e=>{
 document.getElementById("prog").addEventListener("click",e=>{const b=e.target.closest("button[data-all]");if(!b)return;
   const pid=b.dataset.all,on=b.dataset.v==="1";Object.keys(S.u).forEach(id=>{if(id.startsWith(pid+"_"))S.u[id][0]=on;});save();fill();calc();});
 document.addEventListener("change",e=>{if(e.target.type==="checkbox"||e.target.tagName==="SELECT"){e.target.dispatchEvent(new Event("input",{bubbles:true}));}});
-document.getElementById("reset").addEventListener("click",()=>{S=JSON.parse(JSON.stringify(DEF));save();fill();calc();});
+document.getElementById("reset").addEventListener("click",e=>{const rb=e.currentTarget;if(!rb.dataset.arm){rb.dataset.arm="1";rb.textContent="Toque de novo para apagar tudo";rb.classList.add("arm");clearTimeout(rb.__t);rb.__t=setTimeout(()=>{delete rb.dataset.arm;rb.textContent="Restaurar padrões";rb.classList.remove("arm");},4000);return;}delete rb.dataset.arm;clearTimeout(rb.__t);rb.textContent="Restaurar padrões";rb.classList.remove("arm");S=JSON.parse(JSON.stringify(DEF));save();fill();calc();});
 
 // mode
 function setMode(m){document.body.classList.toggle("mode-cliente",m==="cliente");document.body.classList.toggle("mode-interno",m==="interno");
@@ -632,7 +638,14 @@ function calc(){
   document.getElementById("flow").innerHTML=f.map(([b,sp])=>`<div><b>${b}</b><span>${sp}</span></div>`).join("");
 }
 const SPN="Suínos";
-function __tecPost(){const s=effS(S),r=model(s);window.__roi={inv:r.invest,b:r.benef,liq:r.liq,roi:r.roi};window.__prods=r.prod;sbar();const a=document.getElementById("wa-sum");if(a)a.href="https://wa.me/?text="+encodeURIComponent(resumoTxt());}
+function pBR(t){t=String(t).trim().replace(/\s/g,"");if(t.includes(","))t=t.replace(/\./g,"").replace(",",".");else if(/^-?\d{1,3}(\.\d{3})+$/.test(t))t=t.replace(/\./g,"");return parseFloat(t);}
+function fBR(v){if(typeof v!=="number"||!isFinite(v))return v;if(Number.isInteger(v)&&Math.abs(v)>=1000)return v.toLocaleString("pt-BR");return String(+v.toFixed(6)).replace(".",",");}
+function fmtNums(){const a=document.activeElement,L=(typeof NUMKEYS!=="undefined"?NUMKEYS:typeof KEYS!=="undefined"?KEYS:[]);
+  L.forEach(k=>{const el=document.getElementById(k);if(el&&el!==a&&el.type==="text"&&typeof S[k]==="number")el.value=fBR(S[k]);});
+  if(S.u)Object.keys(S.u).forEach(id=>{const el=document.getElementById("v_"+id);if(el&&el!==a&&el.type==="text")el.value=fBR(S.u[id][1]);});
+  const g=document.getElementById("granja");if(g&&g!==a)g.value=S.granja||"";}
+document.addEventListener("focusout",e=>{if(e.target&&e.target.type==="text")setTimeout(fmtNums,0);});
+function __tecPost(){fmtNums();const s=effS(S),r=model(s);window.__roi={inv:r.invest,b:r.benef,liq:r.liq,roi:r.roi};window.__prods=r.prod;sbar();const a=document.getElementById("wa-sum");if(a)a.href="https://wa.me/?text="+encodeURIComponent(resumoTxt());}
 function resumoTxt(){const R=window.__roi||{},L=[];L.push("*Programa IMEVE · "+SPN+"*");if(S.cliente)L.push("Granja: "+S.cliente);
   const prods=(window.__prods||[]).filter(p=>p.custo>0);if(prods.length){L.push("");L.push("*Produtos*");prods.forEach(p=>L.push("• "+p.nome+": "+brl(p.custo/12)+"/mês"));}
   if(R.inv>0&&R.b>0){L.push("");L.push("*Investimento e retorno*");L.push("Investe "+brlK(R.inv/12)+"/mês e recebe cerca de "+brlK(R.b/12)+"/mês");L.push("Para cada R$ 1 investido, voltam R$ "+nf(2).format(R.roi));}
