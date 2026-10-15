@@ -264,7 +264,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     <p><b>Doses e preços dos produtos</b>: Especificações Técnicas IMEVE (DBA Concentrado 200 g/t; DBA + PAS, PAS-TR+ e PAS-BAC TR 100 a 200 g/t), Programa IMEVE Postura Comercial (Polimeve 100 g/1.000 L) e Proposta IMEVE/BIOAGRO (Eletroaminovit, aves 50 a 100 mL/100 L). Preços de DBA, DBA + PAS, PAS-TR+ e PAS-BAC conforme planilha comparativa interna; confirmar tabela vigente.</p>
     <p><b>Premissas de resultado</b>: valores conservadores para iniciar a conversa. Referências: Relatório Técnico IMEVE, Granja Ino (Suzano-SP), 19.600 aves de 16 a 50 semanas com DBA Concentrado 200 g/t: 129,9 contra 122,2 ovos por ave alojada (+6,3%) e mortalidade de 3,0% contra 4,8%; meta-análises com probióticos em poedeiras (aumento de postura, melhor conversão e qualidade de casca). Estimativa técnica, sem garantia de resultado.</p>
   <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
-  </footer>
+  <p><b>Doses padrão</b>: site e especificações técnicas IMEVE (DBI SUI Pó, PAS-TR+, PAS-BAC TR, DBA, DBA + PAS, Polimeve e Eletroaminovit). Quando a recomendação é uma faixa de uso, a calculadora usa o maior valor da faixa. Todas podem ser ajustadas.</p></footer>
 </div>
 
 <script>
@@ -277,7 +277,7 @@ const DEF={
   a_pint:0.03, a_rec:0.07, a_trans:0.11, a_post:0.17,
   p_ovo:4.41, p_racao:1.35, p_racao_r:1.45, p_pint:4.50,
   pr_dba:34.80, pr_dbapas:61.92, pr_pas:82.00, pr_pasbac:79.20, pr_pol:26.80, pr_ele:103.00,
-  pol_dose:100, ele_dose:75,
+  pol_dose:100, ele_dose:100,
   e_pos:1.5, e_mp:1.0, e_mr:0.5, e_ca:0,
   u:{}
 };
@@ -285,15 +285,15 @@ const FEEDPH=[["ini","Cria · pré-inicial e inicial","rec"],["cre","Recria · c
 const feedUses=(on,dr,dp)=>FEEDPH.map(([k,l,g],i)=>[k,l,i+1,g,on,g==="rec"?dr:dp]);
 const PRODS=[
   {id:"dba",nome:"DBA Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(true,200,200)},
-  {id:"dbapas",nome:"DBA + PAS Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,125,125)},
-  {id:"pas",nome:"PAS-TR+ Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,200,100)},
-  {id:"pasbac",nome:"PAS-BAC TR Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,100,100)},
+  {id:"dbapas",nome:"DBA + PAS Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,200,200)},
+  {id:"pas",nome:"PAS-TR+ Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,200,200)},
+  {id:"pasbac",nome:"PAS-BAC TR Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,200,200)},
   {id:"pol",nome:"Polimeve Solúvel",via:"água",un:"dias",step:1,dose:["pol_dose","Dose na água · aves: 100 g para 1.000 L","g/1000L",10],uses:[
     ["pint","Alojamento das pintainhas (1ª semana)",0.5,"rec",true,5],["vac","Vacinações na recria (2-1-2, total de dias no lote)",2.5,"rec",false,15],
-    ["trans","Transferência para a postura",4.5,"rec",true,5],["calor","Estresse calórico na postura (dias por ano)",8,"pos",false,10]]},
+    ["trans","Transferência para a postura",4.5,"rec",true,4],["calor","Estresse calórico na postura (dias por ano)",8,"pos",false,10]]},
   {id:"ele",nome:"Eletroaminovit",via:"água",un:"dias",step:1,dose:["ele_dose","Dose na água · aves: 50 a 100 mL por 100 L","mL/100L",5],uses:[
-    ["pint","Alojamento das pintainhas (1ª semana)",0.5,"rec",false,5],["vac","Vacinações na recria (total de dias no lote)",2.5,"rec",false,15],
-    ["trans","Transferência para a postura",4.5,"rec",true,5],["calor","Estresse calórico na postura (dias por ano)",8,"pos",false,10]]}
+    ["pint","Alojamento das pintainhas (1ª semana)",0.5,"rec",false,6],["vac","Vacinações na recria (total de dias no lote)",2.5,"rec",false,15],
+    ["trans","Transferência para a postura",4.5,"rec",true,6],["calor","Estresse calórico na postura (dias por ano)",8,"pos",false,10]]}
 ];
 PRODS.forEach(p=>p.uses.forEach(u=>{DEF.u[p.id+"_"+u[0]]=[false,u[5]];}));
 const FIELDS={
@@ -339,7 +339,7 @@ const FIELDS={
     ["e_ca","Economia de ração na postura","% a menos de consumo","%",0.1]]
 };
 
-const KEY="calc-poedeiras-v1-z";
+const KEY="calc-poedeiras-v1-z-d";
 let S=JSON.parse(JSON.stringify(DEF));
 try{const saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved)S=Object.assign(JSON.parse(JSON.stringify(DEF)),saved,{u:Object.assign({},DEF.u,saved.u||{})});}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}

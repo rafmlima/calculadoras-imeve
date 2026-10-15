@@ -276,7 +276,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
     <p><b>Doses e preços dos produtos</b>: Proposta IMEVE/BIOAGRO e Especificações Técnicas IMEVE (PAS-TR Probiótico Mais Concentrado: 100 a 200 g/t). Preço do PAS-TR+ conforme planilha comparativa interna; confirmar tabela vigente.</p>
     <p><b>Premissas de resultado</b>: valores conservadores para iniciar a conversa, a serem substituídos pelos dados da própria granja. Referências: meta-análises com <i>Bacillus</i> em suínos (Lippi et al., 2022, creche: CA −0,15; Gonzalez-Ronquillo et al., 2022, terminação: CA −0,04) e ensaios IMEVE (Embrapa/UFPel, ABRAVES 2013: DBI Líquido +0,56 kg ao desmame; UFMA: CA 2,46 vs 2,67; Coperxanxerê: Polimeve na recria). Peso ao desmame: cada 1 kg a mais no desmame dá 1,9 kg a mais na saída da creche e 4,2 kg no abate (Cooper et al., 2001); Os pesos são interligados: ao mudar o desmame, a calculadora recalcula a creche (×1,9) e o abate (×4,2); ao mudar a creche, recalcula o abate (×2,2); o abate pode ser editado sozinho. O retorno conta o peso extra no abate, atribuído à fase de onde ele veio. Estimativa técnica, sem garantia de resultado.</p>
   <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
-  </footer>
+  <p><b>Doses padrão</b>: site e especificações técnicas IMEVE (DBI SUI Pó, PAS-TR+, PAS-BAC TR, DBA, DBA + PAS, Polimeve e Eletroaminovit). Quando a recomendação é uma faixa de uso, a calculadora usa o maior valor da faixa. Todas podem ser ajustadas.</p></footer>
 </div>
 
 <script>
@@ -296,16 +296,16 @@ const DEF={
 const PRODS=[
   {id:"dbi",nome:"DBI SUI PÓ",via:"ração",un:"g/t",step:50,uses:[
     ["gest","Gestação",1,"mat",true,500],["lact","Lactação",2,"mat",true,500],["p1","Pré-inicial 1 (maternidade e início da creche)",5,"mat",true,1000],["p2","Pré-inicial 2",8,"cre",true,1000],["i1","Inicial 1",9,"cre",true,500],["i2","Inicial 2",10,"cre",true,500],
-    ["cre","Crescimento",12,"ter",true,200],["t1","Terminação 1",13,"ter",true,200],["t2","Terminação 2",14,"ter",true,200],["t3","Terminação 3",15,"ter",true,200],["t4","Terminação 4",16,"ter",true,200],["t5","Terminação 5",17,"ter",true,200]]},
+    ["cre","Crescimento",12,"ter",true,500],["t1","Terminação 1",13,"ter",true,500],["t2","Terminação 2",14,"ter",true,500],["t3","Terminação 3",15,"ter",true,500],["t4","Terminação 4",16,"ter",true,500],["t5","Terminação 5",17,"ter",true,500]]},
   {id:"pas",nome:"PAS-TR+ Concentrado",via:"ração",un:"g/t",step:25,uses:[
     ["gest","Gestação",1,"mat",false,200],["lact","Lactação",2,"mat",false,200],["p1","Pré-inicial 1 (maternidade e início da creche)",5,"mat",false,200],["p2","Pré-inicial 2",8,"cre",false,200],["i1","Inicial 1",9,"cre",false,200],["i2","Inicial 2",10,"cre",false,200],
-    ["cre","Crescimento",12,"ter",false,100],["t1","Terminação 1",13,"ter",false,100],["t2","Terminação 2",14,"ter",false,100],["t3","Terminação 3",15,"ter",false,100],["t4","Terminação 4",16,"ter",false,100],["t5","Terminação 5",17,"ter",false,100]]},
+    ["cre","Crescimento",12,"ter",false,200],["t1","Terminação 1",13,"ter",false,200],["t2","Terminação 2",14,"ter",false,200],["t3","Terminação 3",15,"ter",false,200],["t4","Terminação 4",16,"ter",false,200],["t5","Terminação 5",17,"ter",false,200]]},
   {id:"liq",nome:"DBI Líquido Pig Doser",via:"oral",un:"mL/leitão",step:0.5,uses:[
     ["nasc","Ao nascer (antes ou logo após a 1ª mamada)",3,"mat",true,2],["ferro","No dia da aplicação do ferro",4,"mat",true,2],["desm","No desmame",6,"cre",false,2]]},
   {id:"pol",nome:"Polimeve Solúvel",via:"água",un:"dias",step:1,dose:["pol_dose","Dose na água · 100 g para 500 L","g/1000L",10],uses:[
     ["creche","Entrada na creche",7,"cre",true,4],["manejo","Vacinações e transferências na creche (2 dias antes e 2 depois)",8,"cre",false,4],["term","Entrada na terminação",11,"ter",true,4]]},
   {id:"ele",nome:"Eletroaminovit",via:"água",un:"dias",step:1,dose:["ele_dose","Dose na água · 25 a 50 mL por 100 L","mL/100L",5],uses:[
-    ["creche","Entrada na creche",7,"cre",true,5],["term","Entrada na terminação",11,"ter",false,5]]}
+    ["creche","Entrada na creche",7,"cre",true,6],["term","Entrada na terminação",11,"ter",false,6]]}
 ];
 PRODS.forEach(p=>p.uses.forEach(u=>{DEF.u[p.id+"_"+u[0]]=[false,u[5]];}));
 const FIELDS={
@@ -358,7 +358,7 @@ const FIELDS={
     ["e_cat","Melhora da conversão na terminação","kg ração/kg ganho a menos","kg/kg",0.01]]
 };
 const PHASES=[["gest","Gestação"],["lact","Lactação"],["p1","Pré-inicial 1"],["p2","Pré-inicial 2"],["i1","Inicial 1"],["i2","Inicial 2"],["cre","Crescimento"],["t1","Terminação 1"],["t2","Terminação 2"],["t3","Terminação 3"],["t4","Terminação 4"],["t5","Terminação 5"]];
-const KEY="calc-suinos-v5-z";
+const KEY="calc-suinos-v5-z-d";
 let S=JSON.parse(JSON.stringify(DEF));
 try{const saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved)S=Object.assign(JSON.parse(JSON.stringify(DEF)),saved,{u:Object.assign({},DEF.u,saved.u||{})});}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}

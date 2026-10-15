@@ -205,6 +205,15 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .live{display:block;color:var(--accent);font-weight:700;font-style:normal}
 #cards{align-items:start}
 #sec-precos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
+.fx{display:grid;gap:4px}
+.fx-r{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:10px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)}
+.fx-r label{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600;cursor:pointer;min-width:0}
+.fx-r input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:var(--accent)}
+.fx-r.off label{color:var(--muted);font-weight:500}
+.fx-d{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:0 8px}
+.fx-d input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--fg);font:700 14px var(--f-display);padding:6px 0;text-align:right;outline:none}
+.fx-d em{font-style:normal;font-size:12px;margin-left:6px;color:var(--muted)}
+.fx-r.off .fx-d{opacity:.45}
 </style>
 
 <style>
@@ -326,11 +335,11 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 
   <footer id="info"><h2 class="info-h">Informações</h2>
     <p><b>Como o cálculo funciona</b>: lote padrão de frango (Embrapa): abate aos 43 dias com 2,9 kg e conversão 1,70, cerca de 4,8 kg de ração por ave. A mortalidade média já está descontada. Quando o produtor informa o abate por semana, o alojamento é estimado a partir dele; quando informa a ração produzida, o alojamento é estimado pelo consumo de ~4,7 kg de ração por ave alojada. Semana = ano ÷ 52; mês = ano ÷ 12.</p>
-    <p><b>Doses</b>: Programa IMEVE Pollos de Engorde e Especificações Técnicas IMEVE. PAS-TR+ 200 g/t até 21 dias e 150 g/t depois; PAS-BAC TR 150 e 100 g/t; DBA Concentrado 200 g/t; DBA + PAS 125 g/t. Polimeve 100 g para 1.000 L de água no alojamento (5 dias) e na troca de ração aos 21 dias (5 dias). Eletroaminovit 75 mL por 100 L de água em vacinação e transferência (5 dias).</p>
+    <p><b>Doses</b>: Programa IMEVE Pollos de Engorde e Especificações Técnicas IMEVE. PAS-TR+, PAS-BAC TR, DBA e DBA + PAS: 200 g/t em todas as fases. Polimeve 100 g para 1.000 L de água no alojamento (5 dias) e na troca de ração aos 21 dias (5 dias). Eletroaminovit 75 mL por 100 L de água em vacinação e transferência (5 dias).</p>
     <p><b>Retorno para o produtor</b>: estimativa simplificada com premissas conservadoras (conversão 0,03 melhor, 0,5 ponto a menos de mortalidade e 1% a mais de peso), valorizadas pelo preço do frango e da ração. Para um cálculo detalhado, use a calculadora técnica.</p>
     <p>Potencial é o consumo se a granja usar o programa completo. Use como referência de tamanho de oportunidade, não como pedido garantido.</p>
   <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
-  </footer>
+  <p><b>Doses padrão</b>: site e especificações técnicas IMEVE (DBI SUI Pó, PAS-TR+, PAS-BAC TR, DBA, DBA + PAS, Polimeve e Eletroaminovit). Quando a recomendação é uma faixa de uso, a calculadora usa o maior valor da faixa. Todas podem ser ajustadas.</p></footer>
 </div>
 
 <script>
@@ -340,12 +349,12 @@ const DEF={
   modo:"aloj", qtd:100000, qtr:100, racao:"pas", ref:"integracao", p_frango:4.75, c_prod:4.85,
   idade:43, peso:2.9, mort:5.5, kg_ate21:1.18, kg_pos21:3.65, p_racao:1.82,
   a_aloj:0.05, a_troca:0.20, a_s2:0.10,
-  d_pas1:200, d_pas2:150, d_pasbac1:150, d_pasbac2:100, d_dba1:200, d_dba2:200, d_dbapas1:125, d_dbapas2:125,
-  d_pol:100, dp_aloj:5, dp_troca:5, d_ele:75, de_s2:5,
+  d_pas1:200, d_pas2:200, d_pasbac1:200, d_pasbac2:200, d_dba1:200, d_dba2:200, d_dbapas1:200, d_dbapas2:200,
+  d_pol:100, dp_aloj:5, dp_troca:4, d_ele:100, de_s2:6,
   pr_pas:82.00, pr_pasbac:79.20, pr_dba:34.80, pr_dbapas:61.92, pr_pol:26.80, pr_ele:103.00,
   e_ca:0.03, e_mort:0.5, e_peso:1.0,
-  a_vac:0.12, a_s45:0.30, a_calor:0.35, dp_vac:5, dp_calor:5, de_s45:14, de_calor:5,
-de_aloj:5, de_troca:5,   mn:{pa:true,pr:true,pv:false,pq:false,po:false,ea:false,er:false,e2:true,eq:false,eo:false},
+  a_vac:0.12, a_s45:0.30, a_calor:0.35, dp_vac:4, dp_calor:5, de_s45:14, de_calor:6,
+de_aloj:6, de_troca:6,   mn:{pa:true,pr:true,pv:false,pq:false,po:false,ea:false,er:false,e2:true,eq:false,eo:false},
   on:{feed:false,pol:false,ele:false}
 };
 const PRE=[10000,25000,50000,100000,250000,500000];
@@ -375,7 +384,7 @@ const FIELDS={
     ["d_ele","Eletroaminovit na água","","mL/100L",5],["de_s2","Eletroaminovit: dias em vacinação e transferência","","dias",1],
     ["de_s45","Eletroaminovit: dias na 4ª e 5ª semanas","","dias",1],["de_calor","Eletroaminovit: dias de temperaturas extremas","por lote","dias",1]]
 };
-const KEY="potencial-frango-v1-v5";
+const KEY="potencial-frango-v1-v5-d";
 let S=JSON.parse(JSON.stringify(DEF));S.ox={};
 try{const sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv)S=Object.assign(JSON.parse(JSON.stringify(DEF)),sv,{on:Object.assign({},DEF.on,sv.on||{}),mn:Object.assign({},DEF.mn,sv.mn||{}),ox:Object.assign({},sv.ox||{})});}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
@@ -396,6 +405,7 @@ document.addEventListener("input",e=>{const id=e.target.id;
   else if(id==="ref"||id==="racao"){S[id]=e.target.value;}
   else if(id&&(id.startsWith("ov_")||id.startsWith("od_"))){const v=parseFloat(e.target.value),k=id.slice(3);S.ox=S.ox||{};S.ox[k]=Object.assign({},oxv(S,k));S.ox[k][id[1]]=isFinite(v)?Math.max(0,v):0;}
   else if(id&&id.startsWith("mn_")){S.mn[id.slice(3)]=e.target.checked;}
+  else if(id&&id.startsWith("fx_")){S.fx=S.fx||{};S.fx[id.slice(3)]=e.target.checked;}
   else if(id&&id.startsWith("cx_")){const k=id.slice(3),v=parseFloat(String(e.target.value).replace(",","."));S[k]=isFinite(v)?v:0;const el=document.getElementById(k);if(el)el.value=S[k];}
   else if(id&&id.startsWith("on_")){S.on[id.slice(3)]=e.target.checked;}
   else return; save();calc();});
@@ -467,11 +477,11 @@ function renderBE(items){
    <div class="be-h"><div><b>${it.nome}</b> <span class="be-f">· ${it.fase}</span></div><div class="be-c">Custa <b>${brlK(it.custo/12)}</b> por mês · ${it.pa(it.custo)}</div></div>${ind.length>1?`<p class="be-q">Para se pagar, basta <b>um</b> destes resultados:</p>`:`<p class="be-q">Para se pagar, basta este resultado:</p>`}
    <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b><small class="be-eq">= empata: cada R$ 1 investido volta R$ 1</small>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">Com o resultado do passo 2 (${i.fmt(i.ref)}): cada R$ 1 investido volta R$ ${nf(2).format(x)} → ${x>=1.005?"paga e sobra":x>=0.995?"empata":"não paga sozinho"}</em>`:""}</div>`;}).join(""):'<p class="note" style="margin:0">Com os preços atuais nenhum indicador cobre o custo.</p>'}</div></div>`;}).join("");
 }
-const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.pas;return [[F[1],"Preço","R$/kg"],[F[2],"Dose até 21 dias","g/t"],[F[3],"Dose após 21 dias","g/t"]];},pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
+const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.pas;return [[F[1],"Preço","R$/kg"]];},pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
 const PARS=[["conv","Conversão alimentar",["e_ca"]],["mort","Mortalidade",["e_mort"]],["peso","Peso no abate",["e_peso"]]];
 function CIN(id,adv){const L0=typeof CI[id]==="function"?CI[id]():CI[id];if(!L0)return "";const L=L0.filter(e=>!String(e[0]).startsWith("pr_")&&(e[3]==="x")===!!adv);if(!L.length)return "";
   return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div></label>`).join("")+`</div>`;}
-function effS(S0){const s=Object.assign({},S0);PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
+function effS(S0){const s=Object.assign({},S0);Object.entries(S0.fx||{}).forEach(([k,v])=>{if(v===false&&typeof s[k]==="number")s[k]=0;});PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
 function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(!box)return;
   box.innerHTML=`<span>A granja vai melhorar em:</span>`+PARS.map(([c,l])=>`<button type="button" data-p="${c}" aria-pressed="${!!S.par[c]}">${l}</button>`).join("");
   PARS.forEach(([c,,show])=>show.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row)row.hidden=!S.par[c];}));
@@ -485,6 +495,9 @@ function PH(id,r){const L=((r.ph||{})[id]||[]).filter(x=>x[1]>0);if(!L.length)re
 document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("details.more")){S.op=S.op||{};S.op[d.dataset.id]=d.open;save();}},true);
 document.addEventListener("click",e=>{if(e.target.id==="adv-btn"){S.adv=!S.adv;save();calc();}});
 function liveMort(r){const M={e_mort:[r.alojSem,"aves a mais por semana",1]};Object.entries(M).forEach(([k,[base,txt,div]])=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}const v=base*(S[k]||0)/100/div;el.textContent=`≈ ${v>=10?n0(v):n1(v)} ${txt}`;});}
+const FX={feed:()=>{const F=FEEDS[S.racao]||FEEDS.pas;return [[F[2],"Até 21 dias (pré-inicial e inicial)",1],[F[3],"Após 21 dias (crescimento e final)",1]];}};
+function FXR(id){const L=FX[id]?FX[id]():null;if(!L)return "";S.fx=S.fx||{};
+  return `<div class="fx"><div class="uf-t">Em quais rações usar · marque as fases</div>`+L.map(([k,l,hasDose])=>{const on=S.fx[k]!==false;return `<div class="fx-r${on?"":" off"}"><label><input type="checkbox" id="fx_${k}" ${on?"checked":""}><span>${l}</span></label>${hasDose?`<div class="fx-d"><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"${on?"":" disabled"}><em>g/t</em></div>`:"<span></span>"}</div>`;}).join("")+`</div>`;}
 function calc(){
   paintPar();const s=effS(S),r=model(s);liveMort(r);
   document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.qtd));
@@ -527,7 +540,7 @@ function calc(){
     ${p.man?`<div class="mans">${MAN[p.man].map(m=>`<label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]} <em>${n0(s[m[2]])} dias</em></label>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
     <div class="money"><span>Faturamento potencial</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
-    <details class="more" data-id="${p.id}"${S.op&&S.op[p.id]?" open":""}><summary>Ver detalhes</summary><div><p class="proto">${p.proto}</p>${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
+    <details class="more" data-id="${p.id}"${S.op&&S.op[p.id]?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
   </article>`;}).join("");
   if(act&&(act.startsWith("ov_")||act.startsWith("od_"))){const el=document.getElementById(act);if(el){el.focus();}}
   if(act&&act.startsWith("cx_")){const el=document.getElementById(act);if(el){el.value=actV;el.focus();try{if(actP!=null)el.setSelectionRange(actP,actP);}catch(e){}}}

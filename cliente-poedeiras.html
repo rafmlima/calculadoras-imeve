@@ -204,6 +204,15 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 .live{display:block;color:var(--accent);font-weight:700;font-style:normal}
 #cards{align-items:start}
 #sec-precos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
+.fx{display:grid;gap:4px}
+.fx-r{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:10px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)}
+.fx-r label{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600;cursor:pointer;min-width:0}
+.fx-r input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:var(--accent)}
+.fx-r.off label{color:var(--muted);font-weight:500}
+.fx-d{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:0 8px}
+.fx-d input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--fg);font:700 14px var(--f-display);padding:6px 0;text-align:right;outline:none}
+.fx-d em{font-style:normal;font-size:12px;margin-left:6px;color:var(--muted)}
+.fx-r.off .fx-d{opacity:.45}
 </style>
 
 <style>
@@ -316,11 +325,11 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 
   <footer id="info"><h2 class="info-h">Informações</h2>
     <p><b>Como o cálculo funciona</b>: granja de postura padrão com galinhas de várias idades (poedeira branca, referência Hy-Line W-80): transferência para a postura com 17 semanas, descarte com 90 semanas, 5,4 kg de ração por ave na cria e recria e 107 g de ração por ave por dia na postura. As mortalidades médias de recria e postura já estão descontadas. Semana = ano ÷ 52; mês = ano ÷ 12.</p>
-    <p><b>Doses</b>: Especificações Técnicas IMEVE. DBA Concentrado 200 g/t; DBA + PAS 125 g/t; PAS-TR+ e PAS-BAC TR 100 g/t (faixa de 100 a 200 g/t), em todas as rações. Polimeve: 100 g para 1.000 L de água no alojamento das pintainhas (5 dias), nas vacinações da recria (15 dias no lote) e na transferência para a postura (5 dias). Eletroaminovit: 75 mL por 100 L de água na transferência (5 dias) e no estresse calórico da postura (10 dias por ano).</p>
+    <p><b>Doses</b>: Especificações Técnicas IMEVE. DBA Concentrado, DBA + PAS, PAS-TR+ e PAS-BAC TR: 200 g/t (maior valor da faixa de 100 a 200 g/t), em todas as rações. Polimeve: 100 g para 1.000 L de água no alojamento das pintainhas (5 dias), nas vacinações da recria (15 dias no lote) e na transferência para a postura (5 dias). Eletroaminovit: 100 mL por 100 L de água na transferência (6 dias) e no estresse calórico da postura (10 dias por ano).</p>
     <p><b>Retorno estimado</b>: estimativa simplificada com premissas conservadoras (1,5% a mais de ovos, 1 ponto a menos de mortalidade na postura e 0,5 na recria), valorizadas pelo preço do ovo, da ração e da pintainha. Referência: ensaio IMEVE na Granja Ino com DBA Concentrado (+6,3% de ovos por ave alojada e mortalidade de 3,0% contra 4,8%).</p>
     <p>Os valores são estimativas para a granja usando o programa completo e podem variar conforme o manejo, a sanidade e os preços praticados.</p>
   <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
-  </footer>
+  <p><b>Doses padrão</b>: site e especificações técnicas IMEVE (DBI SUI Pó, PAS-TR+, PAS-BAC TR, DBA, DBA + PAS, Polimeve e Eletroaminovit). Quando a recomendação é uma faixa de uso, a calculadora usa o maior valor da faixa. Todas podem ser ajustadas.</p></footer>
 </div>
 
 <script>
@@ -331,10 +340,10 @@ const DEF={
   aves:100000, modo:"aves", qtr:80, recria:true, racao:"dba",
   sem_ini:17, sem_desc:90, kg_rec:5.41, g_post:107, mr:3.2, mp:5.5,
   a_pint:0.03, a_rec:0.07, a_trans:0.11, a_post:0.17,
-  d_dba:200, d_dbapas:125, d_pas:100, d_pasbac:100,
-  d_pol:100, dp_pint:5, dp_vac:15, dp_trans:5, d_ele:75, de_trans:5, de_calor:10,
+  d_dba:200, d_dbapas:200, d_pas:200, d_pasbac:200,
+  d_pol:100, dp_pint:5, dp_vac:15, dp_trans:4, d_ele:100, de_trans:6, de_calor:10,
   pr_dba:34.80, pr_dbapas:61.92, pr_pas:82.00, pr_pasbac:79.20, pr_pol:26.80, pr_ele:103.00,
-  dp_calor:10, de_pint:5, de_vac:15,
+  dp_calor:10, de_pint:6, de_vac:15,
   mn:{pp:true,pv:true,pt:true,pq:false,ep:false,ev:false,et:true,eq:true,po:false,eo:false},
   on:{feed:false,pol:false,ele:false}
 };
@@ -365,7 +374,7 @@ const FIELDS={
     ["de_vac","Eletroaminovit: dias nas vacinações da recria","total no lote","dias",1],
     ["de_calor","Eletroaminovit: dias de calor na postura","por ano","dias",1]]
 };
-const KEY="potencial-poedeiras-v1-cliente-v5";
+const KEY="potencial-poedeiras-v1-cliente-v5-d";
 let S=JSON.parse(JSON.stringify(DEF));S.ox={};
 try{const sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv)S=Object.assign(JSON.parse(JSON.stringify(DEF)),sv,{on:Object.assign({},DEF.on,sv.on||{}),mn:Object.assign({},DEF.mn,sv.mn||{}),ox:Object.assign({},sv.ox||{})});}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
@@ -388,6 +397,7 @@ document.addEventListener("input",e=>{const id=e.target.id;
   else if(id==="racao"){S.racao=e.target.value;}
   else if(id&&(id.startsWith("ov_")||id.startsWith("od_"))){const v=parseFloat(e.target.value),k=id.slice(3);S.ox=S.ox||{};S.ox[k]=Object.assign({},oxv(S,k));S.ox[k][id[1]]=isFinite(v)?Math.max(0,v):0;}
   else if(id&&id.startsWith("mn_")){S.mn[id.slice(3)]=e.target.checked;}
+  else if(id&&id.startsWith("fx_")){S.fx=S.fx||{};S.fx[id.slice(3)]=e.target.checked;}
   else if(id&&id.startsWith("cx_")){const k=id.slice(3),v=parseFloat(String(e.target.value).replace(",","."));S[k]=isFinite(v)?v:0;const el=document.getElementById(k);if(el)el.value=S[k];}
   else if(id&&id.startsWith("on_")){S.on[id.slice(3)]=e.target.checked;}
   else return; save();calc();});
@@ -414,7 +424,7 @@ function model(s){
   const vivoRec=r.pint*(1-s.mr/200);
   r.feedRec=vivoRec*s.kg_rec; r.feedPost=s.aves*s.g_post/1000*365; r.feedTot=r.feedRec+r.feedPost;
   const [fn,fp,fd]=FEEDS[s.racao]||FEEDS.dba;
-  r.feedKg=r.feedTot/1000*s[fd]/1000;
+  const fxo=s.fx||{};r.feedRecU=fxo.rec===false?0:r.feedRec;r.feedPostU=fxo.post===false?0:r.feedPost;r.feedKg=(r.feedRecU+r.feedPostU)/1e6*s[fd];
   const WA={pp:s.recria?r.pint*s.a_pint:0,pv:s.recria?vivoRec*s.a_rec:0,pt:r.aloj*s.a_trans,pq:s.aves*s.a_post,ep:s.recria?r.pint*s.a_pint:0,ev:s.recria?vivoRec*s.a_rec:0,et:r.aloj*s.a_trans,eq:s.aves*s.a_post,po:s.aves*s.a_post,eo:s.aves*s.a_post};
   const manL=p=>{let t=MAN[p].filter(m=>s.mn[m[0]]).reduce((a,m)=>a+WA[m[0]]*s[m[2]],0);const o=OX[p];if(s.mn[o]){const x=oxv(s,o);t+=WA[o]*x.v*x.d;}return t;};
   const manK=(p,ks)=>{let t=MAN[p].filter(m=>s.mn[m[0]]&&ks.includes(m[0])).reduce((a,m)=>a+WA[m[0]]*s[m[2]],0);const o=OX[p];if(s.mn[o]&&ks.includes(o)){const x=oxv(s,o);t+=WA[o]*x.v*x.d;}return t;};
@@ -423,7 +433,7 @@ function model(s){
   r.eleL=manL("ele")*s.d_ele/100/1000;
   const sel=`<select id="racao" aria-label="Probiótico na ração" style="border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--fg);font:600 14px var(--f-body);padding:6px 8px;max-width:100%">${Object.entries(FEEDS).map(([k,v])=>`<option value="${k}"${k===s.racao?" selected":""}>${v[0]}</option>`).join("")}</select>`;
   const mq=p=>{const out=[];MAN[p].forEach(m=>{if(s.mn[m[0]])out.push([m[1],WA[m[0]]*s[m[2]]]);});const o=OX[p];if(s.mn[o]){const x=oxv(s,o);out.push(["Outros manejos",WA[o]*x.v*x.d]);}return out;};
-  r.ph={feed:(s.recria?[["Recria",r.feedRec/1e6*s[fd],"kg"]]:[]).concat([["Postura",r.feedPost/1e6*s[fd],"kg"]]),pol:mq("pol").map(([l,L])=>[l,L*s.d_pol/1e6,"kg"]),ele:mq("ele").map(([l,L])=>[l,L*s.d_ele/1e5,"L"])};
+  r.ph={feed:(s.recria?[["Recria",r.feedRecU/1e6*s[fd],"kg"]]:[]).concat([["Postura",r.feedPostU/1e6*s[fd],"kg"]]),pol:mq("pol").map(([l,L])=>[l,L*s.d_pol/1e6,"kg"]),ele:mq("ele").map(([l,L])=>[l,L*s.d_ele/1e5,"L"])};
   r.prod=[
     {id:"feed",nome:"Probiótico na ração",head:sel,proto:`${fn} a ${n0(s[fd])} g/t em todas as rações${s.recria?" (recria e postura)":" (postura)"}`,emb:r.feedKg,embUn:"kg",extra:[r.feedKg/25,"baldes/sacos de 25 kg por mês"],custo:r.feedKg*s[fp]},
     {id:"pol",nome:"Polimeve Solúvel",proto:manTxt("pol",s),man:"pol",emb:r.polKg,embUn:"kg",extra:[r.polKg/0.1,"sachês de 100 g por mês"],custo:r.polKg/0.1*s.pr_pol},
@@ -457,7 +467,7 @@ const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.dba;return [[F[1],"Preço","R$
 const PARS=[["ovos","Produção de ovos",["e_pos"]],["mort","Mortalidade",["e_mp","e_mr"]]];
 function CIN(id,adv){const L0=typeof CI[id]==="function"?CI[id]():CI[id];if(!L0)return "";const L=L0.filter(e=>!String(e[0]).startsWith("pr_")&&(e[3]==="x")===!!adv);if(!L.length)return "";
   return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div></label>`).join("")+`</div>`;}
-function effS(S0){const s=Object.assign({},S0);PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
+function effS(S0){const s=Object.assign({},S0);Object.entries(S0.fx||{}).forEach(([k,v])=>{if(v===false&&typeof s[k]==="number")s[k]=0;});PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
 function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(!box)return;
   box.innerHTML=`<span>A granja vai melhorar em:</span>`+PARS.map(([c,l])=>`<button type="button" data-p="${c}" aria-pressed="${!!S.par[c]}">${l}</button>`).join("");
   PARS.forEach(([c,,show])=>show.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row)row.hidden=!S.par[c];}));
@@ -471,6 +481,9 @@ function PH(id,r){const L=((r.ph||{})[id]||[]).filter(x=>x[1]>0);if(!L.length)re
 document.addEventListener("toggle",e=>{const d=e.target;if(d.matches&&d.matches("details.more")){S.op=S.op||{};S.op[d.dataset.id]=d.open;save();}},true);
 document.addEventListener("click",e=>{if(e.target.id==="adv-btn"){S.adv=!S.adv;save();calc();}});
 function liveMort(r){const M={e_mp:[r.aloj,"galinhas a mais por ano",1],e_mr:[r.pint,"frangas a mais por ano",1]};Object.entries(M).forEach(([k,[base,txt,div]])=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}const v=base*(S[k]||0)/100/div;el.textContent=`≈ ${v>=10?n0(v):n1(v)} ${txt}`;});}
+const FX={feed:()=>(S.recria?[["rec","Recria (cria, recria e pré-postura)",0]]:[]).concat([["post","Postura",0]])};
+function FXR(id){const L=FX[id]?FX[id]():null;if(!L)return "";S.fx=S.fx||{};
+  return `<div class="fx"><div class="uf-t">Em quais rações usar · marque as fases</div>`+L.map(([k,l,hasDose])=>{const on=S.fx[k]!==false;return `<div class="fx-r${on?"":" off"}"><label><input type="checkbox" id="fx_${k}" ${on?"checked":""}><span>${l}</span></label>${hasDose?`<div class="fx-d"><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"${on?"":" disabled"}><em>g/t</em></div>`:"<span></span>"}</div>`;}).join("")+`</div>`;}
 function calc(){
   paintPar();const s=effS(S),r=model(s);liveMort(r);
   document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.aves));
@@ -500,8 +513,8 @@ function calc(){
    mr:{c:"mort",lab:"Mortalidade na recria",u:s.recria?r.pint/100*(s.p_pint+0.5*s.kg_rec*s.p_racao_r):0,fmt:pts,ref:s.e_mr,sub:v=>"≈ "+n0(r.pint*v/100)+" frangas a mais por ano"}};
   const R=[I.mr,I.pos],P=[I.pos,I.mp];
   renderBE([
-   {on:on.feed&&s.recria,nome:fn,fase:"Recria",custo:r.feedRec/1e6*s[fd]*s[fp],pa,ind:R},
-   {on:on.feed,nome:fn,fase:"Postura",custo:r.feedPost/1e6*s[fd]*s[fp],pa,ind:P},
+   {on:on.feed&&s.recria,nome:fn,fase:"Recria",custo:r.feedRecU/1e6*s[fd]*s[fp],pa,ind:R},
+   {on:on.feed,nome:fn,fase:"Postura",custo:r.feedPostU/1e6*s[fd]*s[fp],pa,ind:P},
    {on:on.pol,nome:"Polimeve Solúvel",fase:"Recria (manejos marcados)",custo:polC(r.sp.pol[0]),pa,ind:R},
    {on:on.pol,nome:"Polimeve Solúvel",fase:"Postura (manejos marcados)",custo:polC(r.sp.pol[1]),pa,ind:P},
    {on:on.ele,nome:"Eletroaminovit",fase:"Recria (manejos marcados)",custo:eleC(r.sp.ele[0]),pa,ind:R},
@@ -516,7 +529,7 @@ function calc(){
     ${p.man?`<div class="mans">${MAN[p.man].map(m=>`<label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]} <em>${n0(s[m[2]])} dias</em></label>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
     <div class="money"><span>Investimento</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
-    <details class="more" data-id="${p.id}"${S.op&&S.op[p.id]?" open":""}><summary>Ver detalhes</summary><div><p class="proto">${p.proto}</p>${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
+    <details class="more" data-id="${p.id}"${S.op&&S.op[p.id]?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
   </article>`;}).join("");
   if(act&&(act.startsWith("ov_")||act.startsWith("od_"))){const el=document.getElementById(act);if(el){el.focus();}}
   if(act&&act.startsWith("cx_")){const el=document.getElementById(act);if(el){el.value=actV;el.focus();try{if(actP!=null)el.setSelectionRange(actP,actP);}catch(e){}}}

@@ -262,10 +262,10 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
   <footer id="info"><h2 class="info-h">Informações</h2>
     <p><b>Índices padrão</b> (editáveis): Embrapa Suínos e Aves, coeficientes técnicos do custo de produção (<a href="https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/1149413/1/COT592.pdf" target="_blank" rel="noopener">COT 592, 2022</a>): frango abatido aos 43 dias com 2,9 kg, conversão 1,70 e mortalidade de 5,5%. Divisão do consumo por fase conforme o manual Cobb 500 (suplemento de desempenho 2022) e Ross 308 AP (2022), ajustada ao total da Embrapa. Água: relação água:ração de 1,8:1 a 21 °C (Aviagen, 2025).</p>
     <p><b>Preços de mercado</b>: frango vivo nas praças de integração (SC/RS) R$ 4,75/kg e mercado independente em SP R$ 5,70/kg (Safras & Mercado, set/2026); custo de produção Embrapa ICPFrango (PR) R$ 4,85/kg vivo (ago/2026), com a ração em ~64% do custo. O preço da ração (R$ 1,82/kg) foi calculado a partir do ICPFrango: ajuste com os valores do cliente.</p>
-    <p><b>Doses e preços dos produtos</b>: Programa IMEVE Pollos de Engorde (PAS-TR Concentrado 200 g/t nos primeiros 7 a 15 dias e 150 g/t depois; Polimeve 100 g/1.000 L no alojamento, na troca de ração aos 21 dias, em vacinações e temperaturas extremas; Eletroaminovit 0,5 a 1 L/1.000 L) e Especificações Técnicas IMEVE. Preços conforme planilha comparativa interna e Proposta IMEVE/BIOAGRO; confirmar tabela vigente.</p>
+    <p><b>Doses e preços dos produtos</b>: Programa IMEVE Pollos de Engorde (PAS-TR Concentrado 200 g/t em todas as fases; Polimeve 100 g/1.000 L no alojamento, na troca de ração aos 21 dias, em vacinações e temperaturas extremas; Eletroaminovit 0,5 a 1 L/1.000 L) e Especificações Técnicas IMEVE. Preços conforme planilha comparativa interna e Proposta IMEVE/BIOAGRO; confirmar tabela vigente.</p>
     <p><b>Premissas de resultado</b>: valores conservadores. Meta-análises com <i>Bacillus</i> em frangos mostram melhora de conversão de 0,07 (lotes desafiados por coccidiose, Riaz et al., 2026) a 0,10 (sem desafio, Opazo et al., 2025) e redução das chances de mortalidade em lotes desafiados. A calculadora usa 0,03 de conversão, 0,5 ponto de mortalidade e 1% de peso. Estimativa técnica, sem garantia de resultado.</p>
   <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
-  </footer>
+  <p><b>Doses padrão</b>: site e especificações técnicas IMEVE (DBI SUI Pó, PAS-TR+, PAS-BAC TR, DBA, DBA + PAS, Polimeve e Eletroaminovit). Quando a recomendação é uma faixa de uso, a calculadora usa o maior valor da faixa. Todas podem ser ajustadas.</p></footer>
 </div>
 
 <script>
@@ -278,22 +278,22 @@ const DEF={
   a_aloj:0.05, a_s2:0.10, a_troca:0.20, a_vac:0.12, a_s45:0.30, a_calor:0.35,
   p_frango:4.75, ref:"integracao", c_prod:4.85, p_racao:1.82, p_pint:2.45,
   pr_pas:82.00, pr_pasbac:79.20, pr_dba:34.80, pr_dbapas:61.92, pr_pol:26.80, pr_ele:103.00,
-  pol_dose:100, ele_dose:75,
+  pol_dose:100, ele_dose:100,
   e_ca:0.03, e_mort:0.5, e_peso:1.0,
   u:{}
 };
 const FEEDPH=[["pi","Pré-inicial (1 a 7 dias)","ini"],["ini","Inicial (8 a 21 dias)","ini"],["cre","Crescimento (22 a 35 dias)","fin"],["fin","Final / abate (36 dias ao abate)","fin"]];
 const feedUses=(on,d)=>FEEDPH.map(([k,l,g],i)=>[k,l,[1,3,6,8][i],g,on,d[i]]);
 const PRODS=[
-  {id:"pas",nome:"PAS-TR+ Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(true,[200,200,150,150])},
-  {id:"pasbac",nome:"PAS-BAC TR Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,[150,150,100,100])},
+  {id:"pas",nome:"PAS-TR+ Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(true,[200,200,200,200])},
+  {id:"pasbac",nome:"PAS-BAC TR Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,[200,200,200,200])},
   {id:"dba",nome:"DBA Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,[200,200,200,200])},
-  {id:"dbapas",nome:"DBA + PAS Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,[125,125,125,125])},
+  {id:"dbapas",nome:"DBA + PAS Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,[200,200,200,200])},
   {id:"pol",nome:"Polimeve Solúvel",via:"água",un:"dias",step:1,dose:["pol_dose","Dose na água · 100 g para 1.000 L","g/1000L",10],uses:[
-    ["aloj","Alojamento dos pintinhos (primeiros dias)",0,"ini",true,5],["troca","Troca de ração aos 21 dias",4,"fin",true,5],
-    ["vac","Vacinações e transferências (2-1-2)",2,"ini",false,5],["calor","Temperaturas extremas (dias por lote)",7,"fin",false,5]]},
+    ["aloj","Alojamento dos pintinhos (primeiros dias)",0,"ini",true,5],["troca","Troca de ração aos 21 dias",4,"fin",true,4],
+    ["vac","Vacinações e transferências (2-1-2)",2,"ini",false,4],["calor","Temperaturas extremas (dias por lote)",7,"fin",false,5]]},
   {id:"ele",nome:"Eletroaminovit",via:"água",un:"dias",step:1,dose:["ele_dose","Dose na água · 50 a 100 mL por 100 L","mL/100L",5],uses:[
-    ["s2","2ª semana de vida",2.5,"ini",true,7],["s45","4ª e 5ª semanas",6.5,"fin",false,14],["calor","Temperaturas extremas (dias por lote)",7,"fin",false,5]]}
+    ["s2","2ª semana de vida",2.5,"ini",true,6],["s45","4ª e 5ª semanas",6.5,"fin",false,14],["calor","Temperaturas extremas (dias por lote)",7,"fin",false,6]]}
 ];
 PRODS.forEach(p=>p.uses.forEach(u=>{DEF.u[p.id+"_"+u[0]]=[false,u[5]];}));
 const FIELDS={
@@ -331,7 +331,7 @@ const FIELDS={
     ["e_mort","Redução da mortalidade","pontos percentuais","p.p.",0.1],
     ["e_peso","Aumento do peso de abate","% a mais","%",0.1]]
 };
-const KEY="calc-frango-v1-z";
+const KEY="calc-frango-v1-z-d";
 let S=JSON.parse(JSON.stringify(DEF));
 try{const saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved)S=Object.assign(JSON.parse(JSON.stringify(DEF)),saved,{u:Object.assign({},DEF.u,saved.u||{})});}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
