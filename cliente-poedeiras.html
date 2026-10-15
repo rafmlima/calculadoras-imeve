@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora Cliente Poedeiras</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+[hidden]{display:none!important}
+
+/* Layout: barra de topo com abas Cliente/Interna; coluna de premissas à esquerda, painel de resultados fixo à direita; empilha no celular */
+:root{
+  --bg:#f3f5f6; --surface:#ffffff; --surface-2:#eaeef0; --line:#d5dde1;
+  --fg:#15232b; --muted:#5b6b74;
+  --accent:#0b6e8a; --accent-ink:#ffffff; --accent-soft:#dcedf2;
+  --cost:#b25f12; --cost-soft:#f6e6d4;
+  --good:#24804f; --good-soft:#dcefe3; --bad:#b3322c;
+  --f-display:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f171b; --surface:#16222a; --surface-2:#1d2c35; --line:#2b3d47;
+  --fg:#e5edf0; --muted:#97a9b2;
+  --accent:#4fb3cf; --accent-ink:#06222b; --accent-soft:#163b47;
+  --cost:#e39a55; --cost-soft:#3a2816;
+  --good:#5cc58b; --good-soft:#163525; --bad:#ef7a73; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f171b; --surface:#16222a; --surface-2:#1d2c35; --line:#2b3d47;
+  --fg:#e5edf0; --muted:#97a9b2;
+  --accent:#4fb3cf; --accent-ink:#06222b; --accent-soft:#163b47;
+  --cost:#e39a55; --cost-soft:#3a2816;
+  --good:#5cc58b; --good-soft:#163525; --bad:#ef7a73; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.brand small{display:block;font-family:var(--f-display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,3vw,30px);margin:2px 0 0;text-wrap:balance;letter-spacing:-.01em}
+.client-line{display:flex;gap:8px;align-items:center;margin-top:6px;color:var(--muted)}
+.client-line input{border:none;border-bottom:1px dashed var(--line);background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:2px 0;min-width:0;width:260px;max-width:100%}
+.tabs{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:4px;gap:4px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:600 14px var(--f-display);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.results{order:-1;position:static}}
+/* inputs */
+details.sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px}
+details.sec>summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;font:700 15px var(--f-display)}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary .hint{font:500 12px var(--f-body);color:var(--muted)}
+details.sec>summary::after{content:"+";font:600 18px var(--f-display);color:var(--muted);margin-left:10px}
+details.sec[open]>summary::after{content:"−"}
+.body{padding:2px 14px 14px;display:grid;gap:8px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 148px;gap:10px;align-items:center}
+.row label{font-size:14px}
+.row label em{font-style:normal;color:var(--muted);font-size:12px;display:block;line-height:1.2}
+.num{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);overflow:hidden}
+.num input{width:100%;min-width:0;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px;text-align:right;font-variant-numeric:tabular-nums}
+.num span{font-size:12px;color:var(--muted);padding-right:8px;white-space:nowrap}
+.sub{font:700 11px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.note{font-size:12.5px;color:var(--muted)}
+.prog{width:100%;border-collapse:collapse;font-size:14px}
+.prog th{font:600 11px var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+.prog td{padding:6px 4px;border-bottom:1px solid var(--surface-2);vertical-align:middle}
+.prog td:first-child{width:38%}
+.prog select{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--fg);font:500 14px var(--f-body);padding:7px 6px}
+.prog .num{min-width:96px}
+.chk{display:flex;align-items:center;gap:8px;font-weight:600}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.prodbox{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:4px}
+.prodhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 10px;margin-bottom:4px}
+.prodhead b{font:700 15px var(--f-display)}
+.via{font:600 11px var(--f-display);letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-left:6px;vertical-align:2px}
+.quick{display:flex;gap:4px}
+.quick button{border:0;background:transparent;color:var(--accent);font:600 12.5px var(--f-body);cursor:pointer;padding:2px 4px;text-decoration:underline}
+.ph{display:grid;grid-template-columns:minmax(0,1fr) 148px;gap:10px;align-items:center;padding:3px 0;border-top:1px solid var(--surface-2)}
+.ph label{display:flex;gap:10px;align-items:center;cursor:pointer;font-size:14px;min-width:0}
+.ph input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:var(--accent)}
+.ph.off label span,.ph.off .num{opacity:.45}
+.ph.dose{border-top:0;padding-bottom:6px}
+/* results */
+.results{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:grid;gap:14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.panel h2{font:700 13px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.hero{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.hero{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hero .k:first-child{grid-column:1/-1}}
+.k .v{font:800 clamp(22px,2.6vw,30px) var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.1}
+.k .l{font-size:13px;color:var(--muted)}
+.k.main .v{color:var(--good)}
+.k.main.neg .v{color:var(--bad)}
+.verdict{margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--good-soft);font-weight:600}
+.verdict.neg{background:var(--cost-soft)}
+table.t{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+table.t th{font:600 11px var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right;padding:6px 6px;border-bottom:1px solid var(--line)}
+table.t th:first-child,table.t td:first-child{text-align:left}
+#t-plano th:nth-child(2),#t-plano th:nth-child(3){text-align:left}
+table.t td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--surface-2);white-space:nowrap}
+table.t th{white-space:nowrap}
+table.t tr.tot td{font-weight:700;border-top:1px solid var(--line);border-bottom:0}
+table.t td.off{color:var(--muted)}
+.scroll{overflow-x:auto}
+.wide{display:grid;gap:14px;margin-top:20px}
+.wide>*{min-width:0}
+.body>*,.results>*,.inputs,.grid>*{min-width:0}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:13.5px}
+.bar .track{height:14px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;background:var(--good);border-radius:4px}
+.bar.cost .fill{background:var(--cost)}
+.bar .amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.flow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.flow div b{display:block;font:700 18px var(--f-display);font-variant-numeric:tabular-nums}
+.flow div span{font-size:12.5px;color:var(--muted)}
+.pill{display:inline-block;font:600 11px var(--f-display);letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.pill.int{background:var(--cost-soft);color:var(--cost)}
+footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:900px}
+footer p{margin:6px 0}
+footer a{color:var(--accent)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 13px var(--f-display);padding:7px 12px;border-radius:8px;cursor:pointer}
+[data-only="interno"]{}
+body.mode-cliente [data-only="interno"]{display:none!important}
+body.mode-interno [data-only="cliente"]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.bar .fill{transition:width .3s ease}}
+@media (max-width:900px){.results{position:static!important;top:auto}}
+.mans{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 10px;background:var(--surface-2);border-radius:8px}
+.mans .chk2{color:var(--fg);font-size:13px}
+.mans{display:grid;gap:6px}
+.orow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 10px;border-top:1px solid var(--line);padding-top:6px}
+.oin{display:flex;align-items:center;gap:6px}
+.oin .nx{width:56px}
+.oin small{font-size:12px;color:var(--muted)}
+.mhead,.mrow{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:8px;align-items:center}
+.mhead{font:600 11px var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mhead span:last-child{text-align:center}
+.mrow em{font-style:normal;color:var(--muted);font-size:12px}
+.nx{width:100%;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg);font:600 14px var(--f-body);padding:4px 6px;text-align:center}
+.nx:disabled{opacity:.4}
+.mans em{font-style:normal;color:var(--muted);font-size:12px;font-weight:500}
+[hidden]{display:none!important}
+body:not(.show-info) footer#info{display:none}
+body.show-info .wrap > *:not(header):not(footer){display:none!important}
+footer#info{margin-top:4px;max-width:860px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;font-size:14.5px;line-height:1.55;color:var(--fg)}
+footer#info p{margin:0 0 12px}
+footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
+#info-btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.be{display:grid;gap:10px}
+.be-row{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:10px;background:var(--surface)}
+.be-row.prog{border:2px solid var(--accent)}
+.be-h{display:flex;justify-content:space-between;gap:4px 16px;flex-wrap:wrap;align-items:baseline}
+.be-h b{font:800 16px var(--f-display)}
+.be-f{font-size:12.5px;color:var(--muted);font-weight:600}
+.be-c{font-size:13px;color:var(--muted)}
+.be-c b{color:var(--fg);font:800 15px var(--f-display)}
+.be-ind{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px}
+.be-i{background:var(--surface-2);border-radius:8px;padding:8px 10px;display:grid;gap:2px;min-width:0;align-content:start}
+.be-i span{font-size:12.5px;color:var(--muted)}
+.be-i b{font:800 20px var(--f-display);font-variant-numeric:tabular-nums;color:var(--accent)}
+.be-i small{font-size:12.5px;font-weight:600}
+.be-i em{font-style:normal;font-size:12px;font-weight:600;color:var(--good)}
+.be-i em.no{color:var(--bad)}
+.bef{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:2px 0 4px}
+.bef>span{font-size:12.5px;color:var(--muted);font-weight:600;margin-right:2px}
+.bef button{border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:600 13px var(--f-display);padding:6px 12px;border-radius:999px;cursor:pointer}
+.bef button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+</style>
+
+<style>
+.size{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.size label{font:700 15px var(--f-display)}
+.bignum{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bignum .num{max-width:240px;flex:1;min-width:0}
+.bignum .num input{font:800 28px var(--f-display);padding:8px 10px}
+.presets{display:flex;gap:6px;flex-wrap:wrap}
+.presets button{border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:600 13px var(--f-display);padding:6px 10px;border-radius:999px;cursor:pointer}
+.presets button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:1000px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.cards{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:10px;align-content:start}
+.card.off{opacity:.5}
+.card h3{margin:0;font:800 18px var(--f-display);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card .proto{font-size:13px;color:var(--muted);margin:0}
+.card .main{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card .main b{font:800 34px var(--f-display);font-variant-numeric:tabular-nums;color:var(--accent);line-height:1}
+.card .main span{font-size:14px;color:var(--muted)}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border-top:1px solid var(--surface-2);padding-top:10px}
+.trio div b{display:block;font:700 16px var(--f-display);font-variant-numeric:tabular-nums}
+.trio div span{font-size:12px;color:var(--muted)}
+.money{display:flex;justify-content:space-between;align-items:baseline;background:var(--surface-2);border-radius:8px;padding:8px 10px;font-weight:600}
+.money b{font:800 18px var(--f-display);font-variant-numeric:tabular-nums}
+.total{background:var(--accent);color:var(--accent-ink);border-radius:var(--r);padding:16px 18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.total{grid-template-columns:minmax(0,1fr)}}
+.total b{display:block;font:800 26px var(--f-display);font-variant-numeric:tabular-nums}
+.total span{font-size:13px;opacity:.85}
+.chk2{display:flex;align-items:center;gap:6px;font:600 12px var(--f-body);color:var(--muted)}
+.chk2 input{width:16px;height:16px;accent-color:var(--accent)}
+.stack{display:grid;gap:14px}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <small>IMEVE · Avicultura de postura · Para o produtor</small>
+      <h1>Calculadora Cliente · Poedeiras</h1>
+      <p class="note" style="margin:6px 0 0;max-width:640px">Informe o número de galinhas em postura, ou quanta ração de postura a granja produz por semana, e veja quanto ela pode consumir de cada produto IMEVE por semana, por mês e por ano.</p>
+    </div>
+    <div class="actions"><button class="btn" id="info-btn" type="button" aria-pressed="false">Informações</button><button class="btn" id="reset" type="button">Restaurar padrões</button></div>
+  </header>
+
+  <div class="stack">
+    <section class="size">
+      <label>Informe os dados da sua granja</label>
+      <div class="tabs" role="tablist" id="modo-tabs" style="flex-wrap:wrap;border-radius:14px"><button type="button" role="tab" data-m="aves">Galinhas em postura</button><button type="button" role="tab" data-m="racao">Ração produzida por semana</button></div>
+      <div class="bignum" id="blk-q">
+        <div class="num"><input id="aves" type="number" step="1000" min="0" inputmode="numeric" aria-label="Galinhas em postura"><span>aves em postura</span></div>
+        <div class="presets" id="presets"></div>
+      </div>
+      <div class="bignum" id="blk-r" hidden>
+        <div class="num"><input id="qtr" type="number" step="1" min="0" inputmode="decimal" aria-label="Toneladas de ração por semana"><span>t de ração/semana</span></div>
+        <div class="presets" id="presets-r"></div>
+      </div>
+      <label class="chk2" style="font-size:14px;color:var(--fg)"><input type="checkbox" id="recria"> A granja cria e recria as próprias frangas</label>
+      <p class="note" id="resumo" style="margin:0"></p>
+    </section>
+
+    <section class="total" aria-label="Investimento total">
+      <div><span>Investimento por mês</span><b id="t-mes">–</b></div>
+      <div><span>Investimento por ano</span><b id="t-ano">–</b></div>
+      <div><span>Por mil aves por ano</span><b id="t-mil">–</b></div>
+    </section>
+
+    <section class="size" aria-label="Retorno para o produtor">
+      <label>Quanto você investe e quanto volta</label>
+      <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+        <div class="row"><label for="p_ovo">Preço do ovo<em>Bastos (Cepea) 13/10/2026: R$ 4,41/dz (R$ 132/cx)</em></label><div class="num"><input id="p_ovo" type="number" step="0.05" inputmode="decimal"><span>R$/dúzia</span></div></div>
+      </div>
+      <div class="flow" id="roi-flow"></div>
+      <p class="note" id="roi-note" style="margin:0"></p>
+    </section>
+    <details class="sec" open>
+      <summary>Resultado esperado com o programa <span class="hint">edite para simular · ex.: mortalidade 0 e só ganho de peso</span></summary>
+      <div class="body" id="sec-efeitos"></div>
+    </details>
+    <section class="size" aria-label="Quanto cada produto precisa melhorar">
+      <label>Quanto cada produto precisa melhorar para se pagar</label>
+      <p class="note" style="margin:0">Por produto e por fase: o investimento e o resultado mínimo que já paga esse investimento. Basta <b>um</b> dos resultados de cada linha; o que passar disso é lucro.</p>
+      <div class="bef" id="be-f"></div>
+        <div class="be" id="be"></div>
+    </section>
+
+    <div class="cards" id="cards"></div>
+
+    <details class="sec">
+      <summary>Preços dos produtos <span class="hint">ajuste para o preço negociado</span></summary>
+      <div class="body" id="sec-precos"></div>
+    </details>
+    <details class="sec">
+      <summary>Premissas da granja padrão <span class="hint">já preenchidas · só mude se precisar</span></summary>
+      <div class="body" id="sec-prem"></div>
+    </details>
+    <details class="sec">
+      <summary>Doses usadas no cálculo <span class="hint">protocolo IMEVE</span></summary>
+      <div class="body" id="sec-dose"></div>
+    </details>
+  </div>
+
+  <footer id="info"><h2 class="info-h">Informações</h2>
+    <p><b>Como o cálculo funciona</b>: granja de postura padrão com galinhas de várias idades (poedeira branca, referência Hy-Line W-80): transferência para a postura com 17 semanas, descarte com 90 semanas, 5,4 kg de ração por ave na cria e recria e 107 g de ração por ave por dia na postura. As mortalidades médias de recria e postura já estão descontadas. Semana = ano ÷ 52; mês = ano ÷ 12.</p>
+    <p><b>Doses</b>: Especificações Técnicas IMEVE. DBA Concentrado 200 g/t; DBA + PAS 125 g/t; PAS-TR+ e PAS-BAC TR 100 g/t (faixa de 100 a 200 g/t), em todas as rações. Polimeve: 100 g para 1.000 L de água no alojamento das pintainhas (5 dias), nas vacinações da recria (15 dias no lote) e na transferência para a postura (5 dias). Eletroaminovit: 75 mL por 100 L de água na transferência (5 dias) e no estresse calórico da postura (10 dias por ano).</p>
+    <p><b>Retorno estimado</b>: estimativa simplificada com premissas conservadoras (1,5% a mais de ovos, 1 ponto a menos de mortalidade na postura e 0,5 na recria), valorizadas pelo preço do ovo, da ração e da pintainha. Referência: ensaio IMEVE na Granja Ino com DBA Concentrado (+6,3% de ovos por ave alojada e mortalidade de 3,0% contra 4,8%).</p>
+    <p>Os valores são estimativas para a granja usando o programa completo e podem variar conforme o manejo, a sanidade e os preços praticados.</p>
+  <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+const FEEDS={dba:["DBA Concentrado","pr_dba","d_dba"],dbapas:["DBA + PAS Concentrado","pr_dbapas","d_dbapas"],pas:["PAS-TR+ Concentrado","pr_pas","d_pas"],pasbac:["PAS-BAC TR Concentrado","pr_pasbac","d_pasbac"]};
+const DEF={
+  p_ovo:4.41, p_racao:1.35, p_racao_r:1.45, p_pint:4.50, postura:85, e_pos:1.5, e_mp:1.0, e_mr:0.5,
+  aves:100000, modo:"aves", qtr:80, recria:true, racao:"dba",
+  sem_ini:17, sem_desc:90, kg_rec:5.41, g_post:107, mr:3.2, mp:5.5,
+  a_pint:0.03, a_rec:0.07, a_trans:0.11, a_post:0.17,
+  d_dba:200, d_dbapas:125, d_pas:100, d_pasbac:100,
+  d_pol:100, dp_pint:5, dp_vac:15, dp_trans:5, d_ele:75, de_trans:5, de_calor:10,
+  pr_dba:34.80, pr_dbapas:61.92, pr_pas:82.00, pr_pasbac:79.20, pr_pol:26.80, pr_ele:103.00,
+  dp_calor:10, de_pint:5, de_vac:15,
+  mn:{pp:true,pv:true,pt:true,pq:false,ep:false,ev:false,et:true,eq:true,po:false,eo:false},
+  on:{feed:true,pol:true,ele:true}
+};
+const PRE=[10000,50000,100000,250000,500000,1000000];
+const FIELDS={
+  "sec-precos":[
+    ["pr_dba","DBA Concentrado","","R$/kg",0.1],["pr_dbapas","DBA + PAS Concentrado","","R$/kg",0.1],
+    ["pr_pas","PAS-TR+ Concentrado","","R$/kg",0.1],["pr_pasbac","PAS-BAC TR Concentrado","","R$/kg",0.1],
+    ["pr_pol","Polimeve Solúvel","sachê de 100 g","R$/sachê",0.1],["pr_ele","Eletroaminovit","frasco de 1 L","R$/frasco",0.5]],
+  "sec-prem":[
+    ["postura","Postura média por ave alojada","","%",0.5],["p_racao","Preço da ração de postura","estimativa","R$/kg",0.05],["p_racao_r","Preço da ração de recria","estimativa","R$/kg",0.05],["p_pint","Preço da pintainha","estimativa","R$/ave",0.1],
+    ["sem_ini","Idade de transferência para a postura","","semanas",1],["sem_desc","Idade de descarte","","semanas",1],
+    ["kg_rec","Ração na cria e recria","por ave, até a transferência","kg",0.1],["g_post","Ração na postura","por ave por dia","g/dia",1],
+    ["a_pint","Água da pintainha (1ª semana)","por ave","L/dia",0.01],["a_rec","Água da franga na recria","por ave","L/dia",0.01],
+    ["a_trans","Água na transferência","por ave","L/dia",0.01],["a_post","Água da galinha no calor","por ave","L/dia",0.01]],
+  "sec-efeitos":[
+    ["e_pos","Produção de ovos","% a mais · Granja Ino: +6,3%","%",0.1],
+    ["e_mp","Mortalidade na postura","pontos a menos · 0 = sem melhora","p.p.",0.1],
+    ["e_mr","Mortalidade na recria","pontos a menos","p.p.",0.1]],
+  "sec-dose":[
+    ["d_dba","DBA Concentrado na ração","","g/t",25],["d_dbapas","DBA + PAS na ração","","g/t",25],
+    ["d_pas","PAS-TR+ na ração","","g/t",25],["d_pasbac","PAS-BAC TR na ração","","g/t",25],
+    ["d_pol","Polimeve na água","","g/1000L",10],["dp_pint","Polimeve: dias no alojamento das pintainhas","","dias",1],
+    ["dp_vac","Polimeve: dias nas vacinações da recria","total no lote","dias",1],["dp_trans","Polimeve: dias na transferência","","dias",1],
+    ["d_ele","Eletroaminovit na água","","mL/100L",5],["de_trans","Eletroaminovit: dias na transferência","","dias",1],
+    ["dp_calor","Polimeve: dias de calor na postura","por ano","dias",1],
+    ["de_pint","Eletroaminovit: dias no alojamento das pintainhas","","dias",1],
+    ["de_vac","Eletroaminovit: dias nas vacinações da recria","total no lote","dias",1],
+    ["de_calor","Eletroaminovit: dias de calor na postura","por ano","dias",1]]
+};
+const KEY="potencial-poedeiras-v1-cliente";
+let S=JSON.parse(JSON.stringify(DEF));S.ox={};
+try{const sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv)S=Object.assign(JSON.parse(JSON.stringify(DEF)),sv,{on:Object.assign({},DEF.on,sv.on||{}),mn:Object.assign({},DEF.mn,sv.mn||{}),ox:Object.assign({},sv.ox||{})});}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+for(const [sec,list] of Object.entries(FIELDS)){
+  document.getElementById(sec).innerHTML=list.map(([k,lab,hint,unit,step])=>`<div class="row"><label for="${k}">${lab}${hint?`<em>${hint}</em>`:""}</label><div class="num"><input id="${k}" type="number" step="${step}" inputmode="decimal"><span>${unit}</span></div></div>`).join("");
+}
+const nf=d=>new Intl.NumberFormat("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const n0=v=>nf(0).format(v), n1=v=>nf(1).format(v), n2=v=>nf(2).format(v);
+const qf=v=>v>=100?n0(v):n1(v);
+const brl=v=>"R$ "+nf(0).format(v);
+const brlK=v=>Math.abs(v)>=1e6?"R$ "+nf(2).format(v/1e6)+" mi":Math.abs(v)>=1e4?"R$ "+nf(0).format(v/1e3)+" mil":brl(v);
+document.getElementById("presets").innerHTML=PRE.map(v=>`<button type="button" data-v="${v}">${v>=1e6?n0(v/1e6)+" milhão":n0(v/1000)+" mil"}</button>`).join("");
+const KEYS=["aves","qtr","p_ovo"].concat(Object.values(FIELDS).flat().map(f=>f[0]));
+function fill(){KEYS.forEach(k=>{document.getElementById(k).value=S[k];});document.getElementById("recria").checked=!!S.recria;}
+fill();
+document.addEventListener("input",e=>{const id=e.target.id;
+  if(KEYS.includes(id)){const v=parseFloat(e.target.value);S[id]=isFinite(v)?v:0;}
+  else if(id==="recria"){S.recria=e.target.checked;}
+  else if(id==="racao"){S.racao=e.target.value;}
+  else if(id&&(id.startsWith("ov_")||id.startsWith("od_"))){const v=parseFloat(e.target.value),k=id.slice(3);S.ox=S.ox||{};S.ox[k]=Object.assign({},oxv(S,k));S.ox[k][id[1]]=isFinite(v)?Math.max(0,v):0;}
+  else if(id&&id.startsWith("mn_")){S.mn[id.slice(3)]=e.target.checked;}
+  else if(id&&id.startsWith("on_")){S.on[id.slice(3)]=e.target.checked;}
+  else return; save();calc();});
+document.addEventListener("change",e=>{if(e.target.type==="checkbox"||e.target.tagName==="SELECT")e.target.dispatchEvent(new Event("input",{bubbles:true}));});
+document.getElementById("presets").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.aves=+b.dataset.v;document.getElementById("aves").value=S.aves;save();calc();});
+document.getElementById("reset").addEventListener("click",()=>{S=JSON.parse(JSON.stringify(DEF));save();fill();calc();});
+
+const MAN={pol:[["pp","Alojamento das pintainhas","dp_pint"],["pt","Transferência para a postura","dp_trans"],["pv","Vacinação na recria","dp_vac"],["pq","Temperatura extrema","dp_calor"]],ele:[["ep","Alojamento das pintainhas","de_pint"],["et","Transferência para a postura","de_trans"],["ev","Vacinação na recria","de_vac"],["eq","Temperatura extrema","de_calor"]]};
+const OX={pol:"po",ele:"eo"};
+const oxv=(s,id)=>{const o=(s.ox&&s.ox[id])||{};return {v:o.v==null?1:o.v,d:o.d==null?3:o.d};};
+const manTxt=(p,s)=>{const a=MAN[p].filter(m=>s.mn[m[0]]).map(m=>m[1].toLowerCase()+" ("+n0(s[m[2]])+" d)");const o=OX[p];if(s.mn[o]){const x=oxv(s,o);if(x.v>0&&x.d>0)a.push("outros manejos ("+n0(x.v)+"× de "+n0(x.d)+" d)");}return a.length?"Na água: "+a.join(" + "):"Nenhum manejo marcado";};
+
+function paintModo(){document.querySelectorAll("#modo-tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===S.modo?"true":"false"));
+  const r=S.modo==="racao";document.getElementById("blk-q").hidden=r;document.getElementById("blk-r").hidden=!r;if(window.__unit)window.__unit();}
+document.getElementById("modo-tabs").addEventListener("click",e=>{const b=e.target.closest("button[data-m]");if(!b)return;S.modo=b.dataset.m;save();paintModo();calc();});
+document.getElementById("presets-r").innerHTML=[10,25,50,100,250,500].map(v=>`<button type="button" data-v="${v}">${v} t</button>`).join("");
+document.getElementById("presets-r").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.qtr=+b.dataset.v;document.getElementById("qtr").value=S.qtr;save();calc();});
+paintModo();
+function model(s){
+  if(s.modo==="racao"){const base=model(Object.assign({},s,{modo:"aves",aves:1}));s=Object.assign({},s,{aves:base.feedTot>0?s.qtr*1000*52/base.feedTot:0});}
+  const r={}, L=Math.max(1,s.sem_desc-s.sem_ini);
+  r.aloj=s.aves/((L/52)*(1-s.mp/200));
+  r.pint=s.recria?r.aloj/(1-s.mr/100):0;
+  const vivoRec=r.pint*(1-s.mr/200);
+  r.feedRec=vivoRec*s.kg_rec; r.feedPost=s.aves*s.g_post/1000*365; r.feedTot=r.feedRec+r.feedPost;
+  const [fn,fp,fd]=FEEDS[s.racao]||FEEDS.dba;
+  r.feedKg=r.feedTot/1000*s[fd]/1000;
+  const WA={pp:s.recria?r.pint*s.a_pint:0,pv:s.recria?vivoRec*s.a_rec:0,pt:r.aloj*s.a_trans,pq:s.aves*s.a_post,ep:s.recria?r.pint*s.a_pint:0,ev:s.recria?vivoRec*s.a_rec:0,et:r.aloj*s.a_trans,eq:s.aves*s.a_post,po:s.aves*s.a_post,eo:s.aves*s.a_post};
+  const manL=p=>{let t=MAN[p].filter(m=>s.mn[m[0]]).reduce((a,m)=>a+WA[m[0]]*s[m[2]],0);const o=OX[p];if(s.mn[o]){const x=oxv(s,o);t+=WA[o]*x.v*x.d;}return t;};
+  const manK=(p,ks)=>{let t=MAN[p].filter(m=>s.mn[m[0]]&&ks.includes(m[0])).reduce((a,m)=>a+WA[m[0]]*s[m[2]],0);const o=OX[p];if(s.mn[o]&&ks.includes(o)){const x=oxv(s,o);t+=WA[o]*x.v*x.d;}return t;};
+  r.sp={pol:[manK("pol",["pp","pv"]),manK("pol",["pt","pq","po"])],ele:[manK("ele",["ep","ev"]),manK("ele",["et","eq","eo"])]};
+  r.polKg=manL("pol")*s.d_pol/1e6;
+  r.eleL=manL("ele")*s.d_ele/100/1000;
+  const sel=`<select id="racao" aria-label="Probiótico na ração" style="border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--fg);font:600 14px var(--f-body);padding:6px 8px;max-width:100%">${Object.entries(FEEDS).map(([k,v])=>`<option value="${k}"${k===s.racao?" selected":""}>${v[0]}</option>`).join("")}</select>`;
+  r.prod=[
+    {id:"feed",nome:"Probiótico na ração",head:sel,proto:`${fn} a ${n0(s[fd])} g/t em todas as rações${s.recria?" (recria e postura)":" (postura)"}`,emb:r.feedKg,embUn:"kg",extra:[r.feedKg/25,"baldes/sacos de 25 kg por mês"],custo:r.feedKg*s[fp]},
+    {id:"pol",nome:"Polimeve Solúvel",proto:manTxt("pol",s),man:"pol",emb:r.polKg,embUn:"kg",extra:[r.polKg/0.1,"sachês de 100 g por mês"],custo:r.polKg/0.1*s.pr_pol},
+    {id:"ele",nome:"Eletroaminovit",proto:manTxt("ele",s),man:"ele",emb:r.eleL,embUn:"litros",extra:[r.eleL,"frascos de 1 L por mês"],custo:r.eleL*s.pr_ele}
+  ];
+  r.aves=s.aves;
+  r.total=r.prod.reduce((a,p)=>a+(s.on[p.id]?p.custo:0),0);
+  return r;
+}
+window.__model=model;
+
+const BEF={todos:"Todos os resultados",peso:"Só peso",mort:"Só mortalidade",conv:"Só conversão",ovos:"Só produção de ovos"};
+const BEFT={peso:"Se melhorar só o peso",mort:"Se melhorar só a mortalidade",conv:"Se melhorar só a conversão",ovos:"Se melhorar só a produção de ovos"};
+document.addEventListener("click",e=>{const b=e.target.closest("#be-f button[data-f]");if(!b)return;S.beF=b.dataset.f;save();calc();});
+function renderBE(items){
+  const el=document.getElementById("be");if(!el)return;
+  const all=items.filter(it=>it.on&&it.custo>0);
+  const cats=[];all.forEach(it=>it.ind.forEach(i=>{if(i.u>0&&!cats.includes(i.c))cats.push(i.c);}));
+  const order=["peso","ovos","mort","conv"].filter(c=>cats.includes(c));
+  let f=S.beF||"todos"; if(f!=="todos"&&!order.includes(f))f="todos";
+  const fb=document.getElementById("be-f");
+  if(fb)fb.innerHTML=all.length?`<span>Mostrar:</span>`+["todos"].concat(order).map(k=>`<button type="button" data-f="${k}" aria-pressed="${k===f}">${BEF[k]}</button>`).join(""):"";
+  const rows=all.map(it=>Object.assign({},it,{ind:it.ind.filter(i=>i.u>0&&(f==="todos"||i.c===f))})).filter(it=>it.ind.length||f==="todos");
+  if(!all.length){el.innerHTML='<p class="note" style="margin:0">Inclua ao menos um produto para ver a análise.</p>';return;}
+  if(!rows.length){el.innerHTML='<p class="note" style="margin:0">Nenhum produto marcado atua nesse resultado.</p>';return;}
+  el.innerHTML=(f!=="todos"?`<p class="note" style="margin:0;font-weight:600">${BEFT[f]}: quanto cada produto precisa para se pagar sozinho.</p>`:"")+rows.map(it=>{const ind=it.ind;return `<div class="be-row${it.prog?" prog":""}">
+   <div class="be-h"><div><b>${it.nome}</b> <span class="be-f">· ${it.fase}</span></div><div class="be-c"><b>${brlK(it.custo/12)}</b> por mês · ${it.pa(it.custo)}</div></div>
+   <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">Com ${i.fmt(i.ref)} (referência): volta R$ ${nf(2).format(x)} por R$ 1</em>`:""}</div>`;}).join(""):'<p class="note" style="margin:0">Com os preços atuais nenhum indicador cobre o custo.</p>'}</div></div>`;}).join("");
+}
+function calc(){
+  const s=S,r=model(s);
+  document.querySelectorAll("#presets button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.aves));
+  document.querySelectorAll("#presets-r button").forEach(b=>b.classList.toggle("on",+b.dataset.v===s.qtr));
+  document.getElementById("resumo").textContent=`${S.modo==="racao"?"≈ "+n0(r.aves)+" galinhas em postura · ":""}${n0(r.aves*0.85)} ovos por dia · ${n0(r.feedTot/1000/12)} t de ração por mês · ${s.recria?n0(r.pint)+" pintainhas por ano":n0(r.aloj)+" frangas compradas por ano"}`;
+  document.getElementById("t-mes").textContent=brlK(r.total/12);
+  document.getElementById("t-ano").textContent=brlK(r.total);
+  document.getElementById("t-mil").textContent=r.aves>0?"R$ "+nf(2).format(r.total/r.aves*1000):"–";
+  {const on=s.on, mn=s.mn, any=on.feed||(on.pol&&(MAN.pol.some(m=>mn[m[0]])||mn.po))||(on.ele&&(MAN.ele.some(m=>mn[m[0]])||mn.eo));
+   const L=Math.max(1,s.sem_desc-s.sem_ini), dz=s.p_ovo, pz=s.postura/100;
+   let b=0;
+   if(any){b+=r.aves*365*pz/12*dz*s.e_pos/100;
+     b+=r.aloj*(L/52)*s.e_mp/200*(365*pz/12*dz-s.g_post/1000*365*s.p_racao);
+     if(s.recria)b+=r.pint*s.e_mr/100*(s.p_pint+0.5*s.kg_rec*s.p_racao_r);}
+   const inv=r.total, liq=b-inv, roi=inv>0?b/inv:0, dzAno=r.aves*365*pz/12;
+   const g=[[brlK(inv/12),"investimento por mês"],[brlK(b/12),"retorno estimado por mês"],[(liq<0?"− ":"")+brlK(Math.abs(liq/12)),"ganho líquido por mês"],[inv>0?"R$ "+nf(2).format(roi):"–","volta para cada R$ 1"],
+     ["R$ "+nf(3).format(dzAno>0?inv/dzAno:0),"investimento por dúzia"],["R$ "+nf(2).format(r.aves>0?inv/r.aves:0),"investimento por ave/ano"]];
+   document.getElementById("roi-flow").innerHTML=g.map(([v,sp],i)=>`<div><b${i===2||i===3?(liq<0?' style="color:var(--bad)"':' style="color:var(--good)"'):''}>${v}</b><span>${sp}</span></div>`).join("");
+   document.getElementById("roi-note").textContent=inv<=0?"Inclua ao menos um produto para calcular.":`Sua granja investe ${brlK(inv)} por ano no programa e recebe de volta cerca de ${brlK(b)}, vindos de mais ovos, menos mortalidade na postura e na recria. Estimativa com premissas conservadoras; o técnico IMEVE pode detalhar o cálculo para a sua granja.`;}
+  {const L=Math.max(1,s.sem_desc-s.sem_ini),dz=s.p_ovo,pz=s.postura/100,FD=FEEDS[s.racao]||FEEDS.dba,fn=FD[0],fp=FD[1],fd=FD[2],on=s.on;
+  const pts=v=>"−"+(v<0.1?nf(3).format(v):n2(v))+" ponto %", cv=v=>"−"+nf(3).format(v)+" kg/kg";
+  const polC=L=>L*s.d_pol/1e6/0.1*s.pr_pol, eleC=L=>L*s.d_ele/1e5*s.pr_ele;
+  const pa=c=>"R$ "+n2(r.aves>0?c/r.aves:0)+" por ave/ano";
+  const I={
+   pos:{c:"ovos",lab:"Produção de ovos",u:r.aves*365*pz/12*dz/100,fmt:v=>"+"+n2(v)+"% de ovos",ref:s.e_pos,sub:v=>"≈ +"+nf(2).format(365*pz*v/100)+" ovo por ave/ano"},
+   mp:{c:"mort",lab:"Mortalidade na postura",u:r.aloj*(L/52)/200*(365*pz/12*dz-s.g_post/1000*365*s.p_racao),fmt:pts,ref:s.e_mp,sub:v=>"≈ "+n0(r.aloj*v/100)+" galinhas a mais por ano"},
+   mr:{c:"mort",lab:"Mortalidade na recria",u:s.recria?r.pint/100*(s.p_pint+0.5*s.kg_rec*s.p_racao_r):0,fmt:pts,ref:s.e_mr,sub:v=>"≈ "+n0(r.pint*v/100)+" frangas a mais por ano"}};
+  const R=[I.mr,I.pos],P=[I.pos,I.mp];
+  renderBE([
+   {on:on.feed&&s.recria,nome:fn,fase:"Recria",custo:r.feedRec/1e6*s[fd]*s[fp],pa,ind:R},
+   {on:on.feed,nome:fn,fase:"Postura",custo:r.feedPost/1e6*s[fd]*s[fp],pa,ind:P},
+   {on:on.pol,nome:"Polimeve Solúvel",fase:"Recria (manejos marcados)",custo:polC(r.sp.pol[0]),pa,ind:R},
+   {on:on.pol,nome:"Polimeve Solúvel",fase:"Postura (manejos marcados)",custo:polC(r.sp.pol[1]),pa,ind:P},
+   {on:on.ele,nome:"Eletroaminovit",fase:"Recria (manejos marcados)",custo:eleC(r.sp.ele[0]),pa,ind:R},
+   {on:on.ele,nome:"Eletroaminovit",fase:"Postura (manejos marcados)",custo:eleC(r.sp.ele[1]),pa,ind:P},
+   {on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.total,pa,ind:[I.pos,I.mp,I.mr]}]);}
+  const act=document.activeElement&&document.activeElement.id;
+  document.getElementById("cards").innerHTML=r.prod.map(p=>{const on=s.on[p.id];return `<article class="card${on?"":" off"}">
+    <h3>${p.head||p.nome}<label class="chk2"><input type="checkbox" id="on_${p.id}" ${on?"checked":""}> incluir</label></h3>
+    <p class="proto">${p.proto}</p>
+    ${p.man?`<div class="mans">${MAN[p.man].map(m=>`<label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]} <em>${n0(s[m[2]])} dias</em></label>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
+    <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
+    <div class="trio"><div><b>${qf(p.emb/52)}</b><span>por semana</span></div><div><b>${qf(p.emb)}</b><span>por ano</span></div><div><b>${qf(p.extra[0]/12)}</b><span>${p.extra[1]}</span></div></div>
+    <div class="money"><span>Investimento</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
+  </article>`;}).join("");
+  if(act&&(act.startsWith("ov_")||act.startsWith("od_"))){const el=document.getElementById(act);if(el){el.focus();}}
+}
+calc();
+})();
+</script>
+<script>(function(){const b=document.getElementById("info-btn");if(!b)return;b.addEventListener("click",()=>{const on=!document.body.classList.contains("show-info");document.body.classList.toggle("show-info",on);b.setAttribute("aria-pressed",on?"true":"false");b.textContent=on?"Voltar à calculadora":"Informações";window.scrollTo(0,0);});})();</script>
+
+</body>
+</html>
