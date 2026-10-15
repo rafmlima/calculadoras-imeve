@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora Técnica Frango de Corte</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+[hidden]{display:none!important}
+
+/* Layout: barra de topo com abas Cliente/Interna; coluna de premissas à esquerda, painel de resultados fixo à direita; empilha no celular */
+:root{
+  --bg:#f3f5f6; --surface:#ffffff; --surface-2:#eaeef0; --line:#d5dde1;
+  --fg:#15232b; --muted:#5b6b74;
+  --accent:#0b6e8a; --accent-ink:#ffffff; --accent-soft:#dcedf2;
+  --cost:#b25f12; --cost-soft:#f6e6d4;
+  --good:#24804f; --good-soft:#dcefe3; --bad:#b3322c;
+  --f-display:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f171b; --surface:#16222a; --surface-2:#1d2c35; --line:#2b3d47;
+  --fg:#e5edf0; --muted:#97a9b2;
+  --accent:#4fb3cf; --accent-ink:#06222b; --accent-soft:#163b47;
+  --cost:#e39a55; --cost-soft:#3a2816;
+  --good:#5cc58b; --good-soft:#163525; --bad:#ef7a73; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f171b; --surface:#16222a; --surface-2:#1d2c35; --line:#2b3d47;
+  --fg:#e5edf0; --muted:#97a9b2;
+  --accent:#4fb3cf; --accent-ink:#06222b; --accent-soft:#163b47;
+  --cost:#e39a55; --cost-soft:#3a2816;
+  --good:#5cc58b; --good-soft:#163525; --bad:#ef7a73; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap{max-width:1240px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.brand small{display:block;font-family:var(--f-display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,3vw,30px);margin:2px 0 0;text-wrap:balance;letter-spacing:-.01em}
+.client-line{display:flex;gap:8px;align-items:center;margin-top:6px;color:var(--muted)}
+.client-line input{border:none;border-bottom:1px dashed var(--line);background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:2px 0;min-width:0;flex:1;width:auto;max-width:420px}
+.tabs{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:4px;gap:4px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:600 14px var(--f-display);padding:8px 16px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.results{order:-1;position:static}}
+/* inputs */
+details.sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px}
+details.sec>summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;font:700 15px var(--f-display)}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary .hint{font:500 12px var(--f-body);color:var(--muted)}
+details.sec>summary::after{content:"+";font:600 18px var(--f-display);color:var(--muted);margin-left:10px}
+details.sec[open]>summary::after{content:"−"}
+.body{padding:2px 14px 14px;display:grid;gap:8px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 148px;gap:10px;align-items:center}
+.row label{font-size:14px}
+.row label em{font-style:normal;color:var(--muted);font-size:12px;display:block;line-height:1.2}
+.num{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);overflow:hidden}
+.num input{width:100%;min-width:0;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px;text-align:right;font-variant-numeric:tabular-nums}
+.num span{font-size:12px;color:var(--muted);padding-right:8px;white-space:nowrap}
+.sub{font:700 11px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.note{font-size:12.5px;color:var(--muted)}
+.prog{width:100%;border-collapse:collapse;font-size:14px}
+.prog th{font:600 11px var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+.prog td{padding:6px 4px;border-bottom:1px solid var(--surface-2);vertical-align:middle}
+.prog td:first-child{width:38%}
+.prog select{width:100%;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--fg);font:500 14px var(--f-body);padding:7px 6px}
+.prog .num{min-width:96px}
+.chk{display:flex;align-items:center;gap:8px;font-weight:600}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+.prodbox{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:grid;gap:4px}
+.prodhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 10px;margin-bottom:4px}
+.prodhead b{font:700 15px var(--f-display)}
+.via{font:600 11px var(--f-display);letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);margin-left:6px;vertical-align:2px}
+.quick{display:flex;gap:4px}
+.quick button{border:0;background:transparent;color:var(--accent);font:600 12.5px var(--f-body);cursor:pointer;padding:2px 4px;text-decoration:underline}
+.ph{display:grid;grid-template-columns:minmax(0,1fr) 148px;gap:10px;align-items:center;padding:3px 0;border-top:1px solid var(--surface-2)}
+.ph label{display:flex;gap:10px;align-items:center;cursor:pointer;font-size:14px;min-width:0}
+.ph input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:var(--accent)}
+.ph.off label span,.ph.off .num{opacity:.45}
+.ph.dose{border-top:0;padding-bottom:6px}
+/* results */
+.results{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:grid;gap:14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.panel h2{font:700 13px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.hero{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.hero{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.hero .k:first-child{grid-column:1/-1}}
+.k .v{font:800 clamp(22px,2.6vw,30px) var(--f-display);font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.1}
+.k .l{font-size:13px;color:var(--muted)}
+.k.main .v{color:var(--good)}
+.k.main.neg .v{color:var(--bad)}
+.verdict{margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--good-soft);font-weight:600}
+.verdict.neg{background:var(--cost-soft)}
+table.t{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:14px}
+table.t th{font:600 11px var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right;padding:6px 6px;border-bottom:1px solid var(--line)}
+table.t th:first-child,table.t td:first-child{text-align:left}
+#t-plano th:nth-child(2),#t-plano th:nth-child(3){text-align:left}
+table.t td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--surface-2);white-space:nowrap}
+table.t th{white-space:nowrap}
+table.t tr.tot td{font-weight:700;border-top:1px solid var(--line);border-bottom:0}
+table.t td.off{color:var(--muted)}
+.scroll{overflow-x:auto}
+.wide{display:grid;gap:14px;margin-top:20px}
+.wide>*{min-width:0}
+.body>*,.results>*,.inputs,.grid>*{min-width:0}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:13.5px}
+.bar .track{height:14px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;background:var(--good);border-radius:4px}
+.bar.cost .fill{background:var(--cost)}
+.bar .amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.flow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.flow div b{display:block;font:700 18px var(--f-display);font-variant-numeric:tabular-nums}
+.flow div span{font-size:12.5px;color:var(--muted)}
+.pill{display:inline-block;font:600 11px var(--f-display);letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.pill.int{background:var(--cost-soft);color:var(--cost)}
+footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:900px}
+footer p{margin:6px 0}
+footer a{color:var(--accent)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 13px var(--f-display);padding:7px 12px;border-radius:8px;cursor:pointer}
+[data-only="interno"]{}
+body.mode-cliente [data-only="interno"]{display:none!important}
+body.mode-interno [data-only="cliente"]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.bar .fill{transition:width .3s ease}}
+@media (max-width:900px){.results{position:static!important;top:auto}}
+body:not(.show-info) footer#info{display:none}
+body.show-info .wrap > *:not(header):not(footer){display:none!important}
+footer#info{margin-top:4px;max-width:860px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;font-size:14.5px;line-height:1.55;color:var(--fg)}
+footer#info p{margin:0 0 12px}
+footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
+#info-btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.be{display:grid;gap:10px}
+.be-row{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:10px;background:var(--surface)}
+.be-row.prog{border:2px solid var(--accent)}
+.be-h{display:flex;justify-content:space-between;gap:4px 16px;flex-wrap:wrap;align-items:baseline}
+.be-h b{font:800 16px var(--f-display)}
+.be-f{font-size:12.5px;color:var(--muted);font-weight:600}
+.be-c{font-size:13px;color:var(--muted)}
+.be-c b{color:var(--fg);font:800 15px var(--f-display)}
+.be-ind{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px}
+.be-i{background:var(--surface-2);border-radius:8px;padding:8px 10px;display:grid;gap:2px;min-width:0;align-content:start}
+.be-i span{font-size:12.5px;color:var(--muted)}
+.be-i b{font:800 20px var(--f-display);font-variant-numeric:tabular-nums;color:var(--accent)}
+.be-i small{font-size:12.5px;font-weight:600}
+.be-i em{font-style:normal;font-size:12px;font-weight:600;color:var(--good)}
+.be-i em.no{color:var(--bad)}
+.bef{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:2px 0 4px}
+.bef>span{font-size:12.5px;color:var(--muted);font-weight:600;margin-right:2px}
+.bef button{border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font:600 13px var(--f-display);padding:6px 12px;border-radius:999px;cursor:pointer}
+.bef button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <small>IMEVE · Avicultura de corte · Frango</small>
+      <h1>Calculadora Técnica · Frango de Corte</h1>
+      <div class="client-line"><span>Granja:</span><input id="cliente" type="text" placeholder="Nome da granja / cliente" value="Granja exemplo (100 mil aves alojadas por semana)"></div>
+    </div>
+    <div style="display:grid;gap:8px;justify-items:end">
+
+      <div class="actions"><button class="btn" id="info-btn" type="button" aria-pressed="false">Informações</button><button class="btn" id="reset" type="button">Restaurar padrões</button></div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="inputs">
+      <details class="sec" open>
+        <summary>Produção <span class="hint">dados da granja</span></summary>
+        <div class="body" id="sec-plantel"></div>
+      </details>
+      <details class="sec">
+        <summary>Desempenho <span class="hint">idade, peso, mortalidade</span></summary>
+        <div class="body" id="sec-fases"></div>
+      </details>
+      <details class="sec">
+        <summary>Consumo de ração <span class="hint">por fase</span></summary>
+        <div class="body"><div id="sec-racao" style="display:grid;gap:8px"></div><p class="note" id="ca-calc" style="margin:4px 0 0"></p></div>
+      </details>
+      <details class="sec" open>
+        <summary>Programa IMEVE <span class="hint">marque as fases de uso</span></summary>
+        <div class="body">
+          <p class="note" style="margin:0">Marque as fases em que cada produto entra. Fase desmarcada não entra no cálculo de consumo nem no retorno.</p>
+          <div id="prog" style="display:grid;gap:10px"></div>
+          <div class="sub">Consumo de água (para os produtos via água)</div>
+          <div id="sec-agua" style="display:grid;gap:8px"></div>
+        </div>
+      </details>
+      <details class="sec" open>
+        <summary>Preços <span class="hint">frango, custo, ração e produtos</span></summary>
+        <div class="body" id="sec-precos"></div>
+      </details>
+      <details class="sec" data-only="cliente" open>
+        <summary>Resultado esperado <span class="hint">premissas do ROI</span></summary>
+        <div class="body" id="sec-efeitos"></div>
+      </details>
+    </div>
+
+    <div class="results">
+      <section class="panel" data-only="cliente">
+        <h2>Retorno do programa IMEVE · por ano</h2>
+        <div class="hero">
+          <div class="k main" id="k-roi-box"><div class="v" id="k-roi">–</div><div class="l">retorno por R$ 1 investido</div></div>
+          <div class="k"><div class="v" id="k-liq">–</div><div class="l">benefício líquido/ano</div></div>
+          <div class="k"><div class="v" id="k-invave">–</div><div class="l">investimento por ave alojada</div></div>
+        </div>
+        <div class="verdict" id="verdict">–</div>
+      </section>
+      <section class="panel" data-only="cliente">
+        <h2>De onde vem o retorno</h2>
+        <div class="bars" id="bars"></div>
+        <p class="note" style="margin:10px 0 0">A melhora de conversão é contada na proporção da ração das fases que recebem produto; mortalidade e peso contam quando o lote recebe algum produto IMEVE.</p>
+      </section>
+      <section class="panel" data-only="cliente">
+        <h2>Quanto cada produto precisa melhorar para se pagar</h2>
+        <p class="note" style="margin:0 0 10px">Por produto e por fase: o investimento e o resultado mínimo que já paga esse investimento. Basta <b>um</b> dos resultados de cada linha; o que passar disso é lucro.</p>
+        <div class="bef" id="be-f"></div>
+        <div class="be" id="be"></div>
+      </section>
+      <section class="panel" id="mkt-panel">
+        <h2>Mercado do frango · preço x custo</h2>
+        <div class="flow" id="mkt-flow"></div>
+        <p class="note" id="mkt-note" style="margin:10px 0 0"></p>
+      </section>
+      <section class="panel">
+        <h2>A granja em números</h2>
+        <div class="flow" id="flow"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="wide">
+    <!-- AMBOS -->
+    <section class="panel">
+      <h2>Produtos IMEVE · por semana e por mês</h2>
+      <div class="scroll"><table class="t" id="t-prod"></table></div>
+    </section>
+    <section class="panel">
+      <h2>Plano de uso por fase · semana e mês</h2>
+      <div class="scroll"><table class="t" id="t-plano"></table></div>
+    </section>
+    <section class="panel">
+      <h2>Ração por fase · semana e mês</h2>
+      <div class="scroll"><table class="t" id="t-fase"></table></div>
+      <p class="note" style="margin:10px 0 0">Alojamento semanal contínuo: semana = consumo anual ÷ 52; mês = consumo anual ÷ 12.</p>
+    </section>
+  </div>
+
+  <footer id="info"><h2 class="info-h">Informações</h2>
+    <p><b>Índices padrão</b> (editáveis): Embrapa Suínos e Aves, coeficientes técnicos do custo de produção (<a href="https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/1149413/1/COT592.pdf" target="_blank" rel="noopener">COT 592, 2022</a>): frango abatido aos 43 dias com 2,9 kg, conversão 1,70 e mortalidade de 5,5%. Divisão do consumo por fase conforme o manual Cobb 500 (suplemento de desempenho 2022) e Ross 308 AP (2022), ajustada ao total da Embrapa. Água: relação água:ração de 1,8:1 a 21 °C (Aviagen, 2025).</p>
+    <p><b>Preços de mercado</b>: frango vivo nas praças de integração (SC/RS) R$ 4,75/kg e mercado independente em SP R$ 5,70/kg (Safras & Mercado, set/2026); custo de produção Embrapa ICPFrango (PR) R$ 4,85/kg vivo (ago/2026), com a ração em ~64% do custo. O preço da ração (R$ 1,82/kg) foi calculado a partir do ICPFrango: ajuste com os valores do cliente.</p>
+    <p><b>Doses e preços dos produtos</b>: Programa IMEVE Pollos de Engorde (PAS-TR Concentrado 200 g/t nos primeiros 7 a 15 dias e 150 g/t depois; Polimeve 100 g/1.000 L no alojamento, na troca de ração aos 21 dias, em vacinações e temperaturas extremas; Eletroaminovit 0,5 a 1 L/1.000 L) e Especificações Técnicas IMEVE. Preços conforme planilha comparativa interna e Proposta IMEVE/BIOAGRO; confirmar tabela vigente.</p>
+    <p><b>Premissas de resultado</b>: valores conservadores. Meta-análises com <i>Bacillus</i> em frangos mostram melhora de conversão de 0,07 (lotes desafiados por coccidiose, Riaz et al., 2026) a 0,10 (sem desafio, Opazo et al., 2025) e redução das chances de mortalidade em lotes desafiados. A calculadora usa 0,03 de conversão, 0,5 ponto de mortalidade e 1% de peso. Estimativa técnica, sem garantia de resultado.</p>
+  <p><b>Quanto cada produto precisa melhorar</b>: para cada produto e fase, o investimento anual dividido pelo valor de cada unidade de melhora (grama a mais, ponto a menos de mortalidade, conversão alimentar), com os mesmos preços do retorno estimado. Cada valor sozinho já paga o produto; a referência é o ganho usado no retorno estimado.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+const DEF={
+  cliente:"Granja exemplo (100 mil aves alojadas por semana)",
+  aloj:100000, aviario:18000,
+  idade:43, peso:2.90, mort:5.5,
+  r_pi:0.18, r_ini:1.00, r_cre:2.10, r_fin:1.55,
+  a_aloj:0.05, a_s2:0.10, a_troca:0.20, a_vac:0.12, a_s45:0.30, a_calor:0.35,
+  p_frango:4.75, ref:"integracao", c_prod:4.85, p_racao:1.82, p_pint:2.45,
+  pr_pas:82.00, pr_pasbac:79.20, pr_dba:34.80, pr_dbapas:61.92, pr_pol:26.80, pr_ele:103.00,
+  pol_dose:100, ele_dose:75,
+  e_ca:0.03, e_mort:0.5, e_peso:1.0,
+  u:{}
+};
+const FEEDPH=[["pi","Pré-inicial (1 a 7 dias)","ini"],["ini","Inicial (8 a 21 dias)","ini"],["cre","Crescimento (22 a 35 dias)","fin"],["fin","Final / abate (36 dias ao abate)","fin"]];
+const feedUses=(on,d)=>FEEDPH.map(([k,l,g],i)=>[k,l,[1,3,6,8][i],g,on,d[i]]);
+const PRODS=[
+  {id:"pas",nome:"PAS-TR+ Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(true,[200,200,150,150])},
+  {id:"pasbac",nome:"PAS-BAC TR Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,[150,150,100,100])},
+  {id:"dba",nome:"DBA Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,[200,200,200,200])},
+  {id:"dbapas",nome:"DBA + PAS Concentrado",via:"ração",un:"g/t",step:25,emb:[25,"baldes/sacos 25 kg"],uses:feedUses(false,[125,125,125,125])},
+  {id:"pol",nome:"Polimeve Solúvel",via:"água",un:"dias",step:1,dose:["pol_dose","Dose na água · 100 g para 1.000 L","g/1000L",10],uses:[
+    ["aloj","Alojamento dos pintinhos (primeiros dias)",0,"ini",true,5],["troca","Troca de ração aos 21 dias",4,"fin",true,5],
+    ["vac","Vacinações e transferências (2-1-2)",2,"ini",false,5],["calor","Temperaturas extremas (dias por lote)",7,"fin",false,5]]},
+  {id:"ele",nome:"Eletroaminovit",via:"água",un:"dias",step:1,dose:["ele_dose","Dose na água · 50 a 100 mL por 100 L","mL/100L",5],uses:[
+    ["s2","2ª semana de vida",2.5,"ini",true,7],["s45","4ª e 5ª semanas",6.5,"fin",false,14],["calor","Temperaturas extremas (dias por lote)",7,"fin",false,5]]}
+];
+PRODS.forEach(p=>p.uses.forEach(u=>{DEF.u[p.id+"_"+u[0]]=[u[4],u[5]];}));
+const FIELDS={
+  "sec-plantel":[
+    ["aloj","Aves alojadas por semana","pintinhos de 1 dia","aves",1000],
+    ["aviario","Capacidade média por aviário","para estimar o número de aviários","aves",500]],
+  "sec-fases":[
+    ["idade","Idade de abate","Embrapa: 43 dias","dias",1],
+    ["peso","Peso de abate","Embrapa: 2,9 kg","kg",0.05],
+    ["mort","Mortalidade no lote","Embrapa: 5,5%","%",0.1]],
+  "sec-racao":[
+    ["r_pi","Pré-inicial","por ave · 1 a 7 dias","kg",0.01],
+    ["r_ini","Inicial","por ave · 8 a 21 dias","kg",0.01],
+    ["r_cre","Crescimento","por ave · 22 a 35 dias","kg",0.01],
+    ["r_fin","Final / abate","por ave · 36 dias ao abate","kg",0.01]],
+  "sec-agua":[
+    ["a_aloj","Pintinho nos primeiros dias","por ave","L/dia",0.01],
+    ["a_s2","Na 2ª semana","por ave","L/dia",0.01],
+    ["a_vac","Nas vacinações","por ave","L/dia",0.01],
+    ["a_troca","Na troca de ração (21 dias)","por ave","L/dia",0.01],
+    ["a_s45","Na 4ª e 5ª semanas","por ave","L/dia",0.01],
+    ["a_calor","No calor (fase final)","por ave","L/dia",0.01]],
+  "sec-precos":[
+    ["p_frango","Preço do frango vivo","integração SC/RS: R$ 4,75 · independente SP: R$ 5,70","R$/kg",0.05],
+    ["c_prod","Custo de produção do frango","Embrapa ICPFrango PR ago/2026: R$ 4,85","R$/kg vivo",0.05],
+    ["p_racao","Ração","estimativa pelo ICPFrango","R$/kg",0.05],
+    ["pr_pas","PAS-TR+ Concentrado","conferir tabela vigente","R$/kg",0.1],
+    ["pr_pasbac","PAS-BAC TR Concentrado","conferir tabela vigente","R$/kg",0.1],
+    ["pr_dba","DBA Concentrado","conferir tabela vigente","R$/kg",0.1],
+    ["pr_dbapas","DBA + PAS Concentrado","conferir tabela vigente","R$/kg",0.1],
+    ["pr_pol","Polimeve Solúvel","sachê de 100 g","R$/sachê",0.1],
+    ["pr_ele","Eletroaminovit","frasco de 1 L","R$/frasco",0.5]],
+  "sec-efeitos":[
+    ["e_ca","Melhora da conversão alimentar","kg de ração/kg de frango a menos","kg/kg",0.01],
+    ["e_mort","Redução da mortalidade","pontos percentuais","p.p.",0.1],
+    ["e_peso","Aumento do peso de abate","% a mais","%",0.1]]
+};
+const KEY="calc-frango-v1";
+let S=JSON.parse(JSON.stringify(DEF));
+try{const saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved)S=Object.assign(JSON.parse(JSON.stringify(DEF)),saved,{u:Object.assign({},DEF.u,saved.u||{})});}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+for(const [sec,list] of Object.entries(FIELDS)){
+  document.getElementById(sec).innerHTML=list.map(([k,lab,hint,unit,step])=>`<div class="row"><label for="${k}">${lab}${hint?`<em>${hint}</em>`:""}</label><div class="num"><input id="${k}" type="number" step="${step}" inputmode="decimal"><span>${unit}</span></div></div>`).join("");
+}
+document.getElementById("sec-precos").insertAdjacentHTML("afterbegin",'<div class="row"><label for="ref">Referência do preço<em>integração ou mercado independente</em></label><div class="num"><select id="ref" style="width:100%;border:0;background:transparent;color:var(--fg);font:600 15px var(--f-body);padding:7px 8px"><option value="integracao">Integração</option><option value="independente">Independente</option></select></div></div>');
+document.getElementById("prog").innerHTML=PRODS.map(p=>`<div class="prodbox" id="box_${p.id}">
+  <div class="prodhead"><div><b>${p.nome}</b><span class="via">${p.via}</span></div><div class="quick"><button type="button" data-all="${p.id}" data-v="1">todas</button><button type="button" data-all="${p.id}" data-v="0">nenhuma</button></div></div>
+  ${p.dose?`<div class="ph dose"><label for="${p.dose[0]}"><span>${p.dose[1]}</span></label><div class="num"><input id="${p.dose[0]}" type="number" step="${p.dose[3]}" inputmode="decimal"><span>${p.dose[2]}</span></div></div>`:""}
+  ${p.uses.map(u=>{const id=p.id+"_"+u[0];return `<div class="ph" id="row_${id}"><label><input type="checkbox" id="on_${id}"><span>${u[1]}</span></label><div class="num"><input id="v_${id}" type="number" step="${p.step}" inputmode="decimal" aria-label="${p.nome}: ${u[1]}"><span>${p.un}</span></div></div>`;}).join("")}
+</div>`).join("");
+
+const NUMKEYS=Object.values(FIELDS).flat().map(f=>f[0]).concat(["pol_dose","ele_dose"]);
+function paintRows(){Object.keys(S.u).forEach(id=>{const row=document.getElementById("row_"+id);if(row)row.classList.toggle("off",!S.u[id][0]);});}
+function fill(){
+  NUMKEYS.forEach(k=>{document.getElementById(k).value=S[k];});
+  Object.keys(S.u).forEach(id=>{const c=document.getElementById("on_"+id),v=document.getElementById("v_"+id);if(c){c.checked=!!S.u[id][0];v.value=S.u[id][1];}});
+  document.getElementById("cliente").value=S.cliente; document.getElementById("ref").value=S.ref;
+  paintRows();
+}
+fill();
+document.addEventListener("input",e=>{
+  const id=e.target.id; if(!id)return;
+  if(NUMKEYS.includes(id)){const v=parseFloat(e.target.value);S[id]=isFinite(v)?v:0;}
+  else if(id.startsWith("on_")){S.u[id.slice(3)][0]=e.target.checked;paintRows();}
+  else if(id.startsWith("v_")){const v=parseFloat(e.target.value);S.u[id.slice(2)][1]=isFinite(v)?v:0;}
+  else if(id==="cliente"){S.cliente=e.target.value;}
+  else if(id==="ref"){S.ref=e.target.value;}
+  else return;
+  save();calc();
+});
+document.addEventListener("change",e=>{if(e.target.type==="checkbox"||e.target.tagName==="SELECT"){e.target.dispatchEvent(new Event("input",{bubbles:true}));}});
+document.getElementById("prog").addEventListener("click",e=>{const b=e.target.closest("button[data-all]");if(!b)return;
+  const pid=b.dataset.all,on=b.dataset.v==="1";Object.keys(S.u).forEach(id=>{if(id.startsWith(pid+"_"))S.u[id][0]=on;});save();fill();calc();});
+document.getElementById("reset").addEventListener("click",()=>{S=JSON.parse(JSON.stringify(DEF));save();fill();calc();});
+
+function setMode(m){document.body.classList.toggle("mode-cliente",m==="cliente");document.body.classList.toggle("mode-interno",m==="interno");
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.mode===m?"true":"false"));
+  }
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+let m0="cliente";
+setMode(m0);
+
+const nf=(d)=>new Intl.NumberFormat("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const n0=v=>nf(0).format(v), n1=v=>nf(1).format(v), n2=v=>nf(2).format(v);
+const n1v=v=>Number.isInteger(v)?n0(v):n1(v);
+const brl=(v,d=0)=>"R$ "+nf(d).format(v);
+const brlK=v=>Math.abs(v)>=1e6?"R$ "+nf(2).format(v/1e6)+" mi":Math.abs(v)>=1e4?"R$ "+nf(0).format(v/1e3)+" mil":brl(v);
+
+function model(s){
+  const r={}, pct=x=>x/100;
+  r.alojAno=s.aloj*52;
+  r.abAno=r.alojAno*(1-pct(s.mort));
+  r.kgVivo=r.abAno*s.peso;
+  const vivoMed=r.alojAno*(1-pct(s.mort)/2);
+  r.feed={pi:r.alojAno*(1-pct(s.mort)*0.15)*s.r_pi, ini:vivoMed*s.r_ini, cre:vivoMed*s.r_cre, fin:r.abAno*s.r_fin};
+  r.feedTot=r.feed.pi+r.feed.ini+r.feed.cre+r.feed.fin;
+  r.kgAve=s.r_pi+s.r_ini+s.r_cre+s.r_fin;
+  r.ca=r.kgVivo>0?r.feedTot/r.kgVivo:0;
+  r.iep=r.ca>0&&s.idade>0?(100-s.mort)*s.peso/(s.idade*r.ca)*100:0;
+  const price={pas:s.pr_pas,pasbac:s.pr_pasbac,dba:s.pr_dba,dbapas:s.pr_dbapas,pol:s.pr_pol/0.1,ele:s.pr_ele};
+  const agua={aloj:s.a_aloj,s2:s.a_s2,vac:s.a_vac,troca:s.a_troca,s45:s.a_s45,calor:s.a_calor};
+  r.uses=[]; const tot={}; PRODS.forEach(p=>tot[p.id]=0);
+  r.cov={ini:false,fin:false}; const feedCov={pi:false,ini:false,cre:false,fin:false};
+  PRODS.forEach(p=>p.uses.forEach(([k,lab,ord,g])=>{
+    const [on,val]=s.u[p.id+"_"+k]||[false,0];
+    let q=0;
+    if(on&&val>0){
+      if(p.via==="ração"){q=r.feed[k]/1000*val/1000;feedCov[k]=true;}
+      else{const L=vivoMed*val*agua[k]; q=p.id==="pol"?L*s.pol_dose/1e6:L*s.ele_dose/100/1000;}
+    }
+    if(q>0){r.cov[g]=true;tot[p.id]+=q;
+      r.uses.push({prod:p.nome,pid:p.id,g,via:p.via,fase:lab,ord,dose:p.id==="pol"?n0(val)+" dias · "+n0(s.pol_dose)+" g/1000 L":p.id==="ele"?n0(val)+" dias · "+n0(s.ele_dose)+" mL/100 L":n1v(val)+" "+p.un,q,un:p.id==="ele"?"L":"kg",custo:q*price[p.id]});}
+  }));
+  r.uses.sort((a,b)=>a.ord-b.ord);
+  r.prod=PRODS.map(p=>{const q=tot[p.id];let emb=null,embUn="";
+    if(p.emb){emb=q/p.emb[0];embUn=p.emb[1];}
+    if(p.id==="pol"){emb=q/0.1;embUn="sachês 100 g";}
+    if(p.id==="ele"){emb=q;embUn="frascos 1 L";}
+    return {id:p.id,nome:p.nome,qtd:q,un:p.id==="ele"?"L":"kg",emb,embUn,custo:q*price[p.id]};});
+  r.invest=r.prod.reduce((a,p)=>a+p.custo,0);
+  // benefícios
+  const shareFeed=r.feedTot>0?Object.keys(feedCov).reduce((a,k)=>a+(feedCov[k]?r.feed[k]:0),0)/r.feedTot:0;
+  const anyCov=r.cov.ini||r.cov.fin;
+  const b={};
+  b.ca=r.kgVivo*s.e_ca*shareFeed*s.p_racao;
+  {const extra=r.alojAno*pct(s.e_mort); b.mort=anyCov?extra*(s.peso*s.p_frango-0.5*r.kgAve*s.p_racao):0;}
+  b.peso=anyCov?r.kgVivo*pct(s.e_peso)*(s.p_frango-r.ca*s.p_racao):0;
+  r.b=b; r.benef=b.ca+b.mort+b.peso; r.liq=r.benef-r.invest; r.roi=r.invest>0?r.benef/r.invest:0;
+  r.shareFeed=shareFeed;
+  return r;
+}
+window.__model=model; window.__DEF=DEF;
+
+const BEF={todos:"Todos os resultados",peso:"Só peso",mort:"Só mortalidade",conv:"Só conversão",ovos:"Só produção de ovos"};
+const BEFT={peso:"Se melhorar só o peso",mort:"Se melhorar só a mortalidade",conv:"Se melhorar só a conversão",ovos:"Se melhorar só a produção de ovos"};
+document.addEventListener("click",e=>{const b=e.target.closest("#be-f button[data-f]");if(!b)return;S.beF=b.dataset.f;save();calc();});
+function renderBE(items){
+  const el=document.getElementById("be");if(!el)return;
+  const all=items.filter(it=>it.on&&it.custo>0);
+  const cats=[];all.forEach(it=>it.ind.forEach(i=>{if(i.u>0&&!cats.includes(i.c))cats.push(i.c);}));
+  const order=["peso","ovos","mort","conv"].filter(c=>cats.includes(c));
+  let f=S.beF||"todos"; if(f!=="todos"&&!order.includes(f))f="todos";
+  const fb=document.getElementById("be-f");
+  if(fb)fb.innerHTML=all.length?`<span>Mostrar:</span>`+["todos"].concat(order).map(k=>`<button type="button" data-f="${k}" aria-pressed="${k===f}">${BEF[k]}</button>`).join(""):"";
+  const rows=all.map(it=>Object.assign({},it,{ind:it.ind.filter(i=>i.u>0&&(f==="todos"||i.c===f))})).filter(it=>it.ind.length||f==="todos");
+  if(!all.length){el.innerHTML='<p class="note" style="margin:0">Inclua ao menos um produto para ver a análise.</p>';return;}
+  if(!rows.length){el.innerHTML='<p class="note" style="margin:0">Nenhum produto marcado atua nesse resultado.</p>';return;}
+  el.innerHTML=(f!=="todos"?`<p class="note" style="margin:0;font-weight:600">${BEFT[f]}: quanto cada produto precisa para se pagar sozinho.</p>`:"")+rows.map(it=>{const ind=it.ind;return `<div class="be-row${it.prog?" prog":""}">
+   <div class="be-h"><div><b>${it.nome}</b> <span class="be-f">· ${it.fase}</span></div><div class="be-c"><b>${brlK(it.custo/12)}</b> por mês · ${it.pa(it.custo)}</div></div>
+   <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">Com ${i.fmt(i.ref)} (referência): volta R$ ${nf(2).format(x)} por R$ 1</em>`:""}</div>`;}).join(""):'<p class="note" style="margin:0">Com os preços atuais nenhum indicador cobre o custo.</p>'}</div></div>`;}).join("");
+}
+function beTec(r,G,GI,PROG,pa){
+  const grp={},ix=id=>PRODS.findIndex(p=>p.id===id);
+  r.uses.forEach(u=>{const k=u.pid+"|"+u.g;if(!grp[k])grp[k]={nome:u.prod,g:u.g,fases:[],custo:0,o:ix(u.pid)*100+u.ord};grp[k].custo+=u.custo;const f=u.fase.replace(/\s*\(.*\)/,"");if(!grp[k].fases.includes(f))grp[k].fases.push(f);});
+  const items=Object.values(grp).sort((a,b)=>a.o-b.o).map(x=>({on:true,nome:x.nome,fase:G[x.g]+": "+x.fases.join(", "),custo:x.custo,pa,ind:GI[x.g]}));
+  items.push({on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.invest,pa,ind:PROG});
+  renderBE(items);
+}
+function calc(){
+  const s=S, r=model(s), W=52, M=12;
+  {const pa=c=>"R$ "+nf(3).format(r.alojAno>0?c/r.alojAno:0)+" por ave alojada";
+  const pts=v=>"−"+(v<0.1?nf(3).format(v):n2(v))+" ponto %", cv=v=>"−"+nf(3).format(v)+" kg/kg";
+  const I={
+   ca:{c:"conv",lab:"Conversão alimentar",u:r.kgVivo*s.p_racao,fmt:cv,ref:s.e_ca,sub:v=>"de "+nf(3).format(r.ca)+" para "+nf(3).format(r.ca-v)},
+   mort:{c:"mort",lab:"Mortalidade",u:r.alojAno/100*(s.peso*s.p_frango-0.5*r.kgAve*s.p_racao),fmt:pts,ref:s.e_mort,sub:v=>"≈ "+n0(s.aloj*v/100)+" aves a mais por semana"},
+   peso:{c:"peso",lab:"Peso no abate",u:r.abAno/1000*(s.p_frango-r.ca*s.p_racao),fmt:v=>"+"+n0(v)+" g por ave",ref:s.e_peso/100*s.peso*1000}};
+  const A=[I.ca,I.mort,I.peso];
+  beTec(r,{ini:"Fase inicial",fin:"Crescimento e final"},{ini:A,fin:A},A,pa);}
+  const kgf=v=>(v<1000?n2(v/1000):n1(v/1000))+" t";
+  const q=(v,un)=>v>0?(v<10?n2(v):n1(v))+" "+un:"–";
+  const set=(id,t)=>{const el=document.getElementById(id);if(el)el.textContent=t;};
+  const refTxt=s.ref==="integracao"?"integração":"independente";
+  set("k-roi",r.invest>0?"R$ "+n2(r.roi):"–");
+  set("k-liq",brlK(r.liq));
+  set("k-invave",r.alojAno>0?"R$ "+nf(3).format(r.invest/r.alojAno):"–");
+  const box=document.getElementById("k-roi-box");
+  if(box){const neg=r.liq<0,v=document.getElementById("verdict");box.classList.toggle("neg",neg);v.classList.toggle("neg",neg);
+    const nome=(s.cliente||"a granja").trim();
+    v.textContent=r.invest<=0?"Escolha ao menos um produto no programa para calcular o retorno.":
+      neg?`Com estas premissas, o ganho estimado (${brlK(r.benef)}) não cobre o investimento (${brlK(r.invest)}). Revise doses, fases ou premissas.`
+         :`Para ${nome}, cada R$ 1,00 investido no programa retorna R$ ${n2(r.roi)}: ${brlK(r.benef)} de ganho para ${brlK(r.invest)} de investimento no ano.`;
+    const items=[["Conversão alimentar",r.b.ca,r.shareFeed>0],["Mortalidade",r.b.mort,r.cov.ini||r.cov.fin],["Peso de abate",r.b.peso,r.cov.ini||r.cov.fin]];
+    const max=Math.max(r.invest,...items.map(i=>Math.abs(i[1])),1);
+    document.getElementById("bars").innerHTML=items.map(([l,val,on])=>`<div class="bar"><span>${l}${on?"":" <span class='note'>(sem produto)</span>"}</span><div class="track"><div class="fill" style="width:${Math.max(0,val)/max*100}%"></div></div><span class="amt">${brlK(val)}</span></div>`).join("")+
+      `<div class="bar cost"><span><b>Investimento IMEVE</b></span><div class="track"><div class="fill" style="width:${r.invest/max*100}%"></div></div><span class="amt">${brlK(r.invest)}</span></div>`;}
+  set("p-mes",brlK(r.invest/M)); set("p-ano",brlK(r.invest)); set("p-mil",r.alojAno>0?brl(r.invest/r.alojAno*1000):"–");
+  {const mg=s.p_frango-s.c_prod, prog=r.kgVivo>0?r.invest/r.kgVivo:0, neg=mg<0, sg=v=>(v<0?"− ":"")+brlK(Math.abs(v));
+   const g=[[brl(s.p_frango,2),`frango vivo · ${refTxt} R$/kg`],[brl(s.c_prod,2),"custo de produção R$/kg"],[(neg?"− ":"")+brl(Math.abs(mg),2),"margem por kg vivo"],[(neg?"− ":"")+brl(Math.abs(mg*s.peso),2),"margem por ave"],
+     [sg(mg*r.kgVivo/M),"resultado da granja/mês"],[brlK(r.kgVivo*s.p_frango/M),"faturamento da granja/mês"],["R$ "+nf(3).format(prog),"programa IMEVE por kg vivo"],[s.c_prod>0?nf(1).format(prog/s.c_prod*100)+"%":"–","do custo de produção"]];
+   document.getElementById("mkt-flow").innerHTML=g.map(([b,sp],i)=>`<div><b${i>=2&&i<=4&&neg?' style="color:var(--bad)"':''}>${b}</b><span>${sp}</span></div>`).join("");
+   set("mkt-note",`Com o frango a R$ ${n2(s.p_frango)} e custo de R$ ${n2(s.c_prod)}, a granja ${neg?"perde":"ganha"} R$ ${n2(Math.abs(mg))} por kg vendido. O programa IMEVE representa ${s.c_prod>0?nf(1).format(prog/s.c_prod*100):"–"}% do custo de produção.`);}
+  document.getElementById("t-prod").innerHTML=`<thead><tr><th>Produto</th><th>Por semana</th><th>Por mês</th><th>Embalagens/mês</th><th data-only="interno">R$/mês</th><th>R$/ano</th><th data-only="cliente">R$/ave</th></tr></thead><tbody>`+
+    r.prod.map(p=>`<tr><td class="${p.custo>0?"":"off"}">${p.nome}</td><td>${q(p.qtd/W,p.un)}</td><td>${q(p.qtd/M,p.un)}</td><td>${p.emb!=null&&p.qtd>0?n1(p.emb/M)+" "+p.embUn:"–"}</td><td data-only="interno">${p.custo>0?brl(p.custo/M):"–"}</td><td>${p.custo>0?brl(p.custo):"–"}</td><td data-only="cliente">${p.custo>0&&r.alojAno>0?"R$ "+nf(3).format(p.custo/r.alojAno):"–"}</td></tr>`).join("")+
+    `<tr class="tot"><td>Total</td><td></td><td></td><td></td><td data-only="interno">${brl(r.invest/M)}</td><td>${brl(r.invest)}</td><td data-only="cliente">${r.alojAno>0?"R$ "+nf(3).format(r.invest/r.alojAno):"–"}</td></tr></tbody>`;
+  document.getElementById("t-plano").innerHTML=`<thead><tr><th>Fase</th><th>Produto</th><th>Via</th><th>Dose</th><th>Por semana</th><th>Por mês</th><th data-only="interno">R$/mês</th></tr></thead><tbody>`+
+    (r.uses.length?r.uses.map(u=>`<tr><td>${u.fase}</td><td style="text-align:left">${u.prod}</td><td style="text-align:left">${u.via}</td><td>${u.dose}</td><td>${q(u.q/W,u.un)}</td><td>${q(u.q/M,u.un)}</td><td data-only="interno">${brl(u.custo/M)}</td></tr>`).join(""):`<tr><td class="off" colspan="7">Nenhuma fase marcada no Programa IMEVE.</td></tr>`)+`</tbody>`;
+  document.getElementById("t-fase").innerHTML=`<thead><tr><th>Fase</th><th>Ração/semana</th><th>Ração/mês</th><th>Ração/ano</th></tr></thead><tbody>`+
+    FEEDPH.map(([k,l])=>`<tr><td>${l}</td><td>${kgf(r.feed[k]/W)}</td><td>${kgf(r.feed[k]/M)}</td><td>${kgf(r.feed[k])}</td></tr>`).join("")+
+    `<tr class="tot"><td>Total</td><td>${kgf(r.feedTot/W)}</td><td>${kgf(r.feedTot/M)}</td><td>${kgf(r.feedTot)}</td></tr></tbody>`;
+  set("ca-calc",`${n2(r.kgAve)} kg de ração por ave alojada · conversão alimentar calculada ${n2(r.ca)} (Embrapa: 1,70) · IEP ${n0(r.iep)}.`);
+  const lotes=s.idade>0?365/(s.idade+14):0;
+  const f=[[n0(s.aloj),"aves alojadas/semana"],[n0(r.abAno/W),"aves abatidas/semana"],[n1(r.kgVivo/W/1000)+" t","peso vivo/semana"],[s.aviario>0&&lotes>0?n0(r.alojAno/lotes/s.aviario):"–","aviários equivalentes"],
+    [n1(r.feedTot/W/1000)+" t","ração por semana"],[n0(r.feedTot/M/1000)+" t","ração por mês"],[n2(r.ca),"conversão alimentar"],[n0(r.iep),"IEP"]];
+  document.getElementById("flow").innerHTML=f.map(([b,sp])=>`<div><b>${b}</b><span>${sp}</span></div>`).join("");
+}
+calc();
+})();
+</script>
+<script>(function(){const b=document.getElementById("info-btn");if(!b)return;b.addEventListener("click",()=>{const on=!document.body.classList.contains("show-info");document.body.classList.toggle("show-info",on);b.setAttribute("aria-pressed",on?"true":"false");b.textContent=on?"Voltar à calculadora":"Informações";window.scrollTo(0,0);});})();</script>
+
+</body>
+</html>
