@@ -205,6 +205,7 @@ footer#info .info-h{font:800 20px var(--f-display);margin:0 0 12px}
 #cards{align-items:start}
 #sec-precos{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
 .fx{display:grid;gap:4px}
+.fx-hint{margin:0;font-size:13px;font-weight:700;color:var(--accent)}
 .fx-r{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:10px;align-items:center;padding:3px 0;border-bottom:1px dashed var(--line)}
 .fx-r label{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:600;cursor:pointer;min-width:0}
 .fx-r input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:var(--accent)}
@@ -484,7 +485,7 @@ const CI={feed:()=>{const F=FEEDS[S.racao]||FEEDS.pas;return [[F[1],"Preço","R$
 const PARS=[["conv","Conversão alimentar",["e_ca"]],["mort","Mortalidade",["e_mort"]],["peso","Peso no abate",["e_peso"]]];
 function CIN(id,adv){const L0=typeof CI[id]==="function"?CI[id]():CI[id];if(!L0)return "";const L=L0.filter(e=>!String(e[0]).startsWith("pr_")&&(e[3]==="x")===!!adv);if(!L.length)return "";
   return `<div class="cin">`+L.map(([k,l,u])=>`<label class="ci"><span>${l}</span><div><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"><em>${u}</em></div></label>`).join("")+`</div>`;}
-function effS(S0){const s=Object.assign({},S0);Object.entries(S0.fx||{}).forEach(([k,v])=>{if(v===false&&typeof s[k]==="number")s[k]=0;});PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
+function effS(S0){const s=Object.assign({},S0);Object.values(FX).forEach(fn=>fn().forEach(([k])=>{if(!(S0.fx&&S0.fx[k]===true)&&typeof s[k]==="number")s[k]=0;}));PARS.forEach(([c,,show,zero])=>{if(!(S0.par&&S0.par[c]))(zero||show).forEach(k=>{s[k]=0;});});return s;}
 function paintPar(){S.par=S.par||{};const box=document.getElementById("par");if(!box)return;
   box.innerHTML=`<span>A granja vai melhorar em:</span>`+PARS.map(([c,l])=>`<button type="button" data-p="${c}" aria-pressed="${!!S.par[c]}">${l}</button>`).join("");
   PARS.forEach(([c,,show])=>show.forEach(k=>{const el=document.getElementById(k),row=el&&el.closest(".row");if(row)row.hidden=!S.par[c];}));
@@ -500,7 +501,7 @@ document.addEventListener("click",e=>{if(e.target.id==="adv-btn"){S.adv=!S.adv;s
 function liveMort(r){const M={e_mort:[r.alojSem,"aves a mais por semana",1]};Object.entries(M).forEach(([k,[base,txt,div]])=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}const v=base*(S[k]||0)/100/div;el.textContent=`≈ ${v>=10?n0(v):n1(v)} ${txt}`;});}
 const FX={feed:()=>{const F=FEEDS[S.racao]||FEEDS.pas;return [[F[2],"Até 21 dias (pré-inicial e inicial)",1],[F[3],"Após 21 dias (crescimento e final)",1]];}};
 function FXR(id){const L=FX[id]?FX[id]():null;if(!L)return "";S.fx=S.fx||{};
-  return `<div class="fx"><div class="uf-t">Em quais rações usar · marque as fases</div>`+L.map(([k,l,hasDose])=>{const on=S.fx[k]!==false;return `<div class="fx-r${on?"":" off"}"><label><input type="checkbox" id="fx_${k}" ${on?"checked":""}><span>${l}</span></label>${hasDose?`<div class="fx-d"><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"${on?"":" disabled"}><em>g/t</em></div>`:"<span></span>"}</div>`;}).join("")+`</div>`;}
+  return `<div class="fx"><div class="uf-t">Em quais rações usar · marque as fases</div>`+L.map(([k,l,hasDose])=>{const on=S.fx[k]===true;return `<div class="fx-r${on?"":" off"}"><label><input type="checkbox" id="fx_${k}" ${on?"checked":""}><span>${l}</span></label>${hasDose?`<div class="fx-d"><input type="text" inputmode="decimal" id="cx_${k}" value="${String(S[k]).replace(".",",")}"${on?"":" disabled"}><em>g/t</em></div>`:"<span></span>"}</div>`;}).join("")+`</div>`;}
 function fitBig(){const c=fitBig.c||(fitBig.c=document.createElement("canvas").getContext("2d"));document.querySelectorAll(".bignum .num input").forEach(i=>{if(!i.offsetParent)return;const cs=getComputedStyle(i);c.font=`800 28px ${cs.fontFamily}`;const w=c.measureText(String(i.value||"")).width;const avail=i.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-14;const fs=w>0&&w>avail?Math.max(13,Math.floor(28*avail/w)):28;i.style.fontSize=fs+"px";});}
 document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest(".bignum"))fitBig();});
 function calc(){
@@ -545,7 +546,7 @@ function calc(){
     ${p.man?`<div class="mans">${MAN[p.man].map(m=>`<label class="chk2"><input type="checkbox" id="mn_${m[0]}" ${s.mn[m[0]]?"checked":""}${on?"":" disabled"}> ${m[1]} <em>${n0(s[m[2]])} dias</em></label>`).join("")}${(()=>{const o=OX[p.man],x=oxv(s,o),en=on&&s.mn[o];return `<div class="orow"><label class="chk2"><input type="checkbox" id="mn_${o}" ${s.mn[o]?"checked":""}${on?"":" disabled"}> Outros manejos</label><span class="oin"><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="ov_${o}" value="${x.v}" aria-label="Outros manejos: vezes"${en?"":" disabled"}><small>vezes</small><input class="nx" type="number" min="0" step="1" inputmode="numeric" id="od_${o}" value="${x.d}" aria-label="Outros manejos: dias"${en?"":" disabled"}><small>dias</small></span></div>`;})()}</div>`:""}
     <div class="main"><b>${qf(p.emb/12)}</b><span>${p.embUn} por mês</span></div>
     <div class="money"><span>Investimento</span><span><b>${brl(p.custo/12)}</b>/mês</span></div>
-    <details class="more" data-id="${p.id}"${S.op&&S.op[p.id]?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
+    ${FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true)?`<p class="fx-hint">Marque abaixo em quais rações o produto vai entrar.</p>`:""}<details class="more" data-id="${p.id}"${(S.op&&S.op[p.id])||(FX[p.id]&&!FX[p.id]().some(x=>S.fx&&S.fx[x[0]]===true))?" open":""}><summary>Ver detalhes</summary><div>${FXR(p.id)||`<p class="proto">${p.proto}</p>`}${CIN(p.id,true)}<p class="uf-tot">Por semana: <b>${qf(p.emb/52)}</b> · por ano: <b>${qf(p.emb)}</b> ${p.embUn}</p>${PH(p.id,r)}</div></details>
   </article>`;}).join("");
   if(act&&(act.startsWith("ov_")||act.startsWith("od_"))){const el=document.getElementById(act);if(el){el.focus();}}
   if(act&&act.startsWith("cx_")){const el=document.getElementById(act);if(el){el.value=actV;el.focus();try{if(actP!=null)el.setSelectionRange(actP,actP);}catch(e){}}}
