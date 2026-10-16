@@ -576,6 +576,7 @@ function model(s){
 }
 window.__model=model;
 
+function NOIND(it){const L=c=>{const p=PARS.find(x=>x[0]===c);return p?p[1].toLowerCase():c;};const sel=PARS.map(p=>p[0]).filter(c=>S.par&&S.par[c]);const other=[...new Set((it.ind0||[]).filter(i=>i.u>0).map(i=>i.c))].filter(c=>!sel.includes(c));if(other.length)return `<p class="note" style="margin:0">${it.prog?"O programa":"Este produto, nesta fase,"} não entra no cálculo de ${sel.map(L).join(" nem de ")}. Ele se paga por ${other.map(L).join(" ou ")}: marque também no passo 3 para ver quanto precisa melhorar.</p>`;return `<p class="note" style="margin:0">Com os preços atuais o ganho não tem valor: o custo da ração para produzir o ganho é maior que o preço de venda. Confira o preço do animal e da ração no passo 1.</p>`;}
 const BEF={todos:"Todos os resultados",peso:"Só peso",mort:"Só mortalidade",conv:"Só conversão",ovos:"Só produção de ovos"};
 const BEFT={peso:"Se melhorar só o peso",mort:"Se melhorar só a mortalidade",conv:"Se melhorar só a conversão",ovos:"Se melhorar só a produção de ovos"};
 document.addEventListener("click",e=>{const b=e.target.closest("#be-f button[data-f]");if(!b)return;S.beF=b.dataset.f;save();calc();});
@@ -587,13 +588,13 @@ function renderBE(items){
   let f="todos";const selP=PARS.map(p=>p[0]).filter(c=>S.par&&S.par[c]);
   const fb=document.getElementById("be-f");
   if(fb)fb.innerHTML="";
-  const rows=all.map(it=>Object.assign({},it,{ind:it.ind.filter(i=>i.u>0&&(!selP.length||selP.includes(i.c)))})).filter(it=>it.ind.length||f==="todos");
+  const rows=all.map(it=>Object.assign({},it,{ind0:it.ind,ind:it.ind.filter(i=>i.u>0&&(!selP.length||selP.includes(i.c)))})).filter(it=>it.ind.length||f==="todos");
   if(!all.length){window.__beTxt=[];el.innerHTML='<p class="note" style="margin:0">Inclua ao menos um produto para ver a análise.</p>';return;}
   window.__beTxt=rows.filter(it=>!it.prog).map(it=>({n:it.nome+" ("+it.fase+")",i:it.ind.map(i=>{const v=it.custo/i.u;return i.lab+" "+i.fmt(v)+(i.sub?" ("+i.sub(v)+")":"");})}));
   if(!rows.length){el.innerHTML='<p class="note" style="margin:0">Nenhum produto marcado atua nesse resultado.</p>';return;}
   el.innerHTML=(f!=="todos"?`<p class="note" style="margin:0;font-weight:600">${BEFT[f]}: quanto cada produto precisa para se pagar sozinho.</p>`:"")+rows.map(it=>{const ind=it.ind;return `<div class="be-row${it.prog?" prog":""}">
    <div class="be-h"><div><b>${it.nome}</b> <span class="be-f">· ${it.fase}</span></div><div class="be-c">Custa <b>${brlK(it.custo/12)}</b> por mês · ${it.pa(it.custo)}</div></div>${ind.length>1?`<p class="be-q">Para se pagar, basta <b>um</b> destes resultados:</p>`:`<p class="be-q">Para se pagar, basta este resultado:</p>`}
-   <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b><small class="be-eq">= empata: cada R$ 1 investido volta R$ 1</small>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">Com o resultado do passo 3 (${i.fmt(i.ref)}): cada R$ 1 investido volta R$ ${nf(2).format(x)} → ${x>=1.005?"paga e sobra":x>=0.995?"empata":"não paga sozinho"}</em>`:""}</div>`;}).join(""):'<p class="note" style="margin:0">Com os preços atuais nenhum indicador cobre o custo.</p>'}</div></div>`;}).join("");
+   <div class="be-ind">${ind.length?ind.map(i=>{const need=it.custo/i.u,x=i.ref>0?i.ref/need:0;return `<div class="be-i"><span>${f==="todos"?"":"Só "}${f==="todos"?i.lab:i.lab.charAt(0).toLowerCase()+i.lab.slice(1)}</span><b>${i.fmt(need)}</b><small class="be-eq">= empata: cada R$ 1 investido volta R$ 1</small>${i.sub?`<small>${i.sub(need)}</small>`:""}${i.ref>0&&!it.prog?`<em class="${x>=1?"ok":"no"}">Com o resultado do passo 3 (${i.fmt(i.ref)}): cada R$ 1 investido volta R$ ${nf(2).format(x)} → ${x>=1.005?"paga e sobra":x>=0.995?"empata":"não paga sozinho"}</em>`:""}</div>`;}).join(""):NOIND(it)}</div></div>`;}).join("");
   {const pr=el.querySelector(".be-row.prog"),o=[...el.querySelectorAll(".be-row:not(.prog)")];if(pr&&o.length){const d=document.createElement("details");d.className="be-more";d.open=!!S.beOpen;d.innerHTML=`<summary>Ver por produto e fase (${o.length})</summary>`;o.forEach(x=>d.appendChild(x));el.insertBefore(pr,el.firstChild);el.appendChild(d);d.addEventListener("toggle",()=>{S.beOpen=d.open;save();});}}
 }
 const CI={liq:[["pr_liq","Preço do frasco (500 mL)","R$"],["d_liq","Dose por leitão","mL"]],dbi:[["pr_dbi","Preço","R$/kg"]],pol:[["pr_pol","Preço do sachê (100 g)","R$"],["d_pol","Dose na água","g/1000 L"]],ele:[["pr_ele","Preço do frasco (1 L)","R$"],["d_ele","Dose na água","mL/100 L"]]};
@@ -717,7 +718,7 @@ function calc(){
    {on:on.pol,nome:"Polimeve Solúvel",fase:"Terminação (manejos marcados)",custo:polC(r.sp.pol[1]),pa,ind:T},
    {on:on.ele,nome:"Eletroaminovit",fase:"Creche (manejos marcados)",custo:eleC(r.sp.ele[0]),pa,ind:C},
    {on:on.ele,nome:"Eletroaminovit",fase:"Terminação (manejos marcados)",custo:eleC(r.sp.ele[1]),pa,ind:T},
-   {on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.total,pa,ind:[I.pa,I.mm,I.mc,I.mt]}]);}
+   {on:true,prog:true,nome:"Programa completo",fase:"todos os produtos marcados",custo:r.total,pa,ind:[I.pa,I.mm,I.mc,I.mt,I.cac,I.cat]}]);}
   if(r.total>0&&!PARS.some(([c])=>S.par&&S.par[c])){const n=document.getElementById("roi-note");if(n)n.textContent="Para ver o retorno, escolha em “3. Resultado esperado” onde a granja vai melhorar.";}
   const act=document.activeElement&&document.activeElement.id;
   const actV=document.activeElement?document.activeElement.value:"",actP=(()=>{try{return document.activeElement.selectionStart}catch(e){return null}})();
