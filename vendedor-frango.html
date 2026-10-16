@@ -640,6 +640,7 @@ function sbar(){const el=document.getElementById("sbar-in");if(!el)return;const 
   el.innerHTML=`<div class="it"><b>${brlK(R.inv/12)}</b><span>investe por mês</span></div><div class="it"><b>${brlK(R.b/12)}</b><span>volta por mês</span></div><div class="it"><b>${(R.liq<0?"− ":"")+brlK(Math.abs(R.liq/12))}</b><span>ganho líquido/mês</span></div><div class="it"><b>R$ ${nf(2).format(R.roi)}</b><span>para cada R$ 1 investido</span></div><button class="go" id="sbar-go" type="button">Ver detalhes ↓</button>`;}
 function liveX(){const L=(k,t)=>{const lab=document.querySelector(`label[for="${k}"]`);if(!lab)return;let el=lab.querySelector(".live");if(!el){el=document.createElement("span");el.className="live";lab.appendChild(el);}el.textContent=t;};
   if(document.getElementById("e_p7")&&typeof S.e_p7==="number"){const g=S.e_p7/20*S.e_k7/100*S.peso*1000;L("e_p7",`≈ +${n0(g)} g por ave no abate (+${nf(2).format(S.e_p7/20*S.e_k7)}%)`);}
+  if(document.getElementById("e_peso")&&typeof S.e_peso==="number"){L("e_peso",S.e_peso>0&&S.e_k7>0?`↩ equivale a ≈ +${n0(S.e_peso*20/S.e_k7)} g por ave aos 7 dias`:"");}
   if(document.getElementById("e_per")&&typeof S.e_per==="number"){const r=window.__r||{},aves=r.aves||S.aves||0,dz=aves*FRP(S)*365*S.e_per/100/12/12;L("e_per",`≈ +${n0(dz)} dúzias de ovos por mês`);}}
 function FRP(s){const a=Math.max(1,s.sem_desc-s.sem_ini);return Math.min(1,Math.max(0,(s.sem_desc-(s.e_wper||60))/a));}
 function cas7(id){if(id==="e_p7"||id==="e_k7"){S.e_peso=Math.round(S.e_p7/20*S.e_k7*100)/100;}}
