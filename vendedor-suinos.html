@@ -327,6 +327,11 @@ details.phd[open]>summary::before{content:"▾ "}
 .chk2{display:flex;align-items:center;gap:6px;font:600 12px var(--f-body);color:var(--muted)}
 .chk2 input{width:16px;height:16px;accent-color:var(--accent)}
 .stack{display:grid;gap:14px}
+.card.off{opacity:1!important;border-style:dashed}
+.card.off h3 .h3wrap,.card.off::after{opacity:.6}
+.card.off h3 .chk2{color:var(--accent)!important;font-weight:800!important;border:1.5px solid var(--accent);border-radius:999px;padding:4px 12px 4px 8px;background:var(--surface);cursor:pointer}
+.card.off h3 .chk2 input{accent-color:var(--accent);width:18px;height:18px}
+.card.off h3 .chk2:hover{background:color-mix(in srgb,var(--accent) 10%,var(--surface))}
 </style>
 
 </head>
@@ -495,8 +500,9 @@ const FIELDS={
 };
 const KEY="potencial-suinos-v3-v5-d-m";
 let S=JSON.parse(JSON.stringify(DEF));S.ox={};
-try{const sv=JSON.parse(localStorage.getItem(KEY)||"null");if(sv)S=Object.assign(JSON.parse(JSON.stringify(DEF)),sv,{on:Object.assign({},DEF.on,sv.on||{}),mn:Object.assign({},DEF.mn,sv.mn||{}),ox:Object.assign({},sv.ox||{})});}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+try{const sv=JSON.parse(sessionStorage.getItem(KEY)||"null");if(sv)S=Object.assign(JSON.parse(JSON.stringify(DEF)),sv,{on:Object.assign({},DEF.on,sv.on||{}),mn:Object.assign({},DEF.mn,sv.mn||{}),ox:Object.assign({},sv.ox||{})});}catch(e){}
+try{localStorage.removeItem(KEY);}catch(e){}
+function save(){try{sessionStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
 for(const [sec,list] of Object.entries(FIELDS)){
   document.getElementById(sec).innerHTML=list.map(([k,lab,hint,unit,step])=>`<div class="row"><label for="${k}">${lab}${hint?`<em>${hint}</em>`:""}</label><div class="num"><input id="${k}" type="text" step="${step}" inputmode="decimal"><span>${unit}</span></div></div>`).join("");

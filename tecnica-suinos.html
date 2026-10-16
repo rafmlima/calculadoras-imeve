@@ -425,8 +425,9 @@ const FIELDS={
 const PHASES=[["gest","Gestação"],["lact","Lactação"],["p1","Pré-inicial 1"],["p2","Pré-inicial 2"],["i1","Inicial 1"],["i2","Inicial 2"],["cre","Crescimento"],["t1","Terminação 1"],["t2","Terminação 2"],["t3","Terminação 3"],["t4","Terminação 4"],["t5","Terminação 5"]];
 const KEY="calc-suinos-v5-z-d";
 let S=JSON.parse(JSON.stringify(DEF));
-try{const saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved)S=Object.assign(JSON.parse(JSON.stringify(DEF)),saved,{u:Object.assign({},DEF.u,saved.u||{})});}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+try{const saved=JSON.parse(sessionStorage.getItem(KEY)||"null");if(saved)S=Object.assign(JSON.parse(JSON.stringify(DEF)),saved,{u:Object.assign({},DEF.u,saved.u||{})});}catch(e){}
+try{localStorage.removeItem(KEY);}catch(e){}
+function save(){try{sessionStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 
 // build numeric fields
 for(const [sec,list] of Object.entries(FIELDS)){
@@ -461,7 +462,7 @@ document.getElementById("prog").innerHTML=PRODS.map(p=>`<div class="prodbox" id=
 </div>`).join("");
 
 const NUMKEYS=Object.values(FIELDS).flat().map(f=>f[0]).concat(["pol_dose","ele_dose","agua_c","agua_t"]);
-function phCount(){PRODS.forEach(p=>p.uses.forEach(u=>{const id=p.id+"_"+u[0],el=document.getElementById("ufc_"+id);if(!el)return;const on=S.u[id]&&S.u[id][0];el.textContent=on&&UFCG[p.id]?"🦠 "+ufcFmt(UFCG[p.id]*S.u[id][1]/1000):(on&&p.id==="liq"?ufcLiqTxt(S.u[id][1]):"");}));{const d=document.getElementById("ufcd_pol");if(d)d.textContent=PRODS.some(p=>p.id==="pol"&&p.uses.some(u=>S.u["pol_"+u[0]]&&S.u["pol_"+u[0]][0]))?ufcPolTxt(S.pol_dose):"";}PRODS.forEach(p=>{const el=document.getElementById("phc_"+p.id);if(!el)return;const n=p.uses.filter(u=>S.u[p.id+"_"+u[0]]&&S.u[p.id+"_"+u[0]][0]).length,w=p.via==="ração"?["fases","marcadas"]:["manejos","marcados"];el.textContent=`Ver ${w[0]} · ${n} de ${p.uses.length} ${w[1]}`;});}
+function phCount(){try{PRODS.forEach(p=>p.uses.forEach(u=>{const id=p.id+"_"+u[0],el=document.getElementById("ufc_"+id);if(!el)return;const on=S.u[id]&&S.u[id][0];el.textContent=on&&UFCG[p.id]?"🦠 "+ufcFmt(UFCG[p.id]*S.u[id][1]/1000):(on&&p.id==="liq"?ufcLiqTxt(S.u[id][1]):"");}));{const d=document.getElementById("ufcd_pol");if(d)d.textContent=PRODS.some(p=>p.id==="pol"&&p.uses.some(u=>S.u["pol_"+u[0]]&&S.u["pol_"+u[0]][0]))?ufcPolTxt(S.pol_dose):"";}}catch(e){}PRODS.forEach(p=>{const el=document.getElementById("phc_"+p.id);if(!el)return;const n=p.uses.filter(u=>S.u[p.id+"_"+u[0]]&&S.u[p.id+"_"+u[0]][0]).length,w=p.via==="ração"?["fases","marcadas"]:["manejos","marcados"];el.textContent=`Ver ${w[0]} · ${n} de ${p.uses.length} ${w[1]}`;});}
 function paintRows(){phCount();Object.keys(S.u).forEach(id=>{const row=document.getElementById("row_"+id);if(row)row.classList.toggle("off",!S.u[id][0]);});}
 function fill(){
   NUMKEYS.forEach(k=>{document.getElementById(k).value=S[k];});
