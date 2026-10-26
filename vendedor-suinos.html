@@ -403,7 +403,7 @@ details.phd[open]>summary::before{content:"▾ "}
 
     <section class="size" aria-label="Quanto precisa segurar em produção" id="q6-sec">
       <label>6. Em produção: quanto a granja precisa segurar para se pagar</label>
-      <p class="note" style="margin:0">A mesma ideia do passo 5, dita na língua do produtor: o custo dividido pelo preço do kg de suíno vivo. É o ponto de equilíbrio, <b>não uma promessa de resultado</b>. Fale “basta segurar X para se pagar”, e não “o produto aumenta X”.</p>
+      <p class="note" style="margin:0">Quantos suínos a mais (ou quanta ração a menos) a granja precisa para o produto se pagar. Acima disso, é lucro.</p>
       <div id="q6"></div>
     </section>
 
@@ -749,7 +749,7 @@ function it6(){return window.__q6cur||"o programa";}
 
 function Q6(cm,s,r){const vm=(r.vendidos||0)/12,kg=s.p_suino>0?cm/s.p_suino:0,su=s.p_abate>0?kg/s.p_abate:0,pct=vm>0?su/vm*100:0,rk=s.pr_r>0&&vm>0?cm/s.pr_r/vm:0;
   return {t:[[n0(kg)+" kg","de suíno vivo por mês"],["≈ "+n1(su),"suínos a mais vendidos por mês"],[nf(2).format(pct)+"%","dos suínos vendidos"],[nf(2).format(rk)+" kg","de ração a menos por suíno vendido"]],
-   f:`Basta vender ≈ <b>${n1(su)} suínos a mais por mês</b> (${nf(2).format(pct)}% dos vendidos), ou economizar ${nf(2).format(rk)} kg de ração por suíno, para ${it6(r)} se pagar.`};}
+   f:`Basta segurar <b>${nf(2).format(pct)}% a mais de suínos vendidos</b> (≈ ${n1(su)} suínos por mês), ou economizar ${nf(2).format(rk)} kg de ração por suíno, para ${it6(r)} se pagar.`};}
 function q6Rows(){const r=window.__r||{},on=S.on||{};const ps=(r.prod||[]).filter(p=>on[p.id]&&p.custo>0).map(p=>({nome:PNm(p),custo:p.custo}));
   if(ps.length>1)ps.unshift({nome:"Programa completo",custo:ps.reduce((a,p)=>a+p.custo,0),prog:true});return ps;}
 function q6(){const el=document.getElementById("q6");if(!el)return;const s=effS(S),r=window.__r||{},rows=q6Rows();window.__q6txt="";
