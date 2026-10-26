@@ -296,6 +296,7 @@ details.phd[open]>summary::before{content:"▾ "}
 .ph .ufc{margin-left:30px}
 .nrow{margin-top:-6px}.nrow label{color:var(--accent);font-weight:700;font-size:13px}.nrow label em{font-weight:400}.nrow .num{border-color:var(--accent)}
 .row:has(.spin){grid-template-columns:minmax(0,1fr) 176px}.spin{display:flex;flex-direction:column;align-self:stretch;border-left:1px solid var(--line);flex:0 0 auto}.spin button{flex:1;width:28px;min-height:17px;border:0;background:transparent;color:var(--accent);font-size:10px;line-height:1;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}.spin button+button{border-top:1px solid var(--line)}.spin button:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}.spin button:active{background:color-mix(in srgb,var(--accent) 25%,transparent)}@media (max-width:520px){.row:has(.spin){grid-template-columns:minmax(0,1fr) 158px;gap:8px}.row:has(.spin) .num::before{padding-left:6px}.row:has(.spin) .num input{padding:7px 4px}.spin button{width:30px;font-size:11px}}
+.q6row{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:10px;background:var(--surface)}.q6row.prog{border-color:var(--accent);border-width:1.5px}.q6h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}.q6h span{color:var(--muted);font-size:13px}.q6s{margin:10px 0 0;font-size:14px;color:var(--accent);font-weight:700}
 </style>
 
 <style>
@@ -397,6 +398,12 @@ details.phd[open]>summary::before{content:"▾ "}
       <p class="note" style="margin:0">O mínimo que a sua granja precisa melhorar para cada produto se pagar. Acima disso, é lucro.</p>
       <div class="bef" id="be-f"></div>
         <div class="be" id="be"></div>
+    </section>
+
+    <section class="size" aria-label="Quanto precisa segurar em produção" id="q6-sec">
+      <label>6. Em produção: quanto a granja precisa segurar para se pagar</label>
+      <p class="note" style="margin:0">A mesma ideia do passo 5, dita na língua do produtor: o custo dividido pelo preço do kg de suíno vivo. É o ponto de equilíbrio, <b>não uma promessa de resultado</b>. Fale “basta segurar X para se pagar”, e não “o produto aumenta X”.</p>
+      <div id="q6"></div>
     </section>
 
 
@@ -654,7 +661,7 @@ function resumoTxt(){const R=window.__roi||{},L=[];L.push("*Programa IMEVE · "+
   const prods=(window.__prods||[]).filter(p=>S.on[p.id]&&p.custo>0);if(prods.length){L.push("");L.push("*Produtos*");prods.forEach(p=>L.push("• "+PNm(p)+": "+brl(p.custo/12)+"/mês"));}
   if(R.inv>0&&R.b>0){L.push("");L.push("*Investimento e retorno*");L.push("Investe "+brlK(R.inv/12)+"/mês e recebe cerca de "+brlK(R.b/12)+"/mês");L.push("Para cada R$ 1 investido, voltam R$ "+nf(2).format(R.roi));}
   else if(R.inv>0){L.push("");L.push("Investimento: "+brlK(R.inv/12)+"/mês");}
-  const be=window.__beTxt||[];if(be.length){L.push("");L.push("*Para se pagar, basta um destes resultados:*");be.forEach(x=>{L.push("• "+x.n+": "+x.i.join(" ou "));});}
+  if(window.__q6txt){L.push("");L.push("*Ponto de equilíbrio em produção*");L.push(window.__q6txt);}const be=window.__beTxt||[];if(be.length){L.push("");L.push("*Para se pagar, basta um destes resultados:*");be.forEach(x=>{L.push("• "+x.n+": "+x.i.join(" ou "));});}
   const rb=document.getElementById("redbox");if(rb&&!rb.hidden){L.push("");L.push("*Atenção:* "+rb.innerText.replace(/\n/g," "));}
   return L.join("\n");}
 function sbar(){const el=document.getElementById("sbar-in");if(!el)return;const R=window.__roi||{};
@@ -737,6 +744,21 @@ function calc(){
   {const rf=document.getElementById("roi-flow");if(rf&&window.__pk&&(window.__roi||{}).inv>0)rf.insertAdjacentHTML("beforeend",`<div><b>${window.__pk[0]}</b><span>programa IMEVE por kg vivo</span></div><div><b>${window.__pk[1]}</b><span>do custo de produção</span></div>`);}
   fmtNums();sbar();{const a=document.getElementById("wa-sum");if(a)a.href="https://wa.me/?text="+encodeURIComponent(resumoTxt());}}
 calc();
+function it6(){return window.__q6cur||"o programa";}
+
+function Q6(cm,s,r){const vm=(r.vendidos||0)/12,kg=s.p_suino>0?cm/s.p_suino:0,su=s.p_abate>0?kg/s.p_abate:0,pct=vm>0?su/vm*100:0,rk=s.pr_r>0&&vm>0?cm/s.pr_r/vm:0;
+  return {t:[[n0(kg)+" kg","de suíno vivo por mês"],["≈ "+n1(su),"suínos a mais vendidos por mês"],[nf(2).format(pct)+"%","dos suínos vendidos"],[nf(2).format(rk)+" kg","de ração a menos por suíno vendido"]],
+   f:`Basta vender ≈ <b>${n1(su)} suínos a mais por mês</b> (${nf(2).format(pct)}% dos vendidos), ou economizar ${nf(2).format(rk)} kg de ração por suíno, para ${it6(r)} se pagar.`};}
+function q6Rows(){const r=window.__r||{},on=S.on||{};const ps=(r.prod||[]).filter(p=>on[p.id]&&p.custo>0).map(p=>({nome:PNm(p),custo:p.custo}));
+  if(ps.length>1)ps.unshift({nome:"Programa completo",custo:ps.reduce((a,p)=>a+p.custo,0),prog:true});return ps;}
+function q6(){const el=document.getElementById("q6");if(!el)return;const s=effS(S),r=window.__r||{},rows=q6Rows();window.__q6txt="";
+  if(!rows.length){el.innerHTML='<p class="note" style="margin:10px 0 0">Inclua ao menos um produto para ver a conta.</p>';return;}
+  const out=rows.map(it=>{window.__q6cur=it.prog?"o programa":"o "+it.nome;const q=Q6(it.custo/12,s,r);return {it,q};});
+  el.innerHTML=out.map(({it,q})=>`<div class="q6row${it.prog?" prog":""}"><div class="q6h"><b>${it.nome}</b><span>custa ${brlK(it.custo/12)} por mês</span></div><div class="flow">${q.t.map(([b,sp])=>`<div><b>${b}</b><span>${sp}</span></div>`).join("")}</div><p class="q6s">${q.f}</p></div>`).join("");
+  window.__q6txt=out[0].q.f.replace(/<[^>]+>/g,"");}
+(function(){const c0=calc;calc=function(){const v=c0.apply(this,arguments);try{q6();}catch(e){}return v;};})();
+try{q6();}catch(e){}
+
 })();
 </script>
 <script>(function(){const b=document.getElementById("info-btn");if(!b)return;b.addEventListener("click",()=>{const on=!document.body.classList.contains("show-info");document.body.classList.toggle("show-info",on);b.setAttribute("aria-pressed",on?"true":"false");b.textContent=on?"Voltar à calculadora":"Informações";window.scrollTo(0,0);});})();</script>
